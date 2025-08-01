@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="200" height="150" viewBox="0 0 200 150">
+  <rect width="200" height="150" fill="#f8fafc"/>
+  <g transform="translate(100, 75)">
+    <circle cx="0" cy="0" r="30" fill="#FF5F1F" opacity="0.1"/>
+    <path d="M-15 -15 L15 -15 L15 15 L-15 15 Z" fill="#FF5F1F" opacity="0.3"/>
+    <path d="M-10 -10 L10 -10 L10 -5 L-10 -5 Z" fill="#FF5F1F"/>
+    <path d="M-10 0 L10 0 L10 5 L-10 5 Z" fill="#FF5F1F" opacity="0.7"/>
+    <path d="M-10 10 L5 10 L5 15 L-10 15 Z" fill="#FF5F1F" opacity="0.5"/>
+  </g>
+  <text x="100" y="125" text-anchor="middle" fill="#6b7280" font-family="Arial, sans-serif" font-size="12">Business Template</text>
+</svg>

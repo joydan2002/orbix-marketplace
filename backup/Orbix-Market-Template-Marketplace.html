@@ -1,0 +1,816 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Orbix Market - Premium Website Templates Marketplace</title>
+<script src="https://cdn.tailwindcss.com/3.4.16"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css" rel="stylesheet">
+<style>
+:where([class^="ri-"])::before {
+content: "\f3c2";
+}
+.glass-effect {
+backdrop-filter: blur(20px);
+background: rgba(255, 255, 255, 0.1);
+border: 1px solid rgba(255, 255, 255, 0.2);
+}
+.neon-glow {
+box-shadow: 0 0 20px rgba(255, 95, 31, 0.3);
+}
+.gradient-bg {
+background: linear-gradient(135deg, #ffffff 0%, #f8fafc 50%, #ffffff 100%);
+}
+.floating-animation {
+animation: float 6s ease-in-out infinite;
+}
+@keyframes float {
+0%, 100% { transform: translateY(0px); }
+50% { transform: translateY(-20px); }
+}
+.hover-scale {
+transition: transform 0.3s ease;
+}
+.hover-scale:hover {
+transform: scale(1.05);
+}
+.template-card {
+transition: all 0.3s ease;
+background: rgba(255, 255, 255, 0.9);
+backdrop-filter: blur(10px);
+}
+.template-card:hover {
+transform: translateY(-8px);
+box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+}
+.ai-mascot {
+position: fixed;
+bottom: 2rem;
+right: 2rem;
+z-index: 1000;
+animation: bounce 2s infinite;
+}
+@keyframes bounce {
+0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+40% { transform: translateY(-10px); }
+60% { transform: translateY(-5px); }
+}
+</style>
+<script>
+tailwind.config = {
+theme: {
+extend: {
+colors: {
+primary: '#FF5F1F',
+secondary: '#1f2937'
+},
+borderRadius: {
+'none': '0px',
+'sm': '4px',
+DEFAULT: '8px',
+'md': '12px',
+'lg': '16px',
+'xl': '20px',
+'2xl': '24px',
+'3xl': '32px',
+'full': '9999px',
+'button': '8px'
+},
+fontFamily: {
+'inter': ['Inter', 'sans-serif'],
+'pacifico': ['Pacifico', 'serif']
+}
+}
+}
+}
+</script>
+</head>
+<body class="font-inter gradient-bg min-h-screen">
+<!-- Header -->
+<header class="fixed top-0 w-full z-50 glass-effect">
+<div class="max-w-7xl mx-auto px-6 py-4">
+<div class="flex items-center justify-between">
+<!-- Logo -->
+<div class="flex items-center space-x-3">
+<div class="w-10 h-10 bg-primary rounded-lg flex items-center justify-center">
+<span class="text-white font-bold text-xl">O</span>
+</div>
+<span class="font-pacifico text-2xl text-secondary">Orbix Market</span>
+</div>
+<!-- Navigation -->
+<nav class="hidden lg:flex items-center space-x-8">
+<div class="relative group" id="templates-dropdown">
+<a href="#" class="text-secondary hover:text-primary transition-colors font-medium flex items-center">
+Templates
+<div class="w-4 h-4 flex items-center justify-center ml-1">
+<i class="ri-arrow-down-s-line"></i>
+</div>
+</a>
+<div class="absolute top-full left-0 mt-2 w-64 bg-white rounded-xl shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 transform translate-y-2 group-hover:translate-y-0">
+<div class="p-4">
+<div class="mb-4">
+<h4 class="text-sm font-semibold text-secondary mb-2">Categories</h4>
+<div class="space-y-2">
+<a href="#" class="block text-gray-600 hover:text-primary text-sm">Business Templates</a>
+<a href="#" class="block text-gray-600 hover:text-primary text-sm">E-commerce Solutions</a>
+<a href="#" class="block text-gray-600 hover:text-primary text-sm">Portfolio & CV</a>
+<a href="#" class="block text-gray-600 hover:text-primary text-sm">Landing Pages</a>
+<a href="#" class="block text-gray-600 hover:text-primary text-sm">Admin Dashboards</a>
+</div>
+</div>
+<div>
+<h4 class="text-sm font-semibold text-secondary mb-2">Popular Tags</h4>
+<div class="flex flex-wrap gap-2">
+<span class="px-2 py-1 bg-gray-100 text-gray-600 rounded-full text-xs">Responsive</span>
+<span class="px-2 py-1 bg-gray-100 text-gray-600 rounded-full text-xs">React</span>
+<span class="px-2 py-1 bg-gray-100 text-gray-600 rounded-full text-xs">Vue.js</span>
+<span class="px-2 py-1 bg-gray-100 text-gray-600 rounded-full text-xs">WordPress</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<a href="https://readdy.ai/home/136fab50-6547-48fd-9b6d-a7e995a948a5/52509882-4e61-4b43-a207-efb4d81ebbca" data-readdy="true" class="text-secondary hover:text-primary transition-colors font-medium">Services</a>
+<a href="https://readdy.ai/home/136fab50-6547-48fd-9b6d-a7e995a948a5/23390ea0-409a-4689-81d7-ecf81b2a950c" data-readdy="true" class="text-secondary hover:text-primary transition-colors font-medium">Become a Seller</a>
+<a href="#" class="text-secondary hover:text-primary transition-colors font-medium">Pricing</a>
+</nav>
+<!-- Right Side -->
+<div class="flex items-center space-x-4">
+<!-- Search -->
+<div class="hidden md:flex items-center bg-white/50 rounded-full px-4 py-2 backdrop-blur-sm">
+<div class="w-5 h-5 flex items-center justify-center">
+<i class="ri-search-line text-gray-500"></i>
+</div>
+<input type="text" placeholder="Search templates..." class="ml-2 bg-transparent border-none outline-none text-sm w-48">
+</div>
+<!-- Dark Mode Toggle -->
+<button class="w-10 h-10 flex items-center justify-center rounded-full bg-white/20 hover:bg-white/30 transition-colors">
+<i class="ri-moon-line text-secondary"></i>
+</button>
+<!-- Cart -->
+<button class="w-10 h-10 flex items-center justify-center rounded-full bg-white/20 hover:bg-white/30 transition-colors relative">
+<i class="ri-shopping-cart-line text-secondary"></i>
+<span class="absolute -top-1 -right-1 w-5 h-5 bg-primary rounded-full text-white text-xs flex items-center justify-center">3</span>
+</button>
+<!-- User Profile -->
+<div class="flex items-center space-x-2">
+<img src="https://readdy.ai/api/search-image?query=professional%20business%20person%20avatar%20headshot%20clean%20white%20background%20modern%20style&width=40&height=40&seq=user1&orientation=squarish" alt="User" class="w-10 h-10 rounded-full object-cover">
+<button class="w-6 h-6 flex items-center justify-center">
+<i class="ri-arrow-down-s-line text-secondary"></i>
+</button>
+</div>
+</div>
+</div>
+</div>
+</header>
+<!-- Hero Section -->
+<section class="pt-24 pb-16 relative overflow-hidden" style="background-image: url('https://readdy.ai/api/search-image?query=futuristic%20digital%20marketplace%20abstract%20background%20with%20floating%20geometric%20shapes%20holographic%20elements%20neon%20orange%20accents%20modern%20technology%20theme%20clean%20white%20base%20professional%20design&width=1920&height=800&seq=hero1&orientation=landscape'); background-size: cover; background-position: center;">
+<div class="absolute inset-0 bg-white/80 backdrop-blur-sm"></div>
+<div class="max-w-7xl mx-auto px-6 relative z-10">
+<div class="grid lg:grid-cols-2 gap-12 items-center min-h-[600px]">
+<!-- Left Content -->
+<div class="space-y-8">
+<div class="space-y-4">
+<h1 class="text-5xl lg:text-6xl font-bold text-secondary leading-tight">
+Premium Website
+<span class="text-primary">Templates</span>
+Marketplace
+</h1>
+<p class="text-xl text-gray-600 leading-relaxed">
+Discover thousands of professional website templates, UI kits, and digital assets created by talented designers worldwide.
+</p>
+</div>
+<!-- Search Bar -->
+<div class="flex items-center bg-white rounded-2xl p-2 shadow-lg max-w-md">
+<div class="w-6 h-6 flex items-center justify-center ml-4">
+<i class="ri-search-line text-gray-400"></i>
+</div>
+<input type="text" placeholder="Search for templates..." class="flex-1 px-4 py-3 border-none outline-none text-sm">
+<button class="bg-primary text-white px-6 py-3 !rounded-button font-medium hover:bg-primary/90 transition-colors whitespace-nowrap">
+Search
+</button>
+</div>
+<!-- Stats -->
+<div class="flex items-center space-x-8">
+<div class="text-center">
+<div class="text-3xl font-bold text-secondary">15,000+</div>
+<div class="text-sm text-gray-500">Templates</div>
+</div>
+<div class="text-center">
+<div class="text-3xl font-bold text-secondary">2,500+</div>
+<div class="text-sm text-gray-500">Active Sellers</div>
+</div>
+<div class="text-center">
+<div class="text-3xl font-bold text-secondary">50,000+</div>
+<div class="text-sm text-gray-500">Happy Customers</div>
+</div>
+</div>
+</div>
+<!-- Right Content - Floating Templates -->
+<div class="relative">
+<div class="floating-animation">
+<div class="grid grid-cols-2 gap-4">
+<div class="space-y-4">
+<div class="template-card rounded-xl p-4 hover-scale">
+<img src="https://readdy.ai/api/search-image?query=modern%20website%20template%20dashboard%20interface%20clean%20design%20white%20background%20professional%20business%20style&width=200&height=150&seq=template1&orientation=landscape" alt="Template 1" class="w-full h-24 object-cover rounded-lg">
+<div class="mt-2">
+<h4 class="font-semibold text-sm text-secondary">Business Dashboard</h4>
+<p class="text-xs text-gray-500">$49</p>
+</div>
+</div>
+<div class="template-card rounded-xl p-4 hover-scale">
+<img src="https://readdy.ai/api/search-image?query=e-commerce%20website%20template%20modern%20shopping%20interface%20clean%20design%20white%20background%20professional%20style&width=200&height=150&seq=template2&orientation=landscape" alt="Template 2" class="w-full h-24 object-cover rounded-lg">
+<div class="mt-2">
+<h4 class="font-semibold text-sm text-secondary">E-commerce Store</h4>
+<p class="text-xs text-gray-500">$79</p>
+</div>
+</div>
+</div>
+<div class="space-y-4 mt-8">
+<div class="template-card rounded-xl p-4 hover-scale">
+<img src="https://readdy.ai/api/search-image?query=portfolio%20website%20template%20creative%20design%20clean%20layout%20white%20background%20modern%20professional%20style&width=200&height=150&seq=template3&orientation=landscape" alt="Template 3" class="w-full h-24 object-cover rounded-lg">
+<div class="mt-2">
+<h4 class="font-semibold text-sm text-secondary">Creative Portfolio</h4>
+<p class="text-xs text-gray-500">$39</p>
+</div>
+</div>
+<div class="template-card rounded-xl p-4 hover-scale">
+<img src="https://readdy.ai/api/search-image?query=landing%20page%20template%20modern%20design%20clean%20interface%20white%20background%20professional%20business%20style&width=200&height=150&seq=template4&orientation=landscape" alt="Template 4" class="w-full h-24 object-cover rounded-lg">
+<div class="mt-2">
+<h4 class="font-semibold text-sm text-secondary">Landing Page</h4>
+<p class="text-xs text-gray-500">$29</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Filters Section -->
+<section class="py-8 bg-white/50 backdrop-blur-sm">
+<div class="max-w-7xl mx-auto px-6">
+<div class="flex flex-wrap items-center justify-between gap-4">
+<!-- Categories -->
+<div class="flex items-center space-x-4">
+<span class="text-sm font-medium text-secondary">Categories:</span>
+<div class="flex items-center space-x-2">
+<button class="px-4 py-2 bg-primary text-white !rounded-button text-sm font-medium whitespace-nowrap">All Templates</button>
+<button class="px-4 py-2 bg-white/80 text-secondary !rounded-button text-sm font-medium hover:bg-primary hover:text-white transition-colors whitespace-nowrap">Business</button>
+<button class="px-4 py-2 bg-white/80 text-secondary !rounded-button text-sm font-medium hover:bg-primary hover:text-white transition-colors whitespace-nowrap">E-commerce</button>
+<button class="px-4 py-2 bg-white/80 text-secondary !rounded-button text-sm font-medium hover:bg-primary hover:text-white transition-colors whitespace-nowrap">Portfolio</button>
+<button class="px-4 py-2 bg-white/80 text-secondary !rounded-button text-sm font-medium hover:bg-primary hover:text-white transition-colors whitespace-nowrap">Landing</button>
+</div>
+</div>
+<!-- Sort -->
+<div class="flex items-center space-x-4">
+<span class="text-sm font-medium text-secondary">Sort by:</span>
+<div class="relative">
+<button class="flex items-center space-x-2 px-4 py-2 bg-white/80 !rounded-button text-sm font-medium hover:bg-white transition-colors whitespace-nowrap">
+<span>Popular</span>
+<div class="w-4 h-4 flex items-center justify-center">
+<i class="ri-arrow-down-s-line"></i>
+</div>
+</button>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Templates Grid -->
+<section class="py-16">
+<div class="max-w-7xl mx-auto px-6">
+<div class="grid lg:grid-cols-4 gap-8">
+<!-- Sidebar Filters -->
+<div class="lg:col-span-1">
+<div class="glass-effect rounded-2xl p-6 sticky top-32">
+<h3 class="font-semibold text-secondary mb-6">Filters</h3>
+<!-- Price Range -->
+<div class="mb-6">
+<h4 class="font-medium text-secondary mb-3">Price Range</h4>
+<div class="space-y-2">
+<label class="flex items-center space-x-2">
+<input type="checkbox" class="w-4 h-4 rounded border-gray-300">
+<span class="text-sm text-gray-600">Free</span>
+</label>
+<label class="flex items-center space-x-2">
+<input type="checkbox" class="w-4 h-4 rounded border-gray-300">
+<span class="text-sm text-gray-600">$1 - $25</span>
+</label>
+<label class="flex items-center space-x-2">
+<input type="checkbox" class="w-4 h-4 rounded border-gray-300">
+<span class="text-sm text-gray-600">$26 - $50</span>
+</label>
+<label class="flex items-center space-x-2">
+<input type="checkbox" class="w-4 h-4 rounded border-gray-300">
+<span class="text-sm text-gray-600">$51 - $100</span>
+</label>
+</div>
+</div>
+<!-- Technology -->
+<div class="mb-6">
+<h4 class="font-medium text-secondary mb-3">Technology</h4>
+<div class="space-y-2">
+<label class="flex items-center space-x-2">
+<input type="checkbox" class="w-4 h-4 rounded border-gray-300">
+<span class="text-sm text-gray-600">HTML/CSS</span>
+</label>
+<label class="flex items-center space-x-2">
+<input type="checkbox" class="w-4 h-4 rounded border-gray-300">
+<span class="text-sm text-gray-600">React</span>
+</label>
+<label class="flex items-center space-x-2">
+<input type="checkbox" class="w-4 h-4 rounded border-gray-300">
+<span class="text-sm text-gray-600">Vue.js</span>
+</label>
+<label class="flex items-center space-x-2">
+<input type="checkbox" class="w-4 h-4 rounded border-gray-300">
+<span class="text-sm text-gray-600">Figma</span>
+</label>
+<label class="flex items-center space-x-2">
+<input type="checkbox" class="w-4 h-4 rounded border-gray-300">
+<span class="text-sm text-gray-600">WordPress</span>
+</label>
+</div>
+</div>
+<!-- Rating -->
+<div>
+<h4 class="font-medium text-secondary mb-3">Rating</h4>
+<div class="space-y-2">
+<label class="flex items-center space-x-2">
+<input type="checkbox" class="w-4 h-4 rounded border-gray-300">
+<div class="flex items-center space-x-1">
+<div class="flex">
+<i class="ri-star-fill text-yellow-400 text-sm"></i>
+<i class="ri-star-fill text-yellow-400 text-sm"></i>
+<i class="ri-star-fill text-yellow-400 text-sm"></i>
+<i class="ri-star-fill text-yellow-400 text-sm"></i>
+<i class="ri-star-fill text-yellow-400 text-sm"></i>
+</div>
+<span class="text-sm text-gray-600">(5.0)</span>
+</div>
+</label>
+<label class="flex items-center space-x-2">
+<input type="checkbox" class="w-4 h-4 rounded border-gray-300">
+<div class="flex items-center space-x-1">
+<div class="flex">
+<i class="ri-star-fill text-yellow-400 text-sm"></i>
+<i class="ri-star-fill text-yellow-400 text-sm"></i>
+<i class="ri-star-fill text-yellow-400 text-sm"></i>
+<i class="ri-star-fill text-yellow-400 text-sm"></i>
+<i class="ri-star-line text-gray-300 text-sm"></i>
+</div>
+<span class="text-sm text-gray-600">(4.0+)</span>
+</div>
+</label>
+</div>
+</div>
+</div>
+</div>
+<!-- Templates Grid -->
+<div class="lg:col-span-3">
+<div class="grid md:grid-cols-2 xl:grid-cols-3 gap-6">
+<!-- Template Card 1 -->
+<div class="template-card rounded-2xl overflow-hidden">
+<div class="relative">
+<img src="https://readdy.ai/api/search-image?query=modern%20business%20website%20template%20professional%20corporate%20design%20clean%20interface%20white%20background%20dashboard%20layout&width=300&height=200&seq=card1&orientation=landscape" alt="Business Pro Template" class="w-full h-48 object-cover object-top">
+<div class="absolute top-3 right-3">
+<button class="w-8 h-8 bg-white/80 rounded-full flex items-center justify-center hover:bg-white transition-colors">
+<i class="ri-heart-line text-gray-600"></i>
+</button>
+</div>
+<div class="absolute bottom-3 left-3">
+<span class="px-2 py-1 bg-primary text-white text-xs !rounded-button font-medium">React</span>
+</div>
+</div>
+<div class="p-6">
+<div class="flex items-start justify-between mb-3">
+<h3 class="font-semibold text-secondary">Business Pro Dashboard</h3>
+<span class="text-xl font-bold text-primary">$89</span>
+</div>
+<p class="text-sm text-gray-600 mb-4">Complete business dashboard template with modern design and responsive layout</p>
+<div class="flex items-center justify-between mb-4">
+<div class="flex items-center space-x-2">
+<img src="https://readdy.ai/api/search-image?query=professional%20designer%20avatar%20headshot%20clean%20background%20modern%20style&width=24&height=24&seq=seller1&orientation=squarish" alt="Seller" class="w-6 h-6 rounded-full object-cover">
+<span class="text-sm text-gray-600">Alex Johnson</span>
+</div>
+<div class="flex items-center space-x-1">
+<i class="ri-star-fill text-yellow-400 text-sm"></i>
+<span class="text-sm text-gray-600">4.9 (127)</span>
+</div>
+</div>
+<div class="flex space-x-2">
+<button class="flex-1 bg-primary text-white py-2 px-4 !rounded-button text-sm font-medium hover:bg-primary/90 transition-colors whitespace-nowrap">Add to Cart</button>
+<button class="px-4 py-2 border border-gray-200 !rounded-button text-sm font-medium hover:bg-gray-50 transition-colors whitespace-nowrap">Preview</button>
+</div>
+</div>
+</div>
+<!-- Template Card 2 -->
+<div class="template-card rounded-2xl overflow-hidden">
+<div class="relative">
+<img src="https://readdy.ai/api/search-image?query=e-commerce%20website%20template%20online%20shopping%20interface%20modern%20design%20clean%20layout%20white%20background%20product%20showcase&width=300&height=200&seq=card2&orientation=landscape" alt="E-commerce Template" class="w-full h-48 object-cover object-top">
+<div class="absolute top-3 right-3">
+<button class="w-8 h-8 bg-white/80 rounded-full flex items-center justify-center hover:bg-white transition-colors">
+<i class="ri-heart-line text-gray-600"></i>
+</button>
+</div>
+<div class="absolute bottom-3 left-3">
+<span class="px-2 py-1 bg-green-500 text-white text-xs !rounded-button font-medium">Vue.js</span>
+</div>
+</div>
+<div class="p-6">
+<div class="flex items-start justify-between mb-3">
+<h3 class="font-semibold text-secondary">ShopMax E-commerce</h3>
+<span class="text-xl font-bold text-primary">$129</span>
+</div>
+<p class="text-sm text-gray-600 mb-4">Full-featured e-commerce template with cart, checkout, and admin panel</p>
+<div class="flex items-center justify-between mb-4">
+<div class="flex items-center space-x-2">
+<img src="https://readdy.ai/api/search-image?query=female%20designer%20avatar%20headshot%20professional%20clean%20background%20modern%20style&width=24&height=24&seq=seller2&orientation=squarish" alt="Seller" class="w-6 h-6 rounded-full object-cover">
+<span class="text-sm text-gray-600">Sarah Chen</span>
+</div>
+<div class="flex items-center space-x-1">
+<i class="ri-star-fill text-yellow-400 text-sm"></i>
+<span class="text-sm text-gray-600">4.8 (89)</span>
+</div>
+</div>
+<div class="flex space-x-2">
+<button class="flex-1 bg-primary text-white py-2 px-4 !rounded-button text-sm font-medium hover:bg-primary/90 transition-colors whitespace-nowrap">Add to Cart</button>
+<button class="px-4 py-2 border border-gray-200 !rounded-button text-sm font-medium hover:bg-gray-50 transition-colors whitespace-nowrap">Preview</button>
+</div>
+</div>
+</div>
+<!-- Template Card 3 -->
+<div class="template-card rounded-2xl overflow-hidden">
+<div class="relative">
+<img src="https://readdy.ai/api/search-image?query=creative%20portfolio%20website%20template%20modern%20design%20artistic%20layout%20clean%20interface%20white%20background%20showcase%20gallery&width=300&height=200&seq=card3&orientation=landscape" alt="Portfolio Template" class="w-full h-48 object-cover object-top">
+<div class="absolute top-3 right-3">
+<button class="w-8 h-8 bg-white/80 rounded-full flex items-center justify-center hover:bg-white transition-colors">
+<i class="ri-heart-fill text-red-500"></i>
+</button>
+</div>
+<div class="absolute bottom-3 left-3">
+<span class="px-2 py-1 bg-blue-500 text-white text-xs !rounded-button font-medium">HTML</span>
+</div>
+</div>
+<div class="p-6">
+<div class="flex items-start justify-between mb-3">
+<h3 class="font-semibold text-secondary">Creative Portfolio</h3>
+<span class="text-xl font-bold text-primary">$49</span>
+</div>
+<p class="text-sm text-gray-600 mb-4">Stunning portfolio template for creative professionals and agencies</p>
+<div class="flex items-center justify-between mb-4">
+<div class="flex items-center space-x-2">
+<img src="https://readdy.ai/api/search-image?query=creative%20designer%20avatar%20headshot%20artistic%20background%20modern%20style&width=24&height=24&seq=seller3&orientation=squarish" alt="Seller" class="w-6 h-6 rounded-full object-cover">
+<span class="text-sm text-gray-600">Mike Rodriguez</span>
+</div>
+<div class="flex items-center space-x-1">
+<i class="ri-star-fill text-yellow-400 text-sm"></i>
+<span class="text-sm text-gray-600">5.0 (203)</span>
+</div>
+</div>
+<div class="flex space-x-2">
+<button class="flex-1 bg-primary text-white py-2 px-4 !rounded-button text-sm font-medium hover:bg-primary/90 transition-colors whitespace-nowrap">Add to Cart</button>
+<button class="px-4 py-2 border border-gray-200 !rounded-button text-sm font-medium hover:bg-gray-50 transition-colors whitespace-nowrap">Preview</button>
+</div>
+</div>
+</div>
+<!-- Template Card 4 -->
+<div class="template-card rounded-2xl overflow-hidden">
+<div class="relative">
+<img src="https://readdy.ai/api/search-image?query=landing%20page%20website%20template%20modern%20design%20conversion%20focused%20clean%20interface%20white%20background%20marketing%20layout&width=300&height=200&seq=card4&orientation=landscape" alt="Landing Template" class="w-full h-48 object-cover object-top">
+<div class="absolute top-3 right-3">
+<button class="w-8 h-8 bg-white/80 rounded-full flex items-center justify-center hover:bg-white transition-colors">
+<i class="ri-heart-line text-gray-600"></i>
+</button>
+</div>
+<div class="absolute bottom-3 left-3">
+<span class="px-2 py-1 bg-purple-500 text-white text-xs !rounded-button font-medium">Figma</span>
+</div>
+</div>
+<div class="p-6">
+<div class="flex items-start justify-between mb-3">
+<h3 class="font-semibold text-secondary">SaaS Landing Pro</h3>
+<span class="text-xl font-bold text-primary">$39</span>
+</div>
+<p class="text-sm text-gray-600 mb-4">High-converting landing page template perfect for SaaS products</p>
+<div class="flex items-center justify-between mb-4">
+<div class="flex items-center space-x-2">
+<img src="https://readdy.ai/api/search-image?query=tech%20designer%20avatar%20headshot%20professional%20clean%20background%20modern%20style&width=24&height=24&seq=seller4&orientation=squarish" alt="Seller" class="w-6 h-6 rounded-full object-cover">
+<span class="text-sm text-gray-600">Emma Wilson</span>
+</div>
+<div class="flex items-center space-x-1">
+<i class="ri-star-fill text-yellow-400 text-sm"></i>
+<span class="text-sm text-gray-600">4.7 (156)</span>
+</div>
+</div>
+<div class="flex space-x-2">
+<button class="flex-1 bg-primary text-white py-2 px-4 !rounded-button text-sm font-medium hover:bg-primary/90 transition-colors whitespace-nowrap">Add to Cart</button>
+<button class="px-4 py-2 border border-gray-200 !rounded-button text-sm font-medium hover:bg-gray-50 transition-colors whitespace-nowrap">Preview</button>
+</div>
+</div>
+</div>
+<!-- Template Card 5 -->
+<div class="template-card rounded-2xl overflow-hidden">
+<div class="relative">
+<img src="https://readdy.ai/api/search-image?query=restaurant%20website%20template%20food%20service%20design%20modern%20layout%20clean%20interface%20white%20background%20menu%20showcase&width=300&height=200&seq=card5&orientation=landscape" alt="Restaurant Template" class="w-full h-48 object-cover object-top">
+<div class="absolute top-3 right-3">
+<button class="w-8 h-8 bg-white/80 rounded-full flex items-center justify-center hover:bg-white transition-colors">
+<i class="ri-heart-line text-gray-600"></i>
+</button>
+</div>
+<div class="absolute bottom-3 left-3">
+<span class="px-2 py-1 bg-orange-500 text-white text-xs !rounded-button font-medium">WordPress</span>
+</div>
+</div>
+<div class="p-6">
+<div class="flex items-start justify-between mb-3">
+<h3 class="font-semibold text-secondary">Foodie Restaurant</h3>
+<span class="text-xl font-bold text-primary">$69</span>
+</div>
+<p class="text-sm text-gray-600 mb-4">Beautiful restaurant template with online ordering and reservation system</p>
+<div class="flex items-center justify-between mb-4">
+<div class="flex items-center space-x-2">
+<img src="https://readdy.ai/api/search-image?query=chef%20designer%20avatar%20headshot%20culinary%20background%20modern%20style&width=24&height=24&seq=seller5&orientation=squarish" alt="Seller" class="w-6 h-6 rounded-full object-cover">
+<span class="text-sm text-gray-600">David Kim</span>
+</div>
+<div class="flex items-center space-x-1">
+<i class="ri-star-fill text-yellow-400 text-sm"></i>
+<span class="text-sm text-gray-600">4.6 (74)</span>
+</div>
+</div>
+<div class="flex space-x-2">
+<button class="flex-1 bg-primary text-white py-2 px-4 !rounded-button text-sm font-medium hover:bg-primary/90 transition-colors whitespace-nowrap">Add to Cart</button>
+<button class="px-4 py-2 border border-gray-200 !rounded-button text-sm font-medium hover:bg-gray-50 transition-colors whitespace-nowrap">Preview</button>
+</div>
+</div>
+</div>
+<!-- Template Card 6 -->
+<div class="template-card rounded-2xl overflow-hidden">
+<div class="relative">
+<img src="https://readdy.ai/api/search-image?query=fitness%20website%20template%20gym%20health%20modern%20design%20clean%20interface%20white%20background%20workout%20programs&width=300&height=200&seq=card6&orientation=landscape" alt="Fitness Template" class="w-full h-48 object-cover object-top">
+<div class="absolute top-3 right-3">
+<button class="w-8 h-8 bg-white/80 rounded-full flex items-center justify-center hover:bg-white transition-colors">
+<i class="ri-heart-line text-gray-600"></i>
+</button>
+</div>
+<div class="absolute bottom-3 left-3">
+<span class="px-2 py-1 bg-primary text-white text-xs !rounded-button font-medium">React</span>
+</div>
+</div>
+<div class="p-6">
+<div class="flex items-start justify-between mb-3">
+<h3 class="font-semibold text-secondary">FitLife Gym</h3>
+<span class="text-xl font-bold text-primary">$79</span>
+</div>
+<p class="text-sm text-gray-600 mb-4">Complete fitness website with class booking and trainer profiles</p>
+<div class="flex items-center justify-between mb-4">
+<div class="flex items-center space-x-2">
+<img src="https://readdy.ai/api/search-image?query=fitness%20trainer%20avatar%20headshot%20athletic%20background%20modern%20style&width=24&height=24&seq=seller6&orientation=squarish" alt="Seller" class="w-6 h-6 rounded-full object-cover">
+<span class="text-sm text-gray-600">Lisa Thompson</span>
+</div>
+<div class="flex items-center space-x-1">
+<i class="ri-star-fill text-yellow-400 text-sm"></i>
+<span class="text-sm text-gray-600">4.9 (92)</span>
+</div>
+</div>
+<div class="flex space-x-2">
+<button class="flex-1 bg-primary text-white py-2 px-4 !rounded-button text-sm font-medium hover:bg-primary/90 transition-colors whitespace-nowrap">Add to Cart</button>
+<button class="px-4 py-2 border border-gray-200 !rounded-button text-sm font-medium hover:bg-gray-50 transition-colors whitespace-nowrap">Preview</button>
+</div>
+</div>
+</div>
+</div>
+<!-- Load More -->
+<div class="text-center mt-12">
+<button class="bg-white border border-gray-200 text-secondary px-8 py-3 !rounded-button font-medium hover:bg-gray-50 transition-colors whitespace-nowrap">
+Load More Templates
+</button>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Services Section -->
+<section class="py-16 bg-gradient-to-r from-primary/5 to-orange-100/30">
+<div class="max-w-7xl mx-auto px-6">
+<div class="text-center mb-12">
+<h2 class="text-4xl font-bold text-secondary mb-4">Additional Services</h2>
+<p class="text-xl text-gray-600">Professional web services to complement your templates</p>
+</div>
+<div class="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+<!-- Service 1 -->
+<div class="glass-effect rounded-2xl p-6 text-center hover-scale">
+<div class="w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center mx-auto mb-4">
+<i class="ri-palette-line text-primary text-2xl"></i>
+</div>
+<h3 class="font-semibold text-secondary mb-2">Custom Design</h3>
+<p class="text-sm text-gray-600 mb-4">Get a unique website designed specifically for your brand and requirements</p>
+<div class="text-lg font-bold text-primary mb-4">Starting at $299</div>
+<button class="w-full bg-primary text-white py-2 !rounded-button text-sm font-medium hover:bg-primary/90 transition-colors whitespace-nowrap">Get Quote</button>
+</div>
+<!-- Service 2 -->
+<div class="glass-effect rounded-2xl p-6 text-center hover-scale">
+<div class="w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center mx-auto mb-4">
+<i class="ri-code-line text-primary text-2xl"></i>
+</div>
+<h3 class="font-semibold text-secondary mb-2">HTML Slicing</h3>
+<p class="text-sm text-gray-600 mb-4">Convert your Figma or PSD designs into pixel-perfect HTML/CSS code</p>
+<div class="text-lg font-bold text-primary mb-4">Starting at $149</div>
+<button class="w-full bg-primary text-white py-2 !rounded-button text-sm font-medium hover:bg-primary/90 transition-colors whitespace-nowrap">Get Quote</button>
+</div>
+<!-- Service 3 -->
+<div class="glass-effect rounded-2xl p-6 text-center hover-scale">
+<div class="w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center mx-auto mb-4">
+<i class="ri-tools-line text-primary text-2xl"></i>
+</div>
+<h3 class="font-semibold text-secondary mb-2">Customization</h3>
+<p class="text-sm text-gray-600 mb-4">Modify existing templates to match your brand colors and content</p>
+<div class="text-lg font-bold text-primary mb-4">Starting at $99</div>
+<button class="w-full bg-primary text-white py-2 !rounded-button text-sm font-medium hover:bg-primary/90 transition-colors whitespace-nowrap">Get Quote</button>
+</div>
+<!-- Service 4 -->
+<div class="glass-effect rounded-2xl p-6 text-center hover-scale">
+<div class="w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center mx-auto mb-4">
+<i class="ri-search-line text-primary text-2xl"></i>
+</div>
+<h3 class="font-semibold text-secondary mb-2">SEO Optimization</h3>
+<p class="text-sm text-gray-600 mb-4">Optimize your website for search engines and improve performance</p>
+<div class="text-lg font-bold text-primary mb-4">Starting at $199</div>
+<button class="w-full bg-primary text-white py-2 !rounded-button text-sm font-medium hover:bg-primary/90 transition-colors whitespace-nowrap">Get Quote</button>
+</div>
+</div>
+</div>
+</section>
+<!-- CTA Section -->
+<section class="py-20 relative overflow-hidden" style="background-image: url('https://readdy.ai/api/search-image?query=abstract%20technology%20background%20futuristic%20design%20neon%20orange%20accents%20geometric%20patterns%20modern%20digital%20art%20clean%20professional&width=1920&height=600&seq=cta1&orientation=landscape'); background-size: cover; background-position: center;">
+<div class="absolute inset-0 bg-secondary/80"></div>
+<div class="max-w-4xl mx-auto px-6 text-center relative z-10">
+<h2 class="text-4xl lg:text-5xl font-bold text-white mb-6">Ready to Start Selling?</h2>
+<p class="text-xl text-gray-200 mb-8">Join thousands of designers earning passive income by selling their templates on Orbix Market</p>
+<div class="flex flex-col sm:flex-row items-center justify-center space-y-4 sm:space-y-0 sm:space-x-4">
+<a href="https://readdy.ai/home/136fab50-6547-48fd-9b6d-a7e995a948a5/23390ea0-409a-4689-81d7-ecf81b2a950c" data-readdy="true" class="bg-primary text-white px-8 py-4 !rounded-button text-lg font-medium hover:bg-primary/90 transition-colors neon-glow whitespace-nowrap">Become a Seller</a>
+<button class="bg-white/10 text-white px-8 py-4 !rounded-button text-lg font-medium hover:bg-white/20 transition-colors backdrop-blur-sm whitespace-nowrap">Learn More</button>
+</div>
+</div>
+</section>
+<!-- Footer -->
+<footer class="bg-secondary text-white py-16">
+<div class="max-w-7xl mx-auto px-6">
+<div class="grid md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
+<!-- Company -->
+<div>
+<div class="flex items-center space-x-3 mb-6">
+<div class="w-10 h-10 bg-primary rounded-lg flex items-center justify-center">
+<span class="text-white font-bold text-xl">O</span>
+</div>
+<span class="font-pacifico text-2xl">Orbix Market</span>
+</div>
+<p class="text-gray-400 mb-6">The premier marketplace for premium website templates and digital assets.</p>
+<div class="flex items-center space-x-4">
+<a href="#" class="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center hover:bg-white/20 transition-colors">
+<i class="ri-twitter-line"></i>
+</a>
+<a href="#" class="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center hover:bg-white/20 transition-colors">
+<i class="ri-facebook-line"></i>
+</a>
+<a href="#" class="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center hover:bg-white/20 transition-colors">
+<i class="ri-instagram-line"></i>
+</a>
+<a href="#" class="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center hover:bg-white/20 transition-colors">
+<i class="ri-linkedin-line"></i>
+</a>
+</div>
+</div>
+<!-- Products -->
+<div>
+<h3 class="font-semibold mb-6">Products</h3>
+<ul class="space-y-3">
+<li><a href="https://readdy.ai/home/136fab50-6547-48fd-9b6d-a7e995a948a5/e5792013-c520-4348-989f-c202910bb43c" data-readdy="true" class="text-gray-400 hover:text-white transition-colors">Website Templates</a></li>
+<li><a href="#" class="text-gray-400 hover:text-white transition-colors">UI Kits</a></li>
+<li><a href="#" class="text-gray-400 hover:text-white transition-colors">Landing Pages</a></li>
+<li><a href="#" class="text-gray-400 hover:text-white transition-colors">Admin Dashboards</a></li>
+<li><a href="#" class="text-gray-400 hover:text-white transition-colors">E-commerce Templates</a></li>
+</ul>
+</div>
+<!-- Services -->
+<div>
+<h3 class="font-semibold mb-6">Services</h3>
+<ul class="space-y-3">
+<li><a href="#" class="text-gray-400 hover:text-white transition-colors">Custom Design</a></li>
+<li><a href="#" class="text-gray-400 hover:text-white transition-colors">HTML Slicing</a></li>
+<li><a href="#" class="text-gray-400 hover:text-white transition-colors">Template Customization</a></li>
+<li><a href="#" class="text-gray-400 hover:text-white transition-colors">SEO Optimization</a></li>
+<li><a href="#" class="text-gray-400 hover:text-white transition-colors">Mobile Optimization</a></li>
+</ul>
+</div>
+<!-- Support -->
+<div>
+<h3 class="font-semibold mb-6">Support</h3>
+<ul class="space-y-3">
+<li><a href="#" class="text-gray-400 hover:text-white transition-colors">Help Center</a></li>
+<li><a href="#" class="text-gray-400 hover:text-white transition-colors">Contact Us</a></li>
+<li><a href="#" class="text-gray-400 hover:text-white transition-colors">Seller Guidelines</a></li>
+<li><a href="#" class="text-gray-400 hover:text-white transition-colors">Terms of Service</a></li>
+<li><a href="#" class="text-gray-400 hover:text-white transition-colors">Privacy Policy</a></li>
+</ul>
+</div>
+</div>
+<!-- Bottom -->
+<div class="border-t border-gray-700 pt-8">
+<div class="flex flex-col md:flex-row items-center justify-between">
+<p class="text-gray-400 mb-4 md:mb-0">© 2025 Orbix Market. All rights reserved.</p>
+<div class="flex items-center space-x-6">
+<div class="flex items-center space-x-2">
+<i class="ri-visa-fill text-2xl"></i>
+<i class="ri-mastercard-fill text-2xl"></i>
+<i class="ri-paypal-fill text-2xl"></i>
+</div>
+</div>
+</div>
+</div>
+</div>
+</footer>
+<!-- AI Mascot -->
+<div class="ai-mascot">
+<button class="w-16 h-16 bg-primary rounded-full flex items-center justify-center shadow-lg hover:shadow-xl transition-all neon-glow">
+<i class="ri-robot-line text-white text-2xl"></i>
+</button>
+</div>
+<!-- Scripts -->
+<script id="header-interactions">
+document.addEventListener('DOMContentLoaded', function() {
+const header = document.querySelector('header');
+const templatesDropdown = document.getElementById('templates-dropdown');
+window.addEventListener('scroll', function() {
+if (window.scrollY > 100) {
+header.style.background = 'rgba(255, 255, 255, 0.95)';
+} else {
+header.style.background = 'rgba(255, 255, 255, 0.1)';
+}
+});
+if (templatesDropdown) {
+const dropdownContent = templatesDropdown.querySelector('div[class*="absolute"]');
+templatesDropdown.addEventListener('mouseenter', () => {
+dropdownContent.style.display = 'block';
+requestAnimationFrame(() => {
+dropdownContent.style.opacity = '1';
+dropdownContent.style.visibility = 'visible';
+dropdownContent.style.transform = 'translateY(0)';
+});
+});
+templatesDropdown.addEventListener('mouseleave', () => {
+dropdownContent.style.opacity = '0';
+dropdownContent.style.visibility = 'hidden';
+dropdownContent.style.transform = 'translateY(2px)';
+});
+}
+});
+</script>
+<script id="template-interactions">
+document.addEventListener('DOMContentLoaded', function() {
+const heartButtons = document.querySelectorAll('[class*="ri-heart"]').forEach(button => {
+button.addEventListener('click', function(e) {
+e.preventDefault();
+if (this.classList.contains('ri-heart-line')) {
+this.classList.remove('ri-heart-line');
+this.classList.add('ri-heart-fill');
+this.style.color = '#ef4444';
+} else {
+this.classList.remove('ri-heart-fill');
+this.classList.add('ri-heart-line');
+this.style.color = '';
+}
+});
+});
+});
+</script>
+<script id="filter-interactions">
+document.addEventListener('DOMContentLoaded', function() {
+const categoryButtons = document.querySelectorAll('button[class*="px-4 py-2"]');
+categoryButtons.forEach(button => {
+button.addEventListener('click', function() {
+categoryButtons.forEach(btn => {
+btn.classList.remove('bg-primary', 'text-white');
+btn.classList.add('bg-white/80', 'text-secondary');
+});
+this.classList.remove('bg-white/80', 'text-secondary');
+this.classList.add('bg-primary', 'text-white');
+});
+});
+});
+</script>
+<script id="ai-mascot-interaction">
+document.addEventListener('DOMContentLoaded', function() {
+const mascot = document.querySelector('.ai-mascot button');
+mascot.addEventListener('click', function() {
+alert('Hi! I\'m your AI assistant. How can I help you find the perfect template today?');
+});
+});
+</script>
+</body>
+</html>
