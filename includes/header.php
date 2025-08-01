@@ -116,7 +116,7 @@ $config = DatabaseConfig::getAppConfig();
             <!-- Navigation -->
             <nav class="hidden lg:flex items-center space-x-8">
                 <div class="relative group" id="templates-dropdown">
-                    <a href="#" class="text-secondary hover:text-primary transition-colors font-medium flex items-center">
+                    <a href="/orbix/public/templates.php" class="text-secondary hover:text-primary transition-colors font-medium flex items-center">
                         Templates
                         <div class="w-4 h-4 flex items-center justify-center ml-1">
                             <i class="ri-arrow-down-s-line"></i>
@@ -127,20 +127,25 @@ $config = DatabaseConfig::getAppConfig();
                             <div class="mb-4">
                                 <h4 class="text-sm font-semibold text-secondary mb-2">Categories</h4>
                                 <div class="space-y-2">
-                                    <a href="#" class="block text-gray-600 hover:text-primary text-sm">Business Templates</a>
-                                    <a href="#" class="block text-gray-600 hover:text-primary text-sm">E-commerce Solutions</a>
-                                    <a href="#" class="block text-gray-600 hover:text-primary text-sm">Portfolio & CV</a>
-                                    <a href="#" class="block text-gray-600 hover:text-primary text-sm">Landing Pages</a>
-                                    <a href="#" class="block text-gray-600 hover:text-primary text-sm">Admin Dashboards</a>
+                                    <a href="/orbix/public/templates.php?category=business" class="block text-gray-600 hover:text-primary text-sm">Business Templates</a>
+                                    <a href="/orbix/public/templates.php?category=ecommerce" class="block text-gray-600 hover:text-primary text-sm">E-commerce Solutions</a>
+                                    <a href="/orbix/public/templates.php?category=portfolio" class="block text-gray-600 hover:text-primary text-sm">Portfolio & CV</a>
+                                    <a href="/orbix/public/templates.php?category=landing" class="block text-gray-600 hover:text-primary text-sm">Landing Pages</a>
+                                    <a href="/orbix/public/templates.php?category=business" class="block text-gray-600 hover:text-primary text-sm">Admin Dashboards</a>
                                 </div>
+                            </div>
+                            <div class="mb-4">
+                                <a href="/orbix/public/templates.php" class="block w-full bg-primary text-white text-center py-2 px-4 rounded-lg text-sm font-medium hover:bg-primary/90 transition-colors">
+                                    View All Templates
+                                </a>
                             </div>
                             <div>
                                 <h4 class="text-sm font-semibold text-secondary mb-2">Popular Tags</h4>
                                 <div class="flex flex-wrap gap-2">
-                                    <span class="px-2 py-1 bg-gray-100 text-gray-600 rounded-full text-xs">Responsive</span>
-                                    <span class="px-2 py-1 bg-gray-100 text-gray-600 rounded-full text-xs">React</span>
-                                    <span class="px-2 py-1 bg-gray-100 text-gray-600 rounded-full text-xs">Vue.js</span>
-                                    <span class="px-2 py-1 bg-gray-100 text-gray-600 rounded-full text-xs">WordPress</span>
+                                    <a href="/orbix/public/templates.php?tech=html" class="px-2 py-1 bg-gray-100 text-gray-600 rounded-full text-xs hover:bg-primary hover:text-white transition-colors">Responsive</a>
+                                    <a href="/orbix/public/templates.php?tech=react" class="px-2 py-1 bg-gray-100 text-gray-600 rounded-full text-xs hover:bg-primary hover:text-white transition-colors">React</a>
+                                    <a href="/orbix/public/templates.php?tech=vue" class="px-2 py-1 bg-gray-100 text-gray-600 rounded-full text-xs hover:bg-primary hover:text-white transition-colors">Vue.js</a>
+                                    <a href="/orbix/public/templates.php?tech=wordpress" class="px-2 py-1 bg-gray-100 text-gray-600 rounded-full text-xs hover:bg-primary hover:text-white transition-colors">WordPress</a>
                                 </div>
                             </div>
                         </div>
@@ -175,9 +180,6 @@ $config = DatabaseConfig::getAppConfig();
                 <!-- User Profile -->
                 <div class="flex items-center space-x-2">
                     <img src="https://readdy.ai/api/search-image?query=professional%20business%20person%20avatar%20headshot%20clean%20white%20background%20modern%20style&width=40&height=40&seq=user1&orientation=squarish" alt="User" class="w-10 h-10 rounded-full object-cover">
-                    <button class="w-6 h-6 flex items-center justify-center">
-                        <i class="ri-arrow-down-s-line text-secondary"></i>
-                    </button>
                 </div>
             </div>
         </div>

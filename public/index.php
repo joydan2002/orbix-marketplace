@@ -39,10 +39,10 @@ include '../includes/header.php';
 ?>
 
 <!-- Hero Section -->
-<section class="pt-24 pb-16 relative overflow-hidden" style="background-image: url('https://readdy.ai/api/search-image?query=futuristic%20digital%20marketplace%20abstract%20background%20with%20floating%20geometric%20shapes%20holographic%20elements%20neon%20orange%20accents%20modern%20technology%20theme%20clean%20white%20base%20professional%20design&width=1920&height=800&seq=hero1&orientation=landscape'); background-size: cover; background-position: center;">
+<section class="pt-24 pb-32 relative overflow-hidden min-h-screen flex items-center" style="background-image: url('https://readdy.ai/api/search-image?query=futuristic%20digital%20marketplace%20abstract%20background%20with%20floating%20geometric%20shapes%20holographic%20elements%20neon%20orange%20accents%20modern%20technology%20theme%20clean%20white%20base%20professional%20design&width=1920&height=800&seq=hero1&orientation=landscape'); background-size: cover; background-position: center;">
     <div class="absolute inset-0 bg-white/80 backdrop-blur-sm"></div>
-    <div class="max-w-7xl mx-auto px-6 relative z-10">
-        <div class="grid lg:grid-cols-2 gap-12 items-center min-h-[600px]">
+    <div class="max-w-7xl mx-auto px-6 relative z-10 w-full">
+        <div class="grid lg:grid-cols-2 gap-12 items-center">
             <!-- Left Content -->
             <div class="space-y-8">
                 <div class="space-y-4">
@@ -57,12 +57,12 @@ include '../includes/header.php';
                 </div>
                 
                 <!-- Search Bar -->
-                <div class="flex items-center bg-white rounded-2xl p-2 shadow-lg max-w-md">
+                <div class="flex items-center bg-white rounded-full p-2 shadow-lg max-w-md">
                     <div class="w-6 h-6 flex items-center justify-center ml-4">
                         <i class="ri-search-line text-gray-400"></i>
                     </div>
-                    <input type="text" placeholder="Search for templates..." class="flex-1 px-4 py-3 border-none outline-none text-sm">
-                    <button class="bg-primary text-white px-6 py-3 !rounded-button font-medium hover:bg-primary/90 transition-colors whitespace-nowrap">
+                    <input type="text" placeholder="Search for templates..." class="flex-1 px-4 py-3 border-none outline-none text-sm rounded-full bg-transparent">
+                    <button class="bg-primary text-white px-6 py-3 !rounded-full font-medium hover:bg-primary/90 transition-colors whitespace-nowrap">
                         Search
                     </button>
                 </div>
@@ -231,8 +231,8 @@ include '../includes/header.php';
                     </div>
                 </div>
                 
-                <!-- Load More -->
-                <div class="text-center mt-12">
+                <!-- Load More Button - Positioned within templates column -->
+                <div class="text-center mt-12" style="width: 100%; display: flex; justify-content: center;">
                     <button id="load-more-btn" class="bg-white border border-gray-200 text-secondary px-8 py-3 !rounded-button font-medium hover:bg-gray-50 transition-colors whitespace-nowrap" style="display: none;">
                         Load More Templates
                     </button>
@@ -398,8 +398,14 @@ function createTemplateCard(template) {
         i < stars ? '<i class="ri-star-fill text-yellow-400 text-sm"></i>' : '<i class="ri-star-line text-gray-300 text-sm"></i>'
     ).join('');
     
+    // Truncate description to ensure consistent height
+    const maxDescLength = 80;
+    const truncatedDesc = template.description.length > maxDescLength 
+        ? template.description.substring(0, maxDescLength) + '...'
+        : template.description;
+    
     return `
-        <div class="template-card rounded-2xl overflow-hidden">
+        <div class="template-card rounded-2xl overflow-hidden h-full flex flex-col">
             <div class="relative">
                 <img src="${template.preview_image}" alt="${template.title}" class="w-full h-48 object-cover object-top">
                 <div class="absolute top-3 right-3">
@@ -411,22 +417,34 @@ function createTemplateCard(template) {
                     <span class="px-2 py-1 ${techColors[template.technology] || 'bg-gray-500'} text-white text-xs rounded-button font-medium">${template.technology}</span>
                 </div>
             </div>
-            <div class="p-6">
-                <div class="flex items-start justify-between mb-3">
-                    <h3 class="font-semibold text-secondary">${template.title}</h3>
-                    <span class="text-xl font-bold text-primary">$${template.price}</span>
+            <div class="p-6 flex flex-col flex-1">
+                <!-- Title and Price - Fixed height -->
+                <div class="flex items-start justify-between mb-3 min-h-[3rem]">
+                    <h3 class="font-semibold text-secondary leading-tight pr-2 flex-1">${template.title}</h3>
+                    <span class="text-xl font-bold text-primary whitespace-nowrap">$${template.price}</span>
                 </div>
-                <p class="text-sm text-gray-600 mb-4">${template.description}</p>
+                
+                <!-- Description - Fixed height -->
+                <div class="mb-4 min-h-[3rem] flex items-start">
+                    <p class="text-sm text-gray-600 leading-relaxed">${truncatedDesc}</p>
+                </div>
+                
+                <!-- Spacer to push bottom content down -->
+                <div class="flex-1"></div>
+                
+                <!-- Author and Rating - Fixed position from bottom -->
                 <div class="flex items-center justify-between mb-4">
                     <div class="flex items-center space-x-2">
                         <img src="${template.profile_image}" alt="${template.seller_name}" class="w-6 h-6 rounded-full object-cover">
-                        <span class="text-sm text-gray-600">${template.seller_name}</span>
+                        <span class="text-sm text-gray-600 truncate max-w-[8rem]">${template.seller_name}</span>
                     </div>
                     <div class="flex items-center space-x-1">
-                        ${starHtml}
-                        <span class="text-sm text-gray-600">${template.rating} (${template.reviews_count})</span>
+                        <div class="flex">${starHtml}</div>
+                        <span class="text-sm text-gray-600 whitespace-nowrap">${template.rating} (${template.reviews_count})</span>
                     </div>
                 </div>
+                
+                <!-- Buttons - Fixed position at bottom -->
                 <div class="flex space-x-2">
                     <button class="flex-1 bg-primary text-white py-2 px-4 !rounded-button text-sm font-medium hover:bg-primary/90 transition-colors whitespace-nowrap">Add to Cart</button>
                     <button class="px-4 py-2 border border-gray-200 !rounded-button text-sm font-medium hover:bg-gray-50 transition-colors whitespace-nowrap">Preview</button>

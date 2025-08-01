@@ -11,6 +11,7 @@ class DatabaseConfig {
     const DB_USER = 'root';
     const DB_PASS = '';
     const DB_CHARSET = 'utf8mb4';
+    const DB_SOCKET = '/Applications/XAMPP/xamppfiles/var/mysql/mysql.sock';
     
     // App Configuration
     const APP_NAME = 'Orbix Market';
@@ -25,7 +26,7 @@ class DatabaseConfig {
     public static function getConnection() {
         if (self::$connection === null) {
             try {
-                $dsn = "mysql:host=" . self::DB_HOST . ";dbname=" . self::DB_NAME . ";charset=" . self::DB_CHARSET;
+                $dsn = "mysql:unix_socket=" . self::DB_SOCKET . ";dbname=" . self::DB_NAME . ";charset=" . self::DB_CHARSET;
                 self::$connection = new PDO($dsn, self::DB_USER, self::DB_PASS, [
                     PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
                     PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
@@ -33,7 +34,7 @@ class DatabaseConfig {
                 ]);
             } catch (PDOException $e) {
                 error_log("Database connection failed: " . $e->getMessage());
-                throw new Exception("Database connection failed");
+                die("Database connection failed. Please check your configuration.");
             }
         }
         return self::$connection;
