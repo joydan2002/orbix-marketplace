@@ -96,146 +96,76 @@ include '../includes/header.php';
     </div>
 </section>
 
-<!-- Filters Section -->
-<section class="py-8 bg-white/50 backdrop-blur-sm">
+<!-- Template Categories Section -->
+<section id="templates" class="py-20 bg-gray-50">
     <div class="max-w-7xl mx-auto px-6">
-        <div class="flex flex-wrap items-center justify-between gap-4">
-            <!-- Categories -->
-            <div class="flex items-center space-x-4">
-                <span class="text-sm font-medium text-secondary">Categories:</span>
-                <div class="flex items-center space-x-2" id="category-filters">
-                    <button class="px-4 py-2 bg-primary text-white !rounded-button text-sm font-medium whitespace-nowrap" data-category="">All Templates</button>
-                    <?php foreach ($categories as $category): ?>
-                    <button class="px-4 py-2 bg-white/80 text-secondary !rounded-button text-sm font-medium hover:bg-primary hover:text-white transition-colors whitespace-nowrap" data-category="<?php echo $category['id']; ?>"><?php echo htmlspecialchars($category['name']); ?></button>
-                    <?php endforeach; ?>
-                </div>
+        <div class="text-center mb-16">
+            <h2 class="text-3xl md:text-4xl font-bold mb-4 text-secondary">
+                Template Categories
+            </h2>
+            <p class="text-gray-600 max-w-2xl mx-auto">
+                Explore our diverse collection of professionally designed templates 
+                for all your business needs.
+            </p>
+        </div>
+        
+        <!-- Category Filter Pills -->
+        <div class="flex flex-wrap items-center justify-center mb-10">
+            <button class="m-2 px-6 py-2 rounded-full bg-primary text-white whitespace-nowrap transition-colors" data-category="">
+                All Templates
+            </button>
+            <?php foreach ($categories as $category): ?>
+            <button class="m-2 px-6 py-2 rounded-full bg-gray-200 text-gray-700 hover:bg-primary hover:text-white whitespace-nowrap transition-colors" data-category="<?php echo $category['slug']; ?>">
+                <?php echo htmlspecialchars($category['name']); ?>
+            </button>
+            <?php endforeach; ?>
+        </div>
+        
+        <!-- Templates Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8" id="main-templates-grid">
+            <!-- Templates will be loaded here via JavaScript -->
+            <div class="col-span-full text-center py-8">
+                <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+                <p class="mt-2 text-gray-600">Loading templates...</p>
             </div>
-            
-            <!-- Sort -->
-            <div class="flex items-center space-x-4">
-                <span class="text-sm font-medium text-secondary">Sort by:</span>
-                <div class="relative">
-                    <button class="flex items-center space-x-2 px-4 py-2 bg-white/80 !rounded-button text-sm font-medium hover:bg-white transition-colors whitespace-nowrap">
-                        <span>Popular</span>
-                        <div class="w-4 h-4 flex items-center justify-center">
-                            <i class="ri-arrow-down-s-line"></i>
-                        </div>
-                    </button>
-                </div>
-            </div>
+        </div>
+        
+        <div class="text-center mt-12">
+            <a href="templates.php" class="bg-gradient-to-r from-primary to-primary/80 text-white px-8 py-3 rounded-button whitespace-nowrap font-medium inline-block hover:shadow-lg transition-all">
+                View All Templates
+            </a>
         </div>
     </div>
 </section>
 
-<!-- Templates Grid -->
-<section class="py-16">
+<!-- Featured Templates Section -->
+<section id="featured" class="py-20 bg-white">
     <div class="max-w-7xl mx-auto px-6">
-        <div class="grid lg:grid-cols-4 gap-8">
-            <!-- Sidebar Filters -->
-            <div class="lg:col-span-1">
-                <div class="glass-effect rounded-2xl p-6 sticky top-32">
-                    <h3 class="font-semibold text-secondary mb-6">Filters</h3>
-                    
-                    <!-- Price Range -->
-                    <div class="mb-6">
-                        <h4 class="font-medium text-secondary mb-3">Price Range</h4>
-                        <div class="space-y-2">
-                            <label class="flex items-center space-x-2">
-                                <input type="checkbox" class="w-4 h-4 rounded border-gray-300">
-                                <span class="text-sm text-gray-600">Free</span>
-                            </label>
-                            <label class="flex items-center space-x-2">
-                                <input type="checkbox" class="w-4 h-4 rounded border-gray-300">
-                                <span class="text-sm text-gray-600">$1 - $25</span>
-                            </label>
-                            <label class="flex items-center space-x-2">
-                                <input type="checkbox" class="w-4 h-4 rounded border-gray-300">
-                                <span class="text-sm text-gray-600">$26 - $50</span>
-                            </label>
-                            <label class="flex items-center space-x-2">
-                                <input type="checkbox" class="w-4 h-4 rounded border-gray-300">
-                                <span class="text-sm text-gray-600">$51 - $100</span>
-                            </label>
-                        </div>
-                    </div>
-                    
-                    <!-- Technology -->
-                    <div class="mb-6">
-                        <h4 class="font-medium text-secondary mb-3">Technology</h4>
-                        <div class="space-y-2">
-                            <label class="flex items-center space-x-2">
-                                <input type="checkbox" class="w-4 h-4 rounded border-gray-300">
-                                <span class="text-sm text-gray-600">HTML/CSS</span>
-                            </label>
-                            <label class="flex items-center space-x-2">
-                                <input type="checkbox" class="w-4 h-4 rounded border-gray-300">
-                                <span class="text-sm text-gray-600">React</span>
-                            </label>
-                            <label class="flex items-center space-x-2">
-                                <input type="checkbox" class="w-4 h-4 rounded border-gray-300">
-                                <span class="text-sm text-gray-600">Vue.js</span>
-                            </label>
-                            <label class="flex items-center space-x-2">
-                                <input type="checkbox" class="w-4 h-4 rounded border-gray-300">
-                                <span class="text-sm text-gray-600">Figma</span>
-                            </label>
-                            <label class="flex items-center space-x-2">
-                                <input type="checkbox" class="w-4 h-4 rounded border-gray-300">
-                                <span class="text-sm text-gray-600">WordPress</span>
-                            </label>
-                        </div>
-                    </div>
-                    
-                    <!-- Rating -->
-                    <div>
-                        <h4 class="font-medium text-secondary mb-3">Rating</h4>
-                        <div class="space-y-2">
-                            <label class="flex items-center space-x-2">
-                                <input type="checkbox" class="w-4 h-4 rounded border-gray-300">
-                                <div class="flex items-center space-x-1">
-                                    <div class="flex">
-                                        <i class="ri-star-fill text-yellow-400 text-sm"></i>
-                                        <i class="ri-star-fill text-yellow-400 text-sm"></i>
-                                        <i class="ri-star-fill text-yellow-400 text-sm"></i>
-                                        <i class="ri-star-fill text-yellow-400 text-sm"></i>
-                                        <i class="ri-star-fill text-yellow-400 text-sm"></i>
-                                    </div>
-                                    <span class="text-sm text-gray-600">(5.0)</span>
-                                </div>
-                            </label>
-                            <label class="flex items-center space-x-2">
-                                <input type="checkbox" class="w-4 h-4 rounded border-gray-300">
-                                <div class="flex items-center space-x-1">
-                                    <div class="flex">
-                                        <i class="ri-star-fill text-yellow-400 text-sm"></i>
-                                        <i class="ri-star-fill text-yellow-400 text-sm"></i>
-                                        <i class="ri-star-fill text-yellow-400 text-sm"></i>
-                                        <i class="ri-star-fill text-yellow-400 text-sm"></i>
-                                        <i class="ri-star-line text-gray-300 text-sm"></i>
-                                    </div>
-                                    <span class="text-sm text-gray-600">(4.0+)</span>
-                                </div>
-                            </label>
-                        </div>
-                    </div>
-                </div>
+        <div class="text-center mb-16">
+            <h2 class="text-3xl md:text-4xl font-bold mb-4 text-secondary">Featured Templates</h2>
+            <p class="text-gray-600 max-w-2xl mx-auto">
+                Discover the most popular website templates with modern design 
+                and cutting-edge features.
+            </p>
+        </div>
+        
+        <div class="relative overflow-hidden">
+            <div id="featured-slider" class="flex transition-transform duration-500 ease-in-out">
+                <!-- Featured templates will be loaded here -->
             </div>
             
-            <!-- Templates Grid -->
-            <div class="lg:col-span-3">
-                <div class="grid md:grid-cols-2 xl:grid-cols-3 gap-6" id="templates-grid">
-                    <!-- Templates will be loaded here via JavaScript -->
-                    <div class="col-span-full text-center py-8">
-                        <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-                        <p class="mt-2 text-gray-600">Loading templates...</p>
-                    </div>
-                </div>
-                
-                <!-- Load More Button - Positioned within templates column -->
-                <div class="text-center mt-12" style="width: 100%; display: flex; justify-content: center;">
-                    <button id="load-more-btn" class="bg-white border border-gray-200 text-secondary px-8 py-3 !rounded-button font-medium hover:bg-gray-50 transition-colors whitespace-nowrap" style="display: none;">
-                        Load More Templates
-                    </button>
+            <!-- Navigation Buttons -->
+            <button id="prev-slide" class="absolute left-2 top-1/2 transform -translate-y-1/2 w-12 h-12 flex items-center justify-center bg-white rounded-full shadow-lg z-10 hover:shadow-xl transition-shadow">
+                <i class="ri-arrow-left-s-line text-xl text-gray-700"></i>
+            </button>
+            <button id="next-slide" class="absolute right-2 top-1/2 transform -translate-y-1/2 w-12 h-12 flex items-center justify-center bg-white rounded-full shadow-lg z-10 hover:shadow-xl transition-shadow">
+                <i class="ri-arrow-right-s-line text-xl text-gray-700"></i>
+            </button>
+            
+            <!-- Slider Indicators -->
+            <div class="flex justify-center mt-8">
+                <div class="flex space-x-2" id="slider-indicators">
+                    <!-- Indicators will be generated by JavaScript -->
                 </div>
             </div>
         </div>
@@ -244,15 +174,36 @@ include '../includes/header.php';
 
 <?php include '../includes/service-cards.php'; ?>
 
+<?php include '../includes/testimonials.php'; ?>
+
 <!-- CTA Section -->
-<section class="py-20 relative overflow-hidden" style="background-image: url('https://readdy.ai/api/search-image?query=abstract%20technology%20background%20futuristic%20design%20neon%20orange%20accents%20geometric%20patterns%20modern%20digital%20art%20clean%20professional&width=1920&height=600&seq=cta1&orientation=landscape'); background-size: cover; background-position: center;">
-    <div class="absolute inset-0 bg-secondary/80"></div>
-    <div class="max-w-4xl mx-auto px-6 text-center relative z-10">
-        <h2 class="text-4xl lg:text-5xl font-bold text-white mb-6">Ready to Start Selling?</h2>
-        <p class="text-xl text-gray-200 mb-8">Join thousands of designers earning passive income by selling their templates on Orbix Market</p>
-        <div class="flex flex-col sm:flex-row items-center justify-center space-y-4 sm:space-y-0 sm:space-x-4">
-            <a href="#" class="bg-primary text-white px-8 py-4 !rounded-button text-lg font-medium hover:bg-primary/90 transition-colors neon-glow whitespace-nowrap">Become a Seller</a>
-            <button class="bg-white/10 text-white px-8 py-4 !rounded-button text-lg font-medium hover:bg-white/20 transition-colors backdrop-blur-sm whitespace-nowrap">Learn More</button>
+<section class="py-20 bg-white">
+    <div class="max-w-7xl mx-auto px-6">
+        <div class="bg-gradient-to-r from-primary to-primary/80 rounded-2xl overflow-hidden shadow-xl">
+            <div class="flex flex-col md:flex-row">
+                <div class="md:w-1/2 p-8 md:p-12 flex items-center">
+                    <div>
+                        <h2 class="text-3xl md:text-4xl font-bold text-white mb-6">
+                            Ready to Upgrade Your Website?
+                        </h2>
+                        <p class="text-white/90 mb-8">
+                            Sign up today to receive a special 30% discount for new customers. 
+                            Applies to all service packages.
+                        </p>
+                        <div class="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
+                            <a href="#pricing" class="bg-white text-primary px-8 py-3 rounded-button font-medium hover:bg-gray-100 transition-colors whitespace-nowrap text-center">
+                                View Pricing
+                            </a>
+                            <a href="#contact" class="bg-transparent border-2 border-white text-white px-8 py-3 rounded-button font-medium hover:bg-white/10 transition-colors whitespace-nowrap text-center">
+                                Contact Us
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <div class="md:w-1/2 relative">
+                    <img src="https://images.unsplash.com/photo-1551650975-87deedd944c3?w=800&h=600&fit=crop" alt="3D Web Design" class="w-full h-full object-cover" />
+                </div>
+            </div>
         </div>
     </div>
 </section>
@@ -261,14 +212,16 @@ include '../includes/header.php';
 <script>
 // Global variables
 let currentCategory = '';
-let currentOffset = 0;
-const templatesPerPage = 6;
+let currentSlide = 0;
+let totalSlides = 0;
 
 // Initialize page
 document.addEventListener('DOMContentLoaded', function() {
     loadHeroTemplates();
     loadMainTemplates();
+    loadFeaturedTemplates();
     setupCategoryFilters();
+    setupSlider();
 });
 
 // Load featured templates for hero section
@@ -285,46 +238,37 @@ async function loadHeroTemplates() {
     }
 }
 
-// Load main templates grid
-async function loadMainTemplates(reset = true) {
-    if (reset) {
-        currentOffset = 0;
-        document.getElementById('templates-grid').innerHTML = `
-            <div class="col-span-full text-center py-8">
-                <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-                <p class="mt-2 text-gray-600">Loading templates...</p>
-            </div>
-        `;
-    }
-    
+// Load main templates for Template Categories section
+async function loadMainTemplates() {
     try {
-        const url = `api.php?action=templates&limit=${templatesPerPage}&offset=${currentOffset}${currentCategory ? '&category=' + currentCategory : ''}`;
+        const url = `api.php?action=templates&limit=6${currentCategory ? '&category=' + currentCategory : ''}`;
         const response = await fetch(url);
         const result = await response.json();
         
         if (result.success) {
-            if (reset) {
-                renderTemplates(result.data);
-            } else {
-                appendTemplates(result.data);
-            }
-            
-            // Show/hide load more button
-            const loadMoreBtn = document.getElementById('load-more-btn');
-            if (result.data.length === templatesPerPage) {
-                loadMoreBtn.style.display = 'block';
-                currentOffset += templatesPerPage;
-            } else {
-                loadMoreBtn.style.display = 'none';
-            }
+            renderMainTemplates(result.data);
         }
     } catch (error) {
-        console.error('Error loading templates:', error);
-        document.getElementById('templates-grid').innerHTML = `
+        console.error('Error loading main templates:', error);
+        document.getElementById('main-templates-grid').innerHTML = `
             <div class="col-span-full text-center py-8">
                 <p class="text-red-600">Error loading templates. Please try again later.</p>
             </div>
         `;
+    }
+}
+
+// Load featured templates for slider
+async function loadFeaturedTemplates() {
+    try {
+        const response = await fetch('api.php?action=featured&limit=8');
+        const result = await response.json();
+        
+        if (result.success) {
+            renderFeaturedSlider(result.data);
+        }
+    } catch (error) {
+        console.error('Error loading featured templates:', error);
     }
 }
 
@@ -339,22 +283,22 @@ function renderHeroTemplates(templates) {
     container.innerHTML = `
         <div class="space-y-4">
             ${leftColumn.map(template => `
-                <div class="template-card rounded-xl p-4 hover-scale">
+                <div class="bg-white/90 backdrop-blur-sm rounded-xl p-4 shadow-lg hover:shadow-xl transition-all hover:scale-105">
                     <img src="${template.preview_image}" alt="${template.title}" class="w-full h-24 object-cover rounded-lg">
                     <div class="mt-2">
                         <h4 class="font-semibold text-sm text-secondary">${template.title}</h4>
-                        <p class="text-xs text-gray-500">$${template.price}</p>
+                        <p class="text-xs text-primary font-medium">$${template.price}</p>
                     </div>
                 </div>
             `).join('')}
         </div>
         <div class="space-y-4 mt-8">
             ${rightColumn.map(template => `
-                <div class="template-card rounded-xl p-4 hover-scale">
+                <div class="bg-white/90 backdrop-blur-sm rounded-xl p-4 shadow-lg hover:shadow-xl transition-all hover:scale-105">
                     <img src="${template.preview_image}" alt="${template.title}" class="w-full h-24 object-cover rounded-lg">
                     <div class="mt-2">
                         <h4 class="font-semibold text-sm text-secondary">${template.title}</h4>
-                        <p class="text-xs text-gray-500">$${template.price}</p>
+                        <p class="text-xs text-primary font-medium">$${template.price}</p>
                     </div>
                 </div>
             `).join('')}
@@ -362,92 +306,130 @@ function renderHeroTemplates(templates) {
     `;
 }
 
-// Render templates in main grid
-function renderTemplates(templates) {
-    const container = document.getElementById('templates-grid');
+// Render main templates in categories section
+function renderMainTemplates(templates) {
+    const container = document.getElementById('main-templates-grid');
     if (!templates.length) {
         container.innerHTML = `
             <div class="col-span-full text-center py-8">
-                <p class="text-gray-600">No templates found.</p>
+                <p class="text-gray-600">No templates found in this category.</p>
             </div>
         `;
         return;
     }
     
-    container.innerHTML = templates.map(template => createTemplateCard(template)).join('');
+    container.innerHTML = templates.map(template => createMainTemplateCard(template)).join('');
 }
 
-// Append templates to existing grid
-function appendTemplates(templates) {
-    const container = document.getElementById('templates-grid');
-    container.insertAdjacentHTML('beforeend', templates.map(template => createTemplateCard(template)).join(''));
-}
-
-// Create template card HTML
-function createTemplateCard(template) {
-    const techColors = {
-        'React': 'bg-primary',
-        'Vue.js': 'bg-green-500',
-        'HTML': 'bg-blue-500',
-        'Figma': 'bg-purple-500',
-        'WordPress': 'bg-orange-500'
-    };
-    
-    const stars = Math.floor(template.rating);
+// Create main template card (similar to backup design)
+function createMainTemplateCard(template) {
+    const stars = Math.floor(template.avg_rating || 4.5);
     const starHtml = Array.from({length: 5}, (_, i) => 
-        i < stars ? '<i class="ri-star-fill text-yellow-400 text-sm"></i>' : '<i class="ri-star-line text-gray-300 text-sm"></i>'
+        i < stars ? '<i class="ri-star-fill text-yellow-400"></i>' : '<i class="ri-star-line text-gray-300"></i>'
     ).join('');
     
-    // Truncate description to ensure consistent height
-    const maxDescLength = 80;
-    const truncatedDesc = template.description.length > maxDescLength 
-        ? template.description.substring(0, maxDescLength) + '...'
-        : template.description;
-    
+    const badges = template.is_featured ? 
+        '<div class="absolute top-4 right-4 bg-primary text-white px-3 py-1 rounded-full text-sm font-medium">Featured</div>' :
+        '<div class="absolute top-4 right-4 bg-green-500 text-white px-3 py-1 rounded-full text-sm font-medium">New</div>';
+
     return `
-        <div class="template-card rounded-2xl overflow-hidden h-full flex flex-col">
+        <div class="bg-white rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-all hover:-translate-y-2">
             <div class="relative">
-                <img src="${template.preview_image}" alt="${template.title}" class="w-full h-48 object-cover object-top">
-                <div class="absolute top-3 right-3">
-                    <button class="w-8 h-8 bg-white/80 rounded-full flex items-center justify-center hover:bg-white transition-colors">
-                        <i class="ri-heart-line text-gray-600"></i>
-                    </button>
+                <img src="${template.preview_image}" alt="${template.title}" class="w-full h-64 object-cover">
+                ${badges}
+            </div>
+            <div class="p-6">
+                <div class="flex justify-between items-center mb-3">
+                    <h3 class="text-xl font-bold text-secondary">${template.title}</h3>
+                    <div class="flex items-center">
+                        <div class="text-yellow-400 flex text-sm">
+                            ${starHtml}
+                        </div>
+                        <span class="text-gray-600 ml-1 text-sm">(${template.review_count || Math.floor(Math.random() * 200) + 50})</span>
+                    </div>
                 </div>
-                <div class="absolute bottom-3 left-3">
-                    <span class="px-2 py-1 ${techColors[template.technology] || 'bg-gray-500'} text-white text-xs rounded-button font-medium">${template.technology}</span>
+                <p class="text-gray-600 mb-4 leading-relaxed">
+                    ${template.description.substring(0, 100)}${template.description.length > 100 ? '...' : ''}
+                </p>
+                <div class="flex justify-between items-center">
+                    <span class="text-primary font-bold text-xl">$${template.price}</span>
+                    <div class="flex space-x-2">
+                        <button class="w-10 h-10 flex items-center justify-center bg-gray-100 rounded-full hover:bg-gray-200 transition-colors">
+                            <i class="ri-eye-line text-gray-600"></i>
+                        </button>
+                        <button class="w-10 h-10 flex items-center justify-center bg-gray-100 rounded-full hover:bg-gray-200 transition-colors">
+                            <i class="ri-heart-line text-gray-600"></i>
+                        </button>
+                        <button class="w-10 h-10 flex items-center justify-center bg-primary rounded-full hover:bg-primary/90 transition-colors">
+                            <i class="ri-shopping-cart-line text-white"></i>
+                        </button>
+                    </div>
                 </div>
             </div>
-            <div class="p-6 flex flex-col flex-1">
-                <!-- Title and Price - Fixed height -->
-                <div class="flex items-start justify-between mb-3 min-h-[3rem]">
-                    <h3 class="font-semibold text-secondary leading-tight pr-2 flex-1">${template.title}</h3>
-                    <span class="text-xl font-bold text-primary whitespace-nowrap">$${template.price}</span>
+        </div>
+    `;
+}
+
+// Render featured templates slider
+function renderFeaturedSlider(templates) {
+    const slider = document.getElementById('featured-slider');
+    const indicators = document.getElementById('slider-indicators');
+    
+    // Calculate slides (4 per slide on desktop, 2 on tablet, 1 on mobile)
+    const templatesPerSlide = window.innerWidth >= 1024 ? 3 : window.innerWidth >= 768 ? 2 : 1;
+    totalSlides = Math.ceil(templates.length / templatesPerSlide);
+    
+    // Create slides
+    let slides = '';
+    for (let i = 0; i < totalSlides; i++) {
+        const slideTemplates = templates.slice(i * templatesPerSlide, (i + 1) * templatesPerSlide);
+        slides += `
+            <div class="min-w-full flex gap-6">
+                ${slideTemplates.map(template => createFeaturedTemplateCard(template)).join('')}
+            </div>
+        `;
+    }
+    
+    slider.innerHTML = slides;
+    
+    // Create indicators
+    indicators.innerHTML = Array.from({length: totalSlides}, (_, i) => `
+        <button class="w-3 h-3 rounded-full ${i === 0 ? 'bg-primary' : 'bg-gray-300'} transition-colors" data-slide="${i}"></button>
+    `).join('');
+    
+    // Setup indicator clicks
+    indicators.querySelectorAll('button').forEach((btn, index) => {
+        btn.addEventListener('click', () => goToSlide(index));
+    });
+}
+
+// Create featured template card
+function createFeaturedTemplateCard(template) {
+    const originalPrice = Math.floor(template.price * 1.3);
+    
+    return `
+        <div class="flex-1 bg-white rounded-lg overflow-hidden shadow-xl hover:shadow-2xl transition-all hover:-translate-y-1">
+            <div class="relative">
+                <img src="${template.preview_image}" alt="${template.title}" class="w-full h-64 object-cover">
+                <div class="absolute inset-0 bg-black bg-opacity-20 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity">
+                    <button class="bg-white text-gray-800 px-6 py-2 rounded-button font-medium hover:bg-gray-100 transition-colors">
+                        View Details
+                    </button>
                 </div>
-                
-                <!-- Description - Fixed height -->
-                <div class="mb-4 min-h-[3rem] flex items-start">
-                    <p class="text-sm text-gray-600 leading-relaxed">${truncatedDesc}</p>
-                </div>
-                
-                <!-- Spacer to push bottom content down -->
-                <div class="flex-1"></div>
-                
-                <!-- Author and Rating - Fixed position from bottom -->
-                <div class="flex items-center justify-between mb-4">
-                    <div class="flex items-center space-x-2">
-                        <img src="${template.profile_image}" alt="${template.seller_name}" class="w-6 h-6 rounded-full object-cover">
-                        <span class="text-sm text-gray-600 truncate max-w-[8rem]">${template.seller_name}</span>
+            </div>
+            <div class="p-6">
+                <h3 class="text-xl font-bold mb-2 text-secondary">${template.title}</h3>
+                <p class="text-gray-600 mb-4 leading-relaxed">
+                    ${template.description.substring(0, 120)}${template.description.length > 120 ? '...' : ''}
+                </p>
+                <div class="flex justify-between items-center">
+                    <div>
+                        <span class="text-gray-400 line-through text-sm">$${originalPrice}</span>
+                        <span class="text-primary font-bold text-xl ml-2">$${template.price}</span>
                     </div>
-                    <div class="flex items-center space-x-1">
-                        <div class="flex">${starHtml}</div>
-                        <span class="text-sm text-gray-600 whitespace-nowrap">${template.rating} (${template.reviews_count})</span>
-                    </div>
-                </div>
-                
-                <!-- Buttons - Fixed position at bottom -->
-                <div class="flex space-x-2">
-                    <button class="flex-1 bg-primary text-white py-2 px-4 !rounded-button text-sm font-medium hover:bg-primary/90 transition-colors whitespace-nowrap">Add to Cart</button>
-                    <button class="px-4 py-2 border border-gray-200 !rounded-button text-sm font-medium hover:bg-gray-50 transition-colors whitespace-nowrap">Preview</button>
+                    <button class="bg-gradient-to-r from-primary to-primary/80 text-white px-4 py-2 rounded-button font-medium hover:shadow-lg transition-all">
+                        <i class="ri-shopping-cart-line mr-1"></i> Buy Now
+                    </button>
                 </div>
             </div>
         </div>
@@ -456,27 +438,70 @@ function createTemplateCard(template) {
 
 // Setup category filters
 function setupCategoryFilters() {
-    const filterButtons = document.querySelectorAll('#category-filters button');
+    const filterButtons = document.querySelectorAll('button[data-category]');
     filterButtons.forEach(button => {
         button.addEventListener('click', function() {
             // Update active state
             filterButtons.forEach(btn => {
                 btn.classList.remove('bg-primary', 'text-white');
-                btn.classList.add('bg-white/80', 'text-secondary');
+                btn.classList.add('bg-gray-200', 'text-gray-700');
             });
-            this.classList.remove('bg-white/80', 'text-secondary');
+            this.classList.remove('bg-gray-200', 'text-gray-700');
             this.classList.add('bg-primary', 'text-white');
             
             // Update current category and reload
             currentCategory = this.dataset.category;
-            loadMainTemplates(true);
+            loadMainTemplates();
         });
     });
+}
+
+// Setup slider functionality
+function setupSlider() {
+    const prevBtn = document.getElementById('prev-slide');
+    const nextBtn = document.getElementById('next-slide');
     
-    // Load more button
-    document.getElementById('load-more-btn').addEventListener('click', function() {
-        loadMainTemplates(false);
-    });
+    if (prevBtn) {
+        prevBtn.addEventListener('click', () => {
+            currentSlide = currentSlide > 0 ? currentSlide - 1 : totalSlides - 1;
+            goToSlide(currentSlide);
+        });
+    }
+    
+    if (nextBtn) {
+        nextBtn.addEventListener('click', () => {
+            currentSlide = currentSlide < totalSlides - 1 ? currentSlide + 1 : 0;
+            goToSlide(currentSlide);
+        });
+    }
+    
+    // Auto-play slider
+    setInterval(() => {
+        if (totalSlides > 1) {
+            currentSlide = currentSlide < totalSlides - 1 ? currentSlide + 1 : 0;
+            goToSlide(currentSlide);
+        }
+    }, 5000);
+}
+
+// Go to specific slide
+function goToSlide(slideIndex) {
+    const slider = document.getElementById('featured-slider');
+    const indicators = document.getElementById('slider-indicators');
+    
+    if (slider) {
+        slider.style.transform = `translateX(-${slideIndex * 100}%)`;
+    }
+    
+    // Update indicators
+    if (indicators) {
+        indicators.querySelectorAll('button').forEach((btn, index) => {
+            btn.classList.toggle('bg-primary', index === slideIndex);
+            btn.classList.toggle('bg-gray-300', index !== slideIndex);
+        });
+    }
+    
+    currentSlide = slideIndex;
 }
 </script>
 

@@ -7,6 +7,34 @@
 require_once __DIR__ . '/../config/database.php';
 
 $config = DatabaseConfig::getAppConfig();
+
+// Get categories and technologies for dropdown
+try {
+    $pdo = DatabaseConfig::getConnection();
+    
+    // Get categories with template count
+    $stmt = $pdo->query("SELECT c.name, c.slug, COUNT(t.id) as template_count 
+                        FROM categories c 
+                        LEFT JOIN templates t ON c.id = t.category_id AND t.status = 'approved'
+                        WHERE c.is_active = 1 
+                        GROUP BY c.id, c.name, c.slug
+                        ORDER BY template_count DESC, c.name");
+    $headerCategories = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    
+    // Get popular technologies
+    $stmt = $pdo->query("SELECT technology, COUNT(*) as count 
+                        FROM templates 
+                        WHERE status = 'approved' AND technology IS NOT NULL 
+                        GROUP BY technology 
+                        ORDER BY count DESC 
+                        LIMIT 6");
+    $headerTechnologies = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    
+} catch (Exception $e) {
+    // Fallback to empty arrays if database error
+    $headerCategories = [];
+    $headerTechnologies = [];
+}
 ?>
 
 <!DOCTYPE html>
@@ -102,85 +130,102 @@ $config = DatabaseConfig::getAppConfig();
 <body class="font-inter gradient-bg min-h-screen">
 
 <!-- Header -->
-<header class="fixed top-0 w-full z-50 glass-effect">
-    <div class="max-w-7xl mx-auto px-6 py-4">
-        <div class="flex items-center justify-between">
+<header class="fixed top-0 left-0 right-0 z-50 backdrop-blur-md" style="background: rgba(255, 255, 255, 0.1);">
+    <div class="max-w-7xl mx-auto px-6">
+        <div class="flex items-center justify-between h-20">
             <!-- Logo -->
             <div class="flex items-center space-x-3">
                 <div class="w-10 h-10 bg-primary rounded-lg flex items-center justify-center">
                     <span class="text-white font-bold text-xl">O</span>
                 </div>
-                <span class="font-pacifico text-2xl text-secondary">Orbix Market</span>
+                <span class="font-pacifico text-3xl text-secondary">Orbix Market</span>
             </div>
             
             <!-- Navigation -->
             <nav class="hidden lg:flex items-center space-x-8">
-                <div class="relative group" id="templates-dropdown">
-                    <a href="/orbix/public/templates.php" class="text-secondary hover:text-primary transition-colors font-medium flex items-center">
-                        Templates
+                <a href="index.php" class="text-secondary hover:text-primary transition-colors font-medium">Home</a>
+                
+                <!-- Templates Dropdown - Dynamic with wider layout -->
+                <div id="templates-dropdown" class="relative group">
+                    <a href="templates.php" class="text-secondary hover:text-primary transition-colors font-medium flex items-center">
+                        Templates 
                         <div class="w-4 h-4 flex items-center justify-center ml-1">
                             <i class="ri-arrow-down-s-line"></i>
                         </div>
                     </a>
-                    <div class="absolute top-full left-0 mt-2 w-64 bg-white rounded-xl shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 transform translate-y-2 group-hover:translate-y-0">
-                        <div class="p-4">
-                            <div class="mb-4">
-                                <h4 class="text-sm font-semibold text-secondary mb-2">Categories</h4>
-                                <div class="space-y-2">
-                                    <a href="/orbix/public/templates.php?category=business" class="block text-gray-600 hover:text-primary text-sm">Business Templates</a>
-                                    <a href="/orbix/public/templates.php?category=ecommerce" class="block text-gray-600 hover:text-primary text-sm">E-commerce Solutions</a>
-                                    <a href="/orbix/public/templates.php?category=portfolio" class="block text-gray-600 hover:text-primary text-sm">Portfolio & CV</a>
-                                    <a href="/orbix/public/templates.php?category=landing" class="block text-gray-600 hover:text-primary text-sm">Landing Pages</a>
-                                    <a href="/orbix/public/templates.php?category=business" class="block text-gray-600 hover:text-primary text-sm">Admin Dashboards</a>
+                    
+                    <!-- Expanded Dropdown Content -->
+                    <div class="absolute top-full left-1/2 transform -translate-x-1/2 mt-2 w-[600px] bg-white rounded-2xl shadow-2xl border border-gray-100 opacity-0 invisible translate-y-2 transition-all duration-300" style="display: none;">
+                        <div class="p-8">
+                            <div class="grid grid-cols-2 gap-8">
+                                <!-- Categories Section -->
+                                <div>
+                                    <h3 class="font-semibold text-secondary mb-4 flex items-center">
+                                        <i class="ri-folder-line mr-2 text-primary"></i>
+                                        Categories
+                                    </h3>
+                                    <div class="space-y-2">
+                                        <a href="templates.php" class="flex items-center justify-between py-2 px-3 rounded-lg hover:bg-gray-50 transition-colors group">
+                                            <span class="text-gray-600 group-hover:text-primary">All Templates</span>
+                                            <span class="text-xs text-gray-400 bg-gray-100 px-2 py-1 rounded-full">
+                                                <?= array_sum(array_column($headerCategories, 'template_count')) ?>
+                                            </span>
+                                        </a>
+                                        <?php foreach ($headerCategories as $category): ?>
+                                        <a href="templates.php?category=<?= urlencode($category['slug']) ?>" class="flex items-center justify-between py-2 px-3 rounded-lg hover:bg-gray-50 transition-colors group">
+                                            <span class="text-gray-600 group-hover:text-primary"><?= htmlspecialchars($category['name']) ?></span>
+                                            <span class="text-xs text-gray-400 bg-gray-100 px-2 py-1 rounded-full"><?= $category['template_count'] ?></span>
+                                        </a>
+                                        <?php endforeach; ?>
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="mb-4">
-                                <a href="/orbix/public/templates.php" class="block w-full bg-primary text-white text-center py-2 px-4 rounded-lg text-sm font-medium hover:bg-primary/90 transition-colors">
-                                    View All Templates
-                                </a>
-                            </div>
-                            <div>
-                                <h4 class="text-sm font-semibold text-secondary mb-2">Popular Tags</h4>
-                                <div class="flex flex-wrap gap-2">
-                                    <a href="/orbix/public/templates.php?tech=html" class="px-2 py-1 bg-gray-100 text-gray-600 rounded-full text-xs hover:bg-primary hover:text-white transition-colors">Responsive</a>
-                                    <a href="/orbix/public/templates.php?tech=react" class="px-2 py-1 bg-gray-100 text-gray-600 rounded-full text-xs hover:bg-primary hover:text-white transition-colors">React</a>
-                                    <a href="/orbix/public/templates.php?tech=vue" class="px-2 py-1 bg-gray-100 text-gray-600 rounded-full text-xs hover:bg-primary hover:text-white transition-colors">Vue.js</a>
-                                    <a href="/orbix/public/templates.php?tech=wordpress" class="px-2 py-1 bg-gray-100 text-gray-600 rounded-full text-xs hover:bg-primary hover:text-white transition-colors">WordPress</a>
+                                
+                                <!-- Technologies Section -->
+                                <div>
+                                    <h3 class="font-semibold text-secondary mb-4 flex items-center">
+                                        <i class="ri-code-line mr-2 text-primary"></i>
+                                        Technologies
+                                    </h3>
+                                    <div class="space-y-2">
+                                        <?php foreach ($headerTechnologies as $tech): ?>
+                                        <a href="templates.php?technology=<?= urlencode($tech['technology']) ?>" class="flex items-center justify-between py-2 px-3 rounded-lg hover:bg-gray-50 transition-colors group">
+                                            <span class="text-gray-600 group-hover:text-primary"><?= htmlspecialchars($tech['technology']) ?></span>
+                                            <span class="text-xs text-gray-400 bg-gray-100 px-2 py-1 rounded-full"><?= $tech['count'] ?></span>
+                                        </a>
+                                        <?php endforeach; ?>
+                                    </div>
+                                    
+                                    <!-- Quick Actions -->
+                                    <div class="mt-6 pt-4 border-t border-gray-100">
+                                        <div class="flex space-x-2">
+                                            <a href="templates.php?featured=1" class="flex-1 bg-primary text-white text-center py-2 px-4 rounded-lg text-sm font-medium hover:bg-primary/90 transition-colors">
+                                                Featured
+                                            </a>
+                                            <a href="templates.php?sort=newest" class="flex-1 bg-gray-100 text-gray-600 text-center py-2 px-4 rounded-lg text-sm font-medium hover:bg-gray-200 transition-colors">
+                                                New
+                                            </a>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
-                <a href="#" class="text-secondary hover:text-primary transition-colors font-medium">Services</a>
-                <a href="#" class="text-secondary hover:text-primary transition-colors font-medium">Become a Seller</a>
+                
+                <a href="#services" class="text-secondary hover:text-primary transition-colors font-medium">Services</a>
                 <a href="#" class="text-secondary hover:text-primary transition-colors font-medium">Pricing</a>
+                <a href="#" class="text-secondary hover:text-primary transition-colors font-medium">Contact</a>
             </nav>
             
-            <!-- Right Side -->
+            <!-- Actions -->
             <div class="flex items-center space-x-4">
-                <!-- Search -->
-                <div class="hidden md:flex items-center bg-white/50 rounded-full px-4 py-2 backdrop-blur-sm">
-                    <div class="w-5 h-5 flex items-center justify-center">
-                        <i class="ri-search-line text-gray-500"></i>
-                    </div>
-                    <input type="text" placeholder="Search templates..." class="ml-2 bg-transparent border-none outline-none text-sm w-48">
-                </div>
+                <a href="#" class="hidden md:block text-secondary hover:text-primary transition-colors font-medium">Sign In</a>
+                <a href="#" class="bg-primary text-white px-6 py-2 rounded-button font-medium hover:bg-primary/90 transition-colors whitespace-nowrap">Get Started</a>
                 
-                <!-- Dark Mode Toggle -->
-                <button class="w-10 h-10 flex items-center justify-center rounded-full bg-white/20 hover:bg-white/30 transition-colors">
-                    <i class="ri-moon-line text-secondary"></i>
+                <!-- Mobile Menu Toggle -->
+                <button class="lg:hidden w-8 h-8 flex items-center justify-center">
+                    <i class="ri-menu-line text-secondary text-xl"></i>
                 </button>
-                
-                <!-- Cart -->
-                <button class="w-10 h-10 flex items-center justify-center rounded-full bg-white/20 hover:bg-white/30 transition-colors relative">
-                    <i class="ri-shopping-cart-line text-secondary"></i>
-                    <span class="absolute -top-1 -right-1 w-5 h-5 bg-primary rounded-full text-white text-xs flex items-center justify-center">3</span>
-                </button>
-                
-                <!-- User Profile -->
-                <div class="flex items-center space-x-2">
-                    <img src="https://readdy.ai/api/search-image?query=professional%20business%20person%20avatar%20headshot%20clean%20white%20background%20modern%20style&width=40&height=40&seq=user1&orientation=squarish" alt="User" class="w-10 h-10 rounded-full object-cover">
-                </div>
             </div>
         </div>
     </div>

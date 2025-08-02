@@ -10,7 +10,7 @@
                     </div>
                     <span class="font-pacifico text-2xl">Orbix Market</span>
                 </div>
-                <p class="text-gray-400 mb-6">The premier marketplace for premium website templates and digital assets.</p>
+                <p class="text-gray-400 mb-6">The premier marketplace for premium website templates, digital assets, and professional web services. Trusted by thousands of customers worldwide.</p>
                 <div class="flex items-center space-x-4">
                     <a href="#" class="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center hover:bg-white/20 transition-colors">
                         <i class="ri-twitter-line"></i>
@@ -43,11 +43,12 @@
             <div>
                 <h3 class="font-semibold mb-6">Services</h3>
                 <ul class="space-y-3">
-                    <li><a href="#" class="text-gray-400 hover:text-white transition-colors">Custom Design</a></li>
-                    <li><a href="#" class="text-gray-400 hover:text-white transition-colors">HTML Slicing</a></li>
-                    <li><a href="#" class="text-gray-400 hover:text-white transition-colors">Template Customization</a></li>
-                    <li><a href="#" class="text-gray-400 hover:text-white transition-colors">SEO Optimization</a></li>
-                    <li><a href="#" class="text-gray-400 hover:text-white transition-colors">Mobile Optimization</a></li>
+                    <li><a href="#services" class="text-gray-400 hover:text-white transition-colors">Website Design</a></li>
+                    <li><a href="#services" class="text-gray-400 hover:text-white transition-colors">Domain Registration</a></li>
+                    <li><a href="#services" class="text-gray-400 hover:text-white transition-colors">Hosting & Cloud</a></li>
+                    <li><a href="#services" class="text-gray-400 hover:text-white transition-colors">SSL & Security</a></li>
+                    <li><a href="#services" class="text-gray-400 hover:text-white transition-colors">Technical Support</a></li>
+                    <li><a href="#services" class="text-gray-400 hover:text-white transition-colors">Website Maintenance</a></li>
                 </ul>
             </div>
             
@@ -63,7 +64,7 @@
                 </ul>
             </div>
         </div>
-        
+                
         <!-- Bottom -->
         <div class="border-t border-gray-700 pt-8">
             <div class="flex flex-col md:flex-row items-center justify-between">
