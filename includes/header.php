@@ -453,7 +453,7 @@ try {
                 </div>
                 
                 <a href="services.php" class="text-secondary hover:text-primary transition-colors font-medium">Services</a>
-                <a href="#" class="text-secondary hover:text-primary transition-colors font-medium">Seller Channel</a>
+                <a href="seller-channel.php" class="text-secondary hover:text-primary transition-colors font-medium">Seller Channel</a>
                 <a href="#" class="text-secondary hover:text-primary transition-colors font-medium">Support</a>
             </nav>
             

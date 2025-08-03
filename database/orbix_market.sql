@@ -15,6 +15,7 @@ CREATE TABLE users (
     profile_image VARCHAR(255),
     user_type ENUM('buyer', 'seller', 'admin') DEFAULT 'buyer',
     is_verified BOOLEAN DEFAULT FALSE,
+    email_verified BOOLEAN DEFAULT FALSE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
