@@ -498,10 +498,10 @@ try {
                                         <span id="cartTotal" class="font-bold text-xl text-primary">$0</span>
                                     </div>
                                     <div class="flex space-x-3">
-                                        <button class="flex-1 bg-gray-100 text-gray-600 py-2 px-4 rounded-lg font-medium hover:bg-gray-200 transition-colors">
+                                        <button onclick="viewCart()" class="flex-1 bg-gray-100 text-gray-600 py-2 px-4 rounded-lg font-medium hover:bg-gray-200 transition-colors">
                                             View Cart
                                         </button>
-                                        <button class="flex-1 bg-primary text-white py-2 px-4 rounded-lg font-medium hover:bg-primary/90 transition-colors">
+                                        <button onclick="proceedToCheckout()" class="flex-1 bg-primary text-white py-2 px-4 rounded-lg font-medium hover:bg-primary/90 transition-colors">
                                             Checkout
                                         </button>
                                     </div>
@@ -1134,6 +1134,36 @@ const cart = new ShoppingCart();
 // Global function to add items to cart (can be called from template cards)
 window.addToCart = function(templateData) {
     cart.addItem(templateData);
+};
+
+// Global functions for cart buttons
+window.viewCart = function() {
+    // Close the cart dropdown first
+    cart.closeCartDropdown();
+    
+    // Navigate to cart page - we'll create this page
+    window.location.href = 'cart.php';
+};
+
+window.proceedToCheckout = function() {
+    // Check if cart has items
+    if (cart.items.length === 0) {
+        if (window.toast) {
+            window.toast.warning('Your cart is empty. Add some templates first!', {
+                duration: 3000,
+                position: 'top-right'
+            });
+        } else {
+            alert('Your cart is empty. Add some templates first!');
+        }
+        return;
+    }
+    
+    // Close the cart dropdown first
+    cart.closeCartDropdown();
+    
+    // Navigate to checkout page - we'll create this page
+    window.location.href = 'checkout.php';
 };
 <?php endif; ?>
 </script>

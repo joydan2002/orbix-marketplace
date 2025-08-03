@@ -7,8 +7,14 @@
 // Get services from database
 try {
     $pdo = DatabaseConfig::getConnection();
-    $stmt = $pdo->query("SELECT * FROM services WHERE is_active = 1 ORDER BY id");
+    $stmt = $pdo->query("SELECT * FROM services WHERE is_active = 1 AND is_featured = 1 ORDER BY sort_order ASC, id ASC LIMIT 6");
     $services = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    
+    // If we don't have enough featured services, get the most popular ones
+    if (count($services) < 6) {
+        $stmt = $pdo->query("SELECT * FROM services WHERE is_active = 1 ORDER BY is_featured DESC, orders_count DESC, rating DESC LIMIT 6");
+        $services = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
 } catch (Exception $e) {
     // Log error and show empty state
     error_log("Database error in service-cards.php: " . $e->getMessage());
@@ -64,9 +70,15 @@ try {
                     <div class="text-lg font-bold text-primary">
                         Starting at $<?php echo number_format($service['price'], 0); ?>
                     </div>
-                    <a href="#" class="text-primary font-medium flex items-center hover:text-primary/80 transition-colors">
-                        Learn More <i class="ri-arrow-right-line ml-1"></i>
-                    </a>
+                    <div class="flex space-x-2">
+                        <button onclick="window.location.href='service-detail.php?id=<?= $service['id'] ?>'" class="w-10 h-10 flex items-center justify-center border-2 border-gray-200 rounded-lg hover:border-primary hover:text-primary transition-colors">
+                            <i class="ri-eye-line"></i>
+                        </button>
+                        <button onclick="handleOrderService(<?= $service['id'] ?>, '<?= addslashes($service['title']) ?>', <?= $service['price'] ?>, '<?= addslashes($service['preview_image']) ?>', '<?= addslashes($service['seller_name']) ?>')" 
+                                class="w-10 h-10 flex items-center justify-center bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors">
+                            <i class="ri-shopping-cart-line"></i>
+                        </button>
+                    </div>
                 </div>
             </div>
             <?php endforeach; ?>
@@ -365,4 +377,26 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 });
+
+// Handle Order Service function
+function handleOrderService(serviceId, title, price, image, seller) {
+    // Check if user is logged in
+    if (typeof cart === 'undefined') {
+        window.location.href = 'public/auth.php?redirect=' + encodeURIComponent(window.location.href);
+        return;
+    }
+    
+    // Create service data object
+    const serviceData = {
+        id: serviceId,
+        title: title,
+        price: price,
+        image: image,
+        seller: seller,
+        type: 'service'
+    };
+    
+    // Add to cart using the global cart system
+    cart.addItem(serviceData);
+}
 </script>

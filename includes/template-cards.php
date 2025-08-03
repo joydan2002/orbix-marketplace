@@ -151,12 +151,15 @@ if ($templates):
                 
                 <!-- Action Buttons -->
                 <div class="flex gap-3">
-                    <button class="flex-1 bg-gradient-to-r from-orange-500 to-red-500 text-white py-3 px-4 rounded-xl font-semibold hover:from-orange-600 hover:to-red-600 transition-all duration-300 transform hover:scale-105">
-                        <i class="ri-shopping-cart-line mr-2"></i>Add to Cart
-                    </button>
-                    <button class="px-4 py-3 border-2 border-orange-500 text-orange-500 rounded-xl font-semibold hover:bg-orange-500 hover:text-white transition-all duration-300">
-                        <i class="ri-eye-line"></i>
-                    </button>
+                    <div class="flex space-x-2">
+                        <button onclick="window.location.href='template-detail.php?id=<?= $template['id'] ?>'" class="w-10 h-10 flex items-center justify-center border-2 border-gray-200 rounded-lg hover:border-primary hover:text-primary transition-colors">
+                            <i class="ri-eye-line"></i>
+                        </button>
+                        <button onclick="handlePurchaseTemplate(<?= $template['id'] ?>, '<?= addslashes($template['title']) ?>', <?= $template['price'] ?>, '<?= addslashes($template['preview_image']) ?>', '<?= addslashes($template['seller_name']) ?>')" 
+                                class="w-10 h-10 flex items-center justify-center bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors">
+                            <i class="ri-shopping-cart-line"></i>
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>

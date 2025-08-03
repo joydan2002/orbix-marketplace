@@ -609,7 +609,7 @@ $deliveryTimes = $serviceManager->getDeliveryTimeFilters();
                                             class="flex-1 bg-primary text-white py-2 px-4 rounded-button text-sm font-medium hover:bg-primary/90 transition-colors whitespace-nowrap">
                                         <i class="ri-shopping-cart-line mr-1"></i>Order Now
                                     </button>
-                                    <button class="px-4 py-2 border border-gray-200 rounded-button text-sm font-medium hover:bg-gray-50 transition-colors whitespace-nowrap">
+                                    <button onclick="window.location.href='service-detail.php?id=<?= $service['id'] ?>'" class="px-4 py-2 border border-gray-200 rounded-button text-sm font-medium hover:bg-gray-50 transition-colors whitespace-nowrap">
                                         <i class="ri-eye-line"></i>
                                     </button>
                                 </div>
@@ -946,9 +946,9 @@ $deliveryTimes = $serviceManager->getDeliveryTimeFilters();
                 });
             });
 
-            // Technology filters
-            const techInputs = document.querySelectorAll('input[name="technology"]');
-            techInputs.forEach(input => {
+            // Delivery time filters
+            const deliveryInputs = document.querySelectorAll('input[name="delivery_time"]');
+            deliveryInputs.forEach(input => {
                 input.addEventListener('change', function() {
                     // Reset to page 1 when filters change
                     currentPage = 1;
@@ -1066,7 +1066,13 @@ $deliveryTimes = $serviceManager->getDeliveryTimeFilters();
                 filters.category = selectedCategory;
             }
             
-            // Technology - Multiple checkboxes
+            // Delivery time - Multiple checkboxes
+            const checkedDelivery = document.querySelectorAll('input[name="delivery_time"]:checked');
+            if (checkedDelivery.length > 0) {
+                filters.delivery_time = Array.from(checkedDelivery).map(input => input.value);
+            }
+            
+            // Technology - Multiple checkboxes (if available)
             const checkedTech = document.querySelectorAll('input[name="technology"]:checked');
             if (checkedTech.length > 0) {
                 filters.technology = Array.from(checkedTech).map(input => input.value);
@@ -1233,6 +1239,73 @@ $deliveryTimes = $serviceManager->getDeliveryTimeFilters();
         // Helper function for JavaScript addslashes equivalent
         function addslashes(str) {
             return (str + '').replace(/[\\"']/g, '\\$&').replace(/\u0000/g, '\\0');
+        }
+        
+        // Helper function to escape HTML
+        function escapeHtml(text) {
+            const map = {
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#039;'
+            };
+            return text ? text.toString().replace(/[&<>"']/g, function(m) { return map[m]; }) : '';
+        }
+        
+        // Clear all filters function
+        function clearAllFilters() {
+            // Reset category to "All Services"
+            const allCategoryBtn = document.querySelector('#categoryPills button[data-category="all"]');
+            if (allCategoryBtn) {
+                allCategoryBtn.click();
+            }
+            
+            // Clear search
+            const searchInput = document.getElementById('searchInput');
+            if (searchInput) {
+                searchInput.value = '';
+            }
+            
+            // Reset all checkboxes and radios
+            const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+            checkboxes.forEach(input => {
+                input.checked = false;
+            });
+            
+            // Reset category to "all"
+            const allCategoryRadio = document.querySelector('input[name="category"][value="all"]');
+            if (allCategoryRadio) {
+                allCategoryRadio.checked = true;
+            }
+            
+            // Reset rating radio buttons
+            const ratingRadios = document.querySelectorAll('input[name="rating"]');
+            ratingRadios.forEach(input => {
+                input.checked = false;
+            });
+            
+            // Clear price inputs
+            const minPrice = document.getElementById('minPrice');
+            const maxPrice = document.getElementById('maxPrice');
+            if (minPrice) minPrice.value = '';
+            if (maxPrice) maxPrice.value = '';
+            
+            // Reset price slider
+            const priceSlider = document.querySelector('.price-range-slider');
+            if (priceSlider) {
+                priceSlider.value = 1000;
+            }
+            
+            // Reset sort to popular
+            const sortSelect = document.getElementById('sortSelect');
+            if (sortSelect) {
+                sortSelect.value = 'popular';
+            }
+            
+            // Reset to page 1 and apply filters
+            currentPage = 1;
+            applyFilters();
         }
     </script>
 </body>

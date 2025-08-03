@@ -15,104 +15,89 @@ class TemplateManager {
      * Get all templates with optional filtering and sorting
      */
     public function getTemplates($filters = [], $sort = 'popular', $limit = null, $offset = 0) {
-        $sql = "SELECT t.*, c.name as category_name, c.slug as category_slug,
-                       u.first_name, u.last_name, u.profile_image,
-                       COALESCE(AVG(r.rating), 0) as avg_rating,
-                       COUNT(r.id) as review_count
-                FROM templates t
-                LEFT JOIN categories c ON t.category_id = c.id
-                LEFT JOIN users u ON t.seller_id = u.id
-                LEFT JOIN reviews r ON t.id = r.template_id
-                WHERE t.status = 'approved'";
-        
+        $whereConditions = ["t.status = 'approved'"];
         $params = [];
         
         // Apply filters
         if (!empty($filters['category']) && $filters['category'] !== 'all') {
-            $sql .= " AND c.slug = :category";
-            $params['category'] = $filters['category'];
+            $whereConditions[] = "c.slug = ?";
+            $params[] = $filters['category'];
         }
         
         if (!empty($filters['search'])) {
-            $sql .= " AND (t.title LIKE :search OR t.description LIKE :search)";
-            $params['search'] = '%' . $filters['search'] . '%';
+            $whereConditions[] = "(t.title LIKE ? OR t.description LIKE ?)";
+            $searchTerm = '%' . $filters['search'] . '%';
+            $params[] = $searchTerm;
+            $params[] = $searchTerm;
         }
         
         if (!empty($filters['min_price'])) {
-            $sql .= " AND t.price >= :min_price";
-            $params['min_price'] = $filters['min_price'];
+            $whereConditions[] = "t.price >= ?";
+            $params[] = $filters['min_price'];
         }
         
         if (!empty($filters['max_price'])) {
-            $sql .= " AND t.price <= :max_price";
-            $params['max_price'] = $filters['max_price'];
+            $whereConditions[] = "t.price <= ?";
+            $params[] = $filters['max_price'];
         }
         
         if (!empty($filters['technology'])) {
             $technologies = is_array($filters['technology']) ? $filters['technology'] : [$filters['technology']];
             $techPlaceholders = [];
-            foreach ($technologies as $i => $tech) {
-                $techPlaceholders[] = ":tech_$i";
-                $params["tech_$i"] = $tech;
+            foreach ($technologies as $tech) {
+                $techPlaceholders[] = "?";
+                $params[] = $tech;
             }
-            $sql .= " AND t.technology IN (" . implode(',', $techPlaceholders) . ")";
+            $whereConditions[] = "t.technology IN (" . implode(',', $techPlaceholders) . ")";
         }
         
         if (!empty($filters['min_rating'])) {
-            $sql .= " AND t.rating >= :min_rating";
-            $params['min_rating'] = $filters['min_rating'];
+            $whereConditions[] = "t.rating >= ?";
+            $params[] = $filters['min_rating'];
         }
         
         if (!empty($filters['featured'])) {
-            $sql .= " AND t.is_featured = 1";
+            $whereConditions[] = "t.is_featured = 1";
         }
         
-        $sql .= " GROUP BY t.id";
+        // Build WHERE clause
+        $whereClause = count($whereConditions) > 0 ? "WHERE " . implode(" AND ", $whereConditions) : "";
         
-        // Apply sorting
-        switch ($sort) {
-            case 'price-low':
-                $sql .= " ORDER BY t.price ASC";
-                break;
-            case 'price-high':
-                $sql .= " ORDER BY t.price DESC";
-                break;
-            case 'rating':
-                $sql .= " ORDER BY avg_rating DESC, review_count DESC";
-                break;
-            case 'newest':
-                $sql .= " ORDER BY t.created_at DESC";
-                break;
-            case 'popular':
-            default:
-                $sql .= " ORDER BY t.downloads_count DESC, t.views_count DESC";
-                break;
-        }
+        // Build ORDER BY clause
+        $orderBy = match($sort) {
+            'price-low' => "ORDER BY t.price ASC",
+            'price-high' => "ORDER BY t.price DESC",
+            'rating' => "ORDER BY avg_rating DESC, review_count DESC", 
+            'newest' => "ORDER BY t.created_at DESC",
+            default => "ORDER BY t.downloads_count DESC, t.views_count DESC"
+        };
+        
+        $sql = "SELECT t.*, c.name as category_name, c.slug as category_slug,
+                       COALESCE(CONCAT(u.first_name, ' ', u.last_name), 'Anonymous Seller') as seller_name,
+                       COALESCE(u.profile_image, 'https://via.placeholder.com/150x150/FF5F1F/FFFFFF?text=T') as profile_image,
+                       COALESCE(AVG(r.rating), t.rating, 0) as avg_rating,
+                       COUNT(r.id) as review_count
+                FROM templates t
+                LEFT JOIN categories c ON t.category_id = c.id
+                LEFT JOIN users u ON t.seller_id = u.id
+                LEFT JOIN reviews r ON t.id = r.template_id
+                {$whereClause}
+                GROUP BY t.id
+                {$orderBy}";
         
         // Apply limit and offset
         if ($limit) {
-            $sql .= " LIMIT :limit OFFSET :offset";
-            $params['limit'] = $limit;
-            $params['offset'] = $offset;
+            $sql .= " LIMIT ? OFFSET ?";
+            $params[] = $limit;
+            $params[] = $offset;
         }
         
         $stmt = $this->db->prepare($sql);
-        
-        // Bind parameters
-        foreach ($params as $key => $value) {
-            if ($key === 'limit' || $key === 'offset') {
-                $stmt->bindValue(":$key", (int)$value, PDO::PARAM_INT);
-            } else {
-                $stmt->bindValue(":$key", $value);
-            }
-        }
-        
-        $stmt->execute();
+        $stmt->execute($params);
         $templates = $stmt->fetchAll(PDO::FETCH_ASSOC);
         
         // Process templates data
         foreach ($templates as &$template) {
-            $template['seller_name'] = trim($template['first_name'] . ' ' . $template['last_name']);
             $template['tags'] = json_decode($template['tags'], true) ?: [];
             $template['avg_rating'] = round((float)$template['avg_rating'], 1);
             
@@ -264,58 +249,60 @@ class TemplateManager {
      * Get total template count with filters
      */
     public function getTotalCount($filters = []) {
-        $sql = "SELECT COUNT(DISTINCT t.id) as total
-                FROM templates t
-                LEFT JOIN categories c ON t.category_id = c.id
-                WHERE t.status = 'approved'";
-        
+        $whereConditions = ["t.status = 'approved'"];
         $params = [];
         
         // Apply same filters as getTemplates
         if (!empty($filters['category']) && $filters['category'] !== 'all') {
-            $sql .= " AND c.slug = :category";
-            $params['category'] = $filters['category'];
+            $whereConditions[] = "c.slug = ?";
+            $params[] = $filters['category'];
         }
         
         if (!empty($filters['search'])) {
-            $sql .= " AND (t.title LIKE :search OR t.description LIKE :search)";
-            $params['search'] = '%' . $filters['search'] . '%';
+            $whereConditions[] = "(t.title LIKE ? OR t.description LIKE ?)";
+            $searchTerm = '%' . $filters['search'] . '%';
+            $params[] = $searchTerm;
+            $params[] = $searchTerm;
         }
         
         if (!empty($filters['min_price'])) {
-            $sql .= " AND t.price >= :min_price";
-            $params['min_price'] = $filters['min_price'];
+            $whereConditions[] = "t.price >= ?";
+            $params[] = $filters['min_price'];
         }
         
         if (!empty($filters['max_price'])) {
-            $sql .= " AND t.price <= :max_price";
-            $params['max_price'] = $filters['max_price'];
+            $whereConditions[] = "t.price <= ?";
+            $params[] = $filters['max_price'];
         }
         
         if (!empty($filters['technology'])) {
             $technologies = is_array($filters['technology']) ? $filters['technology'] : [$filters['technology']];
             $techPlaceholders = [];
-            foreach ($technologies as $i => $tech) {
-                $techPlaceholders[] = ":tech_$i";
-                $params["tech_$i"] = $tech;
+            foreach ($technologies as $tech) {
+                $techPlaceholders[] = "?";
+                $params[] = $tech;
             }
-            $sql .= " AND t.technology IN (" . implode(',', $techPlaceholders) . ")";
+            $whereConditions[] = "t.technology IN (" . implode(',', $techPlaceholders) . ")";
         }
         
         if (!empty($filters['min_rating'])) {
-            $sql .= " AND t.rating >= :min_rating";
-            $params['min_rating'] = $filters['min_rating'];
+            $whereConditions[] = "t.rating >= ?";
+            $params[] = $filters['min_rating'];
         }
         
         if (!empty($filters['featured'])) {
-            $sql .= " AND t.is_featured = 1";
+            $whereConditions[] = "t.is_featured = 1";
         }
         
+        $whereClause = count($whereConditions) > 0 ? "WHERE " . implode(" AND ", $whereConditions) : "";
+        
+        $sql = "SELECT COUNT(DISTINCT t.id) as total
+                FROM templates t
+                LEFT JOIN categories c ON t.category_id = c.id
+                {$whereClause}";
+        
         $stmt = $this->db->prepare($sql);
-        foreach ($params as $key => $value) {
-            $stmt->bindValue(":$key", $value);
-        }
-        $stmt->execute();
+        $stmt->execute($params);
         
         $result = $stmt->fetch(PDO::FETCH_ASSOC);
         return (int)$result['total'];

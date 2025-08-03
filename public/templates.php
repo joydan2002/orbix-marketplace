@@ -604,7 +604,7 @@ $technologies = $templateManager->getTechnologyFilters();
                                             class="flex-1 bg-primary text-white py-2 px-4 rounded-button text-sm font-medium hover:bg-primary/90 transition-colors whitespace-nowrap">
                                         <i class="ri-shopping-cart-line mr-1"></i>Add to Cart
                                     </button>
-                                    <button class="px-4 py-2 border border-gray-200 rounded-button text-sm font-medium hover:bg-gray-50 transition-colors whitespace-nowrap">
+                                    <button onclick="window.location.href='template-detail.php?id=<?= $template['id'] ?>'" class="px-4 py-2 border border-gray-200 rounded-button text-sm font-medium hover:bg-gray-50 transition-colors whitespace-nowrap">
                                         <i class="ri-eye-line"></i>
                                     </button>
                                 </div>
@@ -787,7 +787,7 @@ $technologies = $templateManager->getTechnologyFilters();
                                     class="flex-1 bg-primary text-white py-2 px-4 rounded-button text-sm font-medium hover:bg-primary/90 transition-colors whitespace-nowrap">
                                 <i class="ri-shopping-cart-line mr-1"></i>Add to Cart
                             </button>
-                            <button class="px-4 py-2 border border-gray-200 rounded-button text-sm font-medium hover:bg-gray-50 transition-colors whitespace-nowrap">
+                            <button onclick="window.location.href='template-detail.php?id=${template.id}'" class="px-4 py-2 border border-gray-200 rounded-button text-sm font-medium hover:bg-gray-50 transition-colors whitespace-nowrap">
                                 <i class="ri-eye-line"></i>
                             </button>
                         </div>

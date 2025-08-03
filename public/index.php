@@ -389,13 +389,13 @@ function createMainTemplateCard(template) {
                 <div class="flex justify-between items-center">
                     <span class="text-primary font-bold text-xl">$${template.price}</span>
                     <div class="flex space-x-2">
-                        <button class="w-10 h-10 flex items-center justify-center bg-gray-100 rounded-full hover:bg-gray-200 transition-colors">
+                        <button onclick="viewTemplateDetails(${template.id})" class="w-10 h-10 flex items-center justify-center bg-gray-100 rounded-full hover:bg-gray-200 transition-colors">
                             <i class="ri-eye-line text-gray-600"></i>
                         </button>
-                        <button class="w-10 h-10 flex items-center justify-center bg-gray-100 rounded-full hover:bg-gray-200 transition-colors">
+                        <button onclick="addToFavorites(${template.id}, 'template')" class="w-10 h-10 flex items-center justify-center bg-gray-100 rounded-full hover:bg-gray-200 transition-colors">
                             <i class="ri-heart-line text-gray-600"></i>
                         </button>
-                        <button class="w-10 h-10 flex items-center justify-center bg-primary rounded-full hover:bg-primary/90 transition-colors">
+                        <button onclick="addToCart(${template.id}, '${escapeHtml(template.title)}', ${template.price}, '${escapeHtml(template.preview_image)}', '${escapeHtml(template.seller_name || 'Unknown')}', 'template')" class="w-10 h-10 flex items-center justify-center bg-primary rounded-full hover:bg-primary/90 transition-colors">
                             <i class="ri-shopping-cart-line text-white"></i>
                         </button>
                     </div>
@@ -447,7 +447,7 @@ function createFeaturedTemplateCard(template) {
             <div class="relative">
                 <img src="${template.preview_image}" alt="${template.title}" class="w-full h-64 object-cover">
                 <div class="absolute inset-0 bg-black bg-opacity-20 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity">
-                    <button class="bg-white text-gray-800 px-6 py-2 rounded-button font-medium hover:bg-gray-100 transition-colors">
+                    <button onclick="viewTemplateDetails(${template.id})" class="bg-white text-gray-800 px-6 py-2 rounded-button font-medium hover:bg-gray-100 transition-colors">
                         View Details
                     </button>
                 </div>
@@ -462,7 +462,7 @@ function createFeaturedTemplateCard(template) {
                         <span class="text-gray-400 line-through text-sm">$${originalPrice}</span>
                         <span class="text-primary font-bold text-xl ml-2">$${template.price}</span>
                     </div>
-                    <button class="bg-gradient-to-r from-primary to-primary/80 text-white px-4 py-2 rounded-button font-medium hover:shadow-lg transition-all">
+                    <button onclick="addToCart(${template.id}, '${escapeHtml(template.title)}', ${template.price}, '${escapeHtml(template.preview_image)}', '${escapeHtml(template.seller_name || 'Unknown')}', 'template')" class="bg-gradient-to-r from-primary to-primary/80 text-white px-4 py-2 rounded-button font-medium hover:shadow-lg transition-all">
                         <i class="ri-shopping-cart-line mr-1"></i> Buy Now
                     </button>
                 </div>
@@ -548,6 +548,64 @@ function loadScript(src) {
         script.onerror = reject;
         document.head.appendChild(script);
     });
+}
+
+// Button handler functions
+function viewTemplateDetails(templateId) {
+    window.location.href = `template-detail.php?id=${templateId}`;
+}
+
+function addToFavorites(itemId, itemType) {
+    // Check if user is logged in
+    if (typeof cart === 'undefined') {
+        window.location.href = 'auth.php?redirect=' + encodeURIComponent(window.location.href);
+        return;
+    }
+    
+    // Add to favorites logic here
+    console.log(`Adding ${itemType} ${itemId} to favorites`);
+    
+    // Show success message
+    if (window.toast) {
+        window.toast.success(`${itemType === 'template' ? 'Template' : 'Service'} added to favorites!`, {
+            duration: 3000,
+            position: 'top-right'
+        });
+    } else {
+        alert(`${itemType === 'template' ? 'Template' : 'Service'} added to favorites!`);
+    }
+}
+
+function addToCart(itemId, title, price, image, seller, itemType) {
+    // Check if user is logged in
+    if (typeof cart === 'undefined') {
+        window.location.href = 'auth.php?redirect=' + encodeURIComponent(window.location.href);
+        return;
+    }
+    
+    // Create item data object
+    const itemData = {
+        id: itemId,
+        title: title,
+        price: price,
+        image: image,
+        seller: seller,
+        type: itemType
+    };
+    
+    // Add to cart using the global cart system
+    cart.addItem(itemData);
+}
+
+// Helper function to escape HTML for JavaScript strings
+function escapeHtml(text) {
+    if (!text) return '';
+    return text.toString()
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
 }
 </script>
 

@@ -41,6 +41,15 @@ class ServiceManager {
             $params[] = $filters["max_price"];
         }
         
+        if (!empty($filters["delivery_time"])) {
+            $deliveryConditions = [];
+            foreach ($filters["delivery_time"] as $delivery) {
+                $deliveryConditions[] = "s.delivery_time = ?";
+                $params[] = $delivery;
+            }
+            $whereConditions[] = "(" . implode(" OR ", $deliveryConditions) . ")";
+        }
+        
         if (!empty($filters["technology"])) {
             $techConditions = [];
             foreach ($filters["technology"] as $tech) {
@@ -68,18 +77,24 @@ class ServiceManager {
             "price-low" => "ORDER BY s.price ASC",
             "price-high" => "ORDER BY s.price DESC", 
             "rating" => "ORDER BY s.rating DESC, s.reviews_count DESC",
+            "delivery" => "ORDER BY CASE 
+                WHEN s.delivery_time LIKE '%hour%' THEN 1
+                WHEN s.delivery_time LIKE '%day%' THEN CAST(SUBSTRING_INDEX(s.delivery_time, ' ', 1) AS UNSIGNED) + 1
+                ELSE 999
+            END ASC",
             default => "ORDER BY s.is_featured DESC, s.orders_count DESC, s.rating DESC"
         };
         
         $sql = "
             SELECT 
                 s.*,
-                u.username as seller_name,
-                u.profile_image,
+                COALESCE(CONCAT(u.first_name, ' ', u.last_name), 'Anonymous Seller') as seller_name,
+                COALESCE(u.profile_image, 'https://via.placeholder.com/150x150/FF5F1F/FFFFFF?text=S') as profile_image,
                 sc.name as category_name,
                 sc.slug as category_slug,
                 s.rating as avg_rating,
-                s.reviews_count as review_count
+                s.reviews_count as review_count,
+                COALESCE(s.orders_count, 0) as orders_count
             FROM services s
             LEFT JOIN users u ON s.seller_id = u.id
             LEFT JOIN service_categories sc ON s.category_id = sc.id
@@ -125,6 +140,15 @@ class ServiceManager {
         if (!empty($filters["max_price"])) {
             $whereConditions[] = "s.price <= ?";
             $params[] = $filters["max_price"];
+        }
+        
+        if (!empty($filters["delivery_time"])) {
+            $deliveryConditions = [];
+            foreach ($filters["delivery_time"] as $delivery) {
+                $deliveryConditions[] = "s.delivery_time = ?";
+                $params[] = $delivery;
+            }
+            $whereConditions[] = "(" . implode(" OR ", $deliveryConditions) . ")";
         }
         
         if (!empty($filters["technology"])) {
@@ -238,12 +262,13 @@ class ServiceManager {
         $sql = "
             SELECT 
                 s.*,
-                u.username as seller_name,
-                u.profile_image,
+                COALESCE(CONCAT(u.first_name, ' ', u.last_name), 'Anonymous Seller') as seller_name,
+                COALESCE(u.profile_image, 'https://via.placeholder.com/150x150/FF5F1F/FFFFFF?text=S') as profile_image,
                 sc.name as category_name,
                 sc.slug as category_slug,
                 s.rating as avg_rating,
-                s.reviews_count as review_count
+                s.reviews_count as review_count,
+                COALESCE(s.orders_count, 0) as orders_count
             FROM services s
             LEFT JOIN users u ON s.seller_id = u.id
             LEFT JOIN service_categories sc ON s.category_id = sc.id
