@@ -163,7 +163,10 @@ if ($templates):
 <?php 
     endforeach;
 else:
-    // Fallback to static templates if database is empty
-    include 'template-cards-static.php';
+    // Show error message if no templates found
+    echo '<div class="col-span-full text-center py-12">';
+    echo '<p class="text-gray-500 text-lg">No templates available at the moment.</p>';
+    echo '<p class="text-gray-400 text-sm mt-2">Please check back later or contact support if this persists.</p>';
+    echo '</div>';
 endif;
 ?>

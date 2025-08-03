@@ -36,6 +36,12 @@ try {
 
 // Include header
 include '../includes/header.php';
+
+// Check for logout success message
+$showLogoutSuccess = isset($_GET['logout']) && $_GET['logout'] === 'success';
+
+// Check for login success message
+$showLoginSuccess = isset($_GET['login']) && $_GET['login'] === 'success';
 ?>
 
 <!-- Hero Section -->
@@ -217,6 +223,35 @@ let totalSlides = 0;
 
 // Initialize page
 document.addEventListener('DOMContentLoaded', function() {
+    // Show login/logout success messages
+    <?php if ($showLoginSuccess): ?>
+        // Load toast notification system first
+        loadScript('../assets/js/components/toast-notification.js').then(() => {
+            setTimeout(() => {
+                if (window.toast) {
+                    window.toast.success('Welcome back! You have successfully signed in to your account.', {
+                        duration: 4000,
+                        position: 'top-right'
+                    });
+                }
+            }, 500);
+        });
+    <?php endif; ?>
+    
+    <?php if ($showLogoutSuccess): ?>
+        // Load toast notification system first
+        loadScript('../assets/js/components/toast-notification.js').then(() => {
+            setTimeout(() => {
+                if (window.toast) {
+                    window.toast.success('You have been successfully logged out. See you again soon!', {
+                        duration: 5000,
+                        position: 'top-right'
+                    });
+                }
+            }, 500);
+        });
+    <?php endif; ?>
+    
     loadHeroTemplates();
     loadMainTemplates();
     loadFeaturedTemplates();
@@ -490,18 +525,29 @@ function goToSlide(slideIndex) {
     const indicators = document.getElementById('slider-indicators');
     
     if (slider) {
-        slider.style.transform = `translateX(-${slideIndex * 100}%)`;
+        const offset = -slideIndex * 100;
+        slider.style.transform = `translateX(${offset}%)`;
     }
     
-    // Update indicators
     if (indicators) {
         indicators.querySelectorAll('button').forEach((btn, index) => {
             btn.classList.toggle('bg-primary', index === slideIndex);
             btn.classList.toggle('bg-gray-300', index !== slideIndex);
         });
     }
-    
+
     currentSlide = slideIndex;
+}
+
+// Helper function to load scripts dynamically
+function loadScript(src) {
+    return new Promise((resolve, reject) => {
+        const script = document.createElement('script');
+        script.src = src;
+        script.onload = resolve;
+        script.onerror = reject;
+        document.head.appendChild(script);
+    });
 }
 </script>
 

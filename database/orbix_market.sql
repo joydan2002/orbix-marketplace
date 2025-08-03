@@ -136,6 +136,32 @@ CREATE TABLE services (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+-- Domains table for domain availability checking
+CREATE TABLE domains (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    name VARCHAR(255) NOT NULL,
+    extension VARCHAR(10) NOT NULL,
+    price DECIMAL(10,2) NOT NULL,
+    is_available BOOLEAN DEFAULT TRUE,
+    is_premium BOOLEAN DEFAULT FALSE,
+    renewal_price DECIMAL(10,2),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    INDEX idx_extension (extension),
+    INDEX idx_available (is_available),
+    UNIQUE KEY unique_domain (name, extension)
+);
+
+-- Domain extensions pricing
+CREATE TABLE domain_extensions (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    extension VARCHAR(10) NOT NULL UNIQUE,
+    price DECIMAL(10,2) NOT NULL,
+    renewal_price DECIMAL(10,2) NOT NULL,
+    is_active BOOLEAN DEFAULT TRUE,
+    sort_order INT DEFAULT 0
+);
+
 -- Insert sample categories
 INSERT INTO categories (name, slug, description, icon) VALUES
 ('Business', 'business', 'Professional business website templates', 'ri-briefcase-line'),
@@ -187,6 +213,44 @@ INSERT INTO reviews (template_id, user_id, rating, review_text) VALUES
 (4, 5, 4, 'Good conversion focused design.'),
 (5, 3, 4, 'Nice restaurant template, easy to customize.'),
 (6, 4, 5, 'Excellent fitness template with great features.');
+
+-- Insert domain extensions
+INSERT INTO domain_extensions (extension, price, renewal_price, sort_order) VALUES
+('.com', 12.99, 14.99, 1),
+('.net', 14.99, 16.99, 2),
+('.org', 13.99, 15.99, 3),
+('.io', 39.99, 39.99, 4),
+('.co', 29.99, 29.99, 5),
+('.biz', 19.99, 21.99, 6),
+('.info', 18.99, 20.99, 7),
+('.tech', 49.99, 49.99, 8);
+
+-- Sample domains data (some available, some taken)
+INSERT INTO domains (name, extension, price, is_available, is_premium) VALUES
+-- Available domains
+('mybusiness', '.com', 12.99, TRUE, FALSE),
+('techstartup', '.com', 12.99, TRUE, FALSE),
+('creativestudio', '.com', 12.99, TRUE, FALSE),
+('digitalagency', '.net', 14.99, TRUE, FALSE),
+('webdesign', '.org', 13.99, TRUE, FALSE),
+('cloudservice', '.io', 39.99, TRUE, FALSE),
+('marketpro', '.co', 29.99, TRUE, FALSE),
+('nextgen', '.tech', 49.99, TRUE, FALSE),
+
+-- Taken domains
+('google', '.com', 12.99, FALSE, FALSE),
+('facebook', '.com', 12.99, FALSE, FALSE),
+('amazon', '.com', 12.99, FALSE, FALSE),
+('microsoft', '.com', 12.99, FALSE, FALSE),
+('apple', '.com', 12.99, FALSE, FALSE),
+('twitter', '.com', 12.99, FALSE, FALSE),
+
+-- Premium domains
+('business', '.com', 299.99, TRUE, TRUE),
+('shop', '.com', 199.99, TRUE, TRUE),
+('store', '.com', 399.99, TRUE, TRUE),
+('tech', '.com', 499.99, TRUE, TRUE),
+('digital', '.com', 249.99, TRUE, TRUE);
 
 -- Create indexes for better performance
 CREATE INDEX idx_templates_category ON templates(category_id);

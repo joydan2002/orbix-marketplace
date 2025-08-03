@@ -1,7 +1,7 @@
 <?php
 /**
- * Templates Gallery Page
- * Displays all available website templates with filtering and search
+ * Services Marketplace Page
+ * Displays all available website-related services with filtering and search
  */
 
 // Start session first - quan trọng để header hiển thị đúng auth status
@@ -10,12 +10,12 @@ if (session_status() === PHP_SESSION_NONE) {
 }
 
 require_once __DIR__ . '/../config/database.php';
-require_once __DIR__ . '/../config/template-manager.php';
+require_once __DIR__ . '/../config/service-manager.php';
 
 // Get database connection
 try {
     $db = DatabaseConfig::getConnection();
-    $templateManager = new TemplateManager($db);
+    $serviceManager = new ServiceManager($db);
 } catch (Exception $e) {
     die('Database connection failed: ' . $e->getMessage());
 }
@@ -48,8 +48,8 @@ if (isset($_GET['ajax'])) {
         $filters['max_price'] = floatval($_GET['max_price']);
     }
     
-    if (!empty($_GET['technology'])) {
-        $filters['technology'] = is_array($_GET['technology']) ? $_GET['technology'] : [$_GET['technology']];
+    if (!empty($_GET['delivery_time'])) {
+        $filters['delivery_time'] = is_array($_GET['delivery_time']) ? $_GET['delivery_time'] : [$_GET['delivery_time']];
     }
     
     if (!empty($_GET['min_rating'])) {
@@ -60,13 +60,13 @@ if (isset($_GET['ajax'])) {
         $filters['featured'] = true;
     }
     
-    // Get templates and total count from database
-    $templates = $templateManager->getTemplates($filters, $sort, $limit, $offset);
-    $totalCount = $templateManager->getTotalCount($filters);
+    // Get services and total count from database
+    $services = $serviceManager->getServices($filters, $sort, $limit, $offset);
+    $totalCount = $serviceManager->getTotalCount($filters);
     $totalPages = ceil($totalCount / $limit);
     
     echo json_encode([
-        'templates' => $templates,
+        'services' => $services,
         'pagination' => [
             'current_page' => $page,
             'total_pages' => $totalPages,
@@ -78,17 +78,17 @@ if (isset($_GET['ajax'])) {
 }
 
 // Get initial data for page load - only from database
-$templates = $templateManager->getTemplates([], 'popular', 12);
-$totalCount = $templateManager->getTotalCount();
-$categories = $templateManager->getCategories();
-$technologies = $templateManager->getTechnologyFilters();
+$services = $serviceManager->getServices([], 'popular', 12);
+$totalCount = $serviceManager->getTotalCount();
+$categories = $serviceManager->getCategories();
+$deliveryTimes = $serviceManager->getDeliveryTimeFilters();
 ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Website Templates - Orbix Market</title>
+    <title>Website Services - Orbix Market</title>
     <script src="https://cdn.tailwindcss.com/3.4.16"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -109,43 +109,43 @@ $technologies = $templateManager->getTechnologyFilters();
             background: linear-gradient(135deg, #ffffff 0%, #f8fafc 50%, #ffffff 100%);
         }
         
-        .template-card {
+        .service-card {
             transition: all 0.3s ease;
             background: rgba(255, 255, 255, 0.9);
             backdrop-filter: blur(10px);
-            height: 100%; /* Make all cards same height */
+            height: 100%;
             display: flex;
             flex-direction: column;
         }
         
-        .template-card:hover {
+        .service-card:hover {
             transform: translateY(-8px);
             box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
         }
         
-        .template-image {
+        .service-image {
             width: 100%;
-            height: 200px; /* Fixed height for all images */
+            height: 200px;
             object-fit: cover;
-            object-position: top;
+            object-position: center;
         }
         
-        .template-content {
+        .service-content {
             padding: 1.5rem;
             flex: 1;
             display: flex;
             flex-direction: column;
         }
         
-        .template-header {
+        .service-header {
             display: flex;
             align-items: flex-start;
             justify-content: space-between;
             margin-bottom: 0.75rem;
-            min-height: 3rem; /* Reserve space for title */
+            min-height: 3rem;
         }
         
-        .template-title {
+        .service-title {
             font-weight: 600;
             color: #1f2937;
             line-height: 1.25;
@@ -157,14 +157,14 @@ $technologies = $templateManager->getTechnologyFilters();
             overflow: hidden;
         }
         
-        .template-price {
+        .service-price {
             font-size: 1.25rem;
             font-weight: 700;
             color: #FF5F1F;
             white-space: nowrap;
         }
         
-        .template-description {
+        .service-description {
             font-size: 0.875rem;
             color: #6b7280;
             margin-bottom: 1rem;
@@ -174,10 +174,10 @@ $technologies = $templateManager->getTechnologyFilters();
             -webkit-box-orient: vertical;
             overflow: hidden;
             line-height: 1.4;
-            min-height: 4.2rem; /* 3 lines * 1.4 line-height */
+            min-height: 4.2rem;
         }
         
-        .template-meta {
+        .service-meta {
             display: flex;
             align-items: center;
             justify-content: space-between;
@@ -185,10 +185,10 @@ $technologies = $templateManager->getTechnologyFilters();
             min-height: 1.5rem;
         }
         
-        .template-actions {
+        .service-actions {
             display: flex;
             gap: 0.5rem;
-            margin-top: auto; /* Push to bottom */
+            margin-top: auto;
         }
         
         .filter-sidebar {
@@ -251,13 +251,13 @@ $technologies = $templateManager->getTechnologyFilters();
         }
         
         /* List View Styles */
-        .templates-list {
+        .services-list {
             display: flex;
             flex-direction: column;
             gap: 1.5rem;
         }
         
-        .template-card-list {
+        .service-card-list {
             display: flex;
             flex-direction: row;
             background: rgba(255, 255, 255, 0.9);
@@ -268,20 +268,20 @@ $technologies = $templateManager->getTechnologyFilters();
             height: auto;
         }
         
-        .template-card-list:hover {
+        .service-card-list:hover {
             transform: translateY(-4px);
             box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
         }
         
-        .template-card-list .template-image {
+        .service-card-list .service-image {
             width: 280px;
             height: 180px;
             object-fit: cover;
-            object-position: top;
+            object-position: center;
             flex-shrink: 0;
         }
         
-        .template-card-list .template-content {
+        .service-card-list .service-content {
             flex: 1;
             padding: 1.5rem;
             display: flex;
@@ -289,14 +289,14 @@ $technologies = $templateManager->getTechnologyFilters();
             justify-content: space-between;
         }
         
-        .template-card-list .template-header {
+        .service-card-list .service-header {
             display: flex;
             align-items: flex-start;
             justify-content: space-between;
             margin-bottom: 1rem;
         }
         
-        .template-card-list .template-title {
+        .service-card-list .service-title {
             font-size: 1.25rem;
             font-weight: 700;
             color: #1f2937;
@@ -307,7 +307,7 @@ $technologies = $templateManager->getTechnologyFilters();
             overflow: hidden;
         }
         
-        .template-card-list .template-description {
+        .service-card-list .service-description {
             font-size: 0.95rem;
             color: #6b7280;
             line-height: 1.5;
@@ -318,20 +318,20 @@ $technologies = $templateManager->getTechnologyFilters();
             overflow: hidden;
         }
         
-        .template-card-list .template-price {
+        .service-card-list .service-price {
             font-size: 1.5rem;
             font-weight: 800;
             color: #FF5F1F;
         }
         
-        .template-card-list .template-actions {
+        .service-card-list .service-actions {
             display: flex;
             gap: 0.75rem;
             align-items: center;
             margin-top: 1rem;
         }
         
-        .template-card-list .template-meta {
+        .service-card-list .service-meta {
             display: flex;
             align-items: center;
             justify-content: space-between;
@@ -385,7 +385,7 @@ $technologies = $templateManager->getTechnologyFilters();
                 <div class="w-4 h-4 flex items-center justify-center">
                     <i class="ri-arrow-right-s-line text-gray-400"></i>
                 </div>
-                <span class="text-secondary font-medium">Templates</span>
+                <span class="text-secondary font-medium">Services</span>
             </div>
         </div>
     </section>
@@ -395,15 +395,15 @@ $technologies = $templateManager->getTechnologyFilters();
         <div class="max-w-7xl mx-auto px-6">
             <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
                 <div>
-                    <h1 class="text-4xl font-bold text-secondary mb-4">Website Templates</h1>
-                    <p class="text-lg text-gray-600">Discover premium website templates for every industry and purpose</p>
+                    <h1 class="text-4xl font-bold text-secondary mb-4">Website Services</h1>
+                    <p class="text-lg text-gray-600">Professional web services from expert freelancers and agencies</p>
                 </div>
                 <div class="flex items-center space-x-4">
                     <div class="flex items-center bg-white/50 rounded-full px-4 py-2 backdrop-blur-sm">
                         <div class="w-5 h-5 flex items-center justify-center">
                             <i class="ri-search-line text-gray-500"></i>
                         </div>
-                        <input type="text" id="searchInput" placeholder="Search website templates..." class="ml-2 bg-transparent border-none outline-none text-sm w-64">
+                        <input type="text" id="searchInput" placeholder="Search website services..." class="ml-2 bg-transparent border-none outline-none text-sm w-64">
                     </div>
                 </div>
             </div>
@@ -438,13 +438,13 @@ $technologies = $templateManager->getTechnologyFilters();
                         
                         <!-- Categories -->
                         <div class="mb-8">
-                            <h4 class="font-medium text-secondary mb-4">Categories</h4>
+                            <h4 class="font-medium text-secondary mb-4">Service Categories</h4>
                             <div class="space-y-3">
                                 <?php foreach ($categories as $category): ?>
                                 <label class="flex items-center space-x-3 cursor-pointer">
                                     <input type="radio" name="category" value="<?= htmlspecialchars($category['slug']) ?>" class="custom-checkbox" <?= $category['slug'] === 'all' ? 'checked' : '' ?>>
                                     <span class="text-sm text-gray-600"><?= htmlspecialchars($category['name']) ?></span>
-                                    <span class="text-xs text-gray-400 ml-auto">(<?= $category['template_count'] ?>)</span>
+                                    <span class="text-xs text-gray-400 ml-auto">(<?= $category['service_count'] ?>)</span>
                                 </label>
                                 <?php endforeach; ?>
                             </div>
@@ -452,13 +452,13 @@ $technologies = $templateManager->getTechnologyFilters();
                         
                         <!-- Price Range -->
                         <div class="mb-8">
-                            <h4 class="font-medium text-secondary mb-4">Price Range</h4>
+                            <h4 class="font-medium text-secondary mb-4">Budget Range</h4>
                             <div class="space-y-4">
                                 <div class="flex items-center justify-between text-sm text-gray-600">
                                     <span>$0</span>
-                                    <span>$500</span>
+                                    <span>$2000</span>
                                 </div>
-                                <input type="range" min="0" max="500" value="250" class="w-full price-range-slider">
+                                <input type="range" min="0" max="2000" value="1000" class="w-full price-range-slider">
                                 <div class="flex items-center space-x-2">
                                     <input type="number" id="minPrice" placeholder="Min" class="w-20 px-2 py-1 border border-gray-200 rounded-button text-sm">
                                     <span class="text-gray-400">-</span>
@@ -467,15 +467,15 @@ $technologies = $templateManager->getTechnologyFilters();
                             </div>
                         </div>
                         
-                        <!-- Technology Stack -->
+                        <!-- Delivery Time -->
                         <div class="mb-8">
-                            <h4 class="font-medium text-secondary mb-4">Technology Stack</h4>
+                            <h4 class="font-medium text-secondary mb-4">Delivery Time</h4>
                             <div class="space-y-3">
-                                <?php foreach ($technologies as $tech): ?>
+                                <?php foreach ($deliveryTimes as $delivery): ?>
                                 <label class="flex items-center space-x-3 cursor-pointer">
-                                    <input type="checkbox" name="technology" value="<?= htmlspecialchars($tech['technology']) ?>" class="custom-checkbox">
-                                    <span class="text-sm text-gray-600"><?= htmlspecialchars($tech['technology']) ?></span>
-                                    <span class="text-xs text-gray-400 ml-auto">(<?= $tech['count'] ?>)</span>
+                                    <input type="checkbox" name="delivery_time" value="<?= htmlspecialchars($delivery['delivery_time']) ?>" class="custom-checkbox">
+                                    <span class="text-sm text-gray-600"><?= htmlspecialchars($delivery['delivery_time']) ?></span>
+                                    <span class="text-xs text-gray-400 ml-auto">(<?= $delivery['count'] ?>)</span>
                                 </label>
                                 <?php endforeach; ?>
                             </div>
@@ -483,7 +483,7 @@ $technologies = $templateManager->getTechnologyFilters();
                         
                         <!-- Rating -->
                         <div class="mb-8">
-                            <h4 class="font-medium text-secondary mb-4">Minimum Rating</h4>
+                            <h4 class="font-medium text-secondary mb-4">Seller Rating</h4>
                             <div class="space-y-3">
                                 <label class="flex items-center space-x-3 cursor-pointer">
                                     <input type="radio" name="rating" value="5" class="custom-checkbox">
@@ -527,12 +527,12 @@ $technologies = $templateManager->getTechnologyFilters();
                     </div>
                 </div>
                 
-                <!-- Templates Grid -->
+                <!-- Services Grid -->
                 <div class="lg:col-span-3">
                     <!-- Top Bar -->
                     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
                         <div class="flex items-center space-x-4">
-                            <span class="text-sm text-gray-600" id="resultsCount">Showing <?= count($templates) ?> templates</span>
+                            <span class="text-sm text-gray-600" id="resultsCount">Showing <?= count($services) ?> services</span>
                             <div class="flex items-center space-x-2">
                                 <button id="gridViewBtn" class="w-8 h-8 flex items-center justify-center bg-primary text-white rounded-button">
                                     <i class="ri-grid-line text-sm"></i>
@@ -552,57 +552,62 @@ $technologies = $templateManager->getTechnologyFilters();
                                     <option value="price-low">Price: Low to High</option>
                                     <option value="price-high">Price: High to Low</option>
                                     <option value="rating">Highest Rated</option>
+                                    <option value="delivery">Fastest Delivery</option>
                                 </select>
                             </div>
                         </div>
                     </div>
                     
-                    <!-- Templates Grid -->
-                    <div class="grid md:grid-cols-2 xl:grid-cols-3 gap-6" id="templatesGrid">
-                        <?php foreach ($templates as $template): ?>
-                        <div class="template-card rounded-2xl overflow-hidden">
+                    <!-- Services Grid -->
+                    <div class="grid md:grid-cols-2 xl:grid-cols-3 gap-6" id="servicesGrid">
+                        <?php foreach ($services as $service): ?>
+                        <div class="service-card rounded-2xl overflow-hidden">
                             <div class="relative">
-                                <img src="<?= htmlspecialchars($template['preview_image']) ?>" alt="<?= htmlspecialchars($template['title']) ?>" class="template-image">
+                                <img src="<?= htmlspecialchars($service['preview_image']) ?>" alt="<?= htmlspecialchars($service['title']) ?>" class="service-image">
                                 <div class="absolute top-3 right-3">
                                     <button class="w-8 h-8 bg-white/80 rounded-full flex items-center justify-center hover:bg-white transition-colors">
                                         <i class="ri-heart-line text-gray-600"></i>
                                     </button>
                                 </div>
-                                <?php if ($template['is_featured']): ?>
+                                <?php if ($service['is_featured']): ?>
                                 <div class="absolute top-3 left-3">
-                                    <span class="px-2 py-1 bg-red-500 text-white text-xs rounded-button font-medium">Best Seller</span>
+                                    <span class="px-2 py-1 bg-red-500 text-white text-xs rounded-button font-medium">Featured</span>
                                 </div>
                                 <?php endif; ?>
                                 <div class="absolute bottom-3 left-3 flex space-x-2">
-                                    <span class="px-2 py-1 bg-primary text-white text-xs rounded-button font-medium"><?= htmlspecialchars($template['technology']) ?></span>
+                                    <span class="px-2 py-1 bg-green-500 text-white text-xs rounded-button font-medium"><?= htmlspecialchars($service['delivery_time']) ?></span>
                                 </div>
                             </div>
-                            <div class="template-content">
-                                <div class="template-header">
+                            <div class="service-content">
+                                <div class="service-header">
                                     <div class="flex-1">
-                                        <div class="flex items-center space-x-2">
-                                            <img src="<?= htmlspecialchars($template['profile_image']) ?>" alt="<?= htmlspecialchars($template['seller_name']) ?>" class="w-6 h-6 rounded-full object-cover">
-                                            <span class="text-sm text-gray-600"><?= htmlspecialchars($template['seller_name']) ?></span>
+                                        <div class="flex items-center space-x-2 mb-2">
+                                            <img src="<?= htmlspecialchars($service['profile_image']) ?>" alt="<?= htmlspecialchars($service['seller_name']) ?>" class="w-6 h-6 rounded-full object-cover">
+                                            <span class="text-sm text-gray-600"><?= htmlspecialchars($service['seller_name']) ?></span>
                                         </div>
                                     </div>
-                                    <div>
-                                        <span class="text-xl font-bold text-primary template-price">$<?= number_format($template['price'], 0) ?></span>
+                                    <div class="text-right">
+                                        <div class="text-xs text-gray-500">Starting at</div>
+                                        <span class="text-xl font-bold text-primary service-price">$<?= number_format($service['price'], 0) ?></span>
                                     </div>
                                 </div>
                                 <div class="flex-1">
-                                    <h3 class="font-semibold text-secondary template-title"><?= htmlspecialchars($template['title']) ?></h3>
-                                    <p class="text-sm text-gray-600 template-description"><?= htmlspecialchars($template['description']) ?></p>
+                                    <h3 class="font-semibold text-secondary service-title"><?= htmlspecialchars($service['title']) ?></h3>
+                                    <p class="text-sm text-gray-600 service-description"><?= htmlspecialchars($service['description']) ?></p>
                                 </div>
-                                <div class="template-meta">
+                                <div class="service-meta">
                                     <div class="flex items-center space-x-1">
                                         <i class="ri-star-fill text-yellow-400 text-sm"></i>
-                                        <span class="text-sm text-gray-600"><?= number_format($template['avg_rating'], 1) ?> (<?= $template['review_count'] ?>)</span>
+                                        <span class="text-sm text-gray-600"><?= number_format($service['avg_rating'], 1) ?> (<?= $service['review_count'] ?>)</span>
+                                    </div>
+                                    <div class="text-xs text-gray-500">
+                                        <i class="ri-shopping-bag-line mr-1"></i><?= $service['orders_count'] ?> orders
                                     </div>
                                 </div>
-                                <div class="template-actions">
-                                    <button onclick="handleAddToCart(<?= $template['id'] ?>, '<?= addslashes($template['title']) ?>', <?= $template['price'] ?>, '<?= addslashes($template['preview_image']) ?>', '<?= addslashes($template['seller_name']) ?>')" 
+                                <div class="service-actions">
+                                    <button onclick="handleOrderService(<?= $service['id'] ?>, '<?= addslashes($service['title']) ?>', <?= $service['price'] ?>, '<?= addslashes($service['preview_image']) ?>', '<?= addslashes($service['seller_name']) ?>')" 
                                             class="flex-1 bg-primary text-white py-2 px-4 rounded-button text-sm font-medium hover:bg-primary/90 transition-colors whitespace-nowrap">
-                                        <i class="ri-shopping-cart-line mr-1"></i>Add to Cart
+                                        <i class="ri-shopping-cart-line mr-1"></i>Order Now
                                     </button>
                                     <button class="px-4 py-2 border border-gray-200 rounded-button text-sm font-medium hover:bg-gray-50 transition-colors whitespace-nowrap">
                                         <i class="ri-eye-line"></i>
@@ -630,17 +635,17 @@ $technologies = $templateManager->getTechnologyFilters();
         let currentPage = 1;
         let totalPages = 1;
         let isLoading = false;
-        let currentView = 'grid'; // Track current view mode
+        let currentView = 'grid';
 
         // Initialize page
         document.addEventListener('DOMContentLoaded', function() {
             initializeFilters();
             initializeSearch();
             initializeCategoryPills();
-            initializeViewToggle(); // Add view toggle initialization
+            initializeViewToggle();
             
             // Initialize pagination with current data
-            const totalCount = <?= isset($totalCount) ? $totalCount : count($templates) ?>;
+            const totalCount = <?= isset($totalCount) ? $totalCount : count($services) ?>;
             const totalPages = Math.ceil(totalCount / 12);
             updatePagination({
                 current_page: 1,
@@ -685,14 +690,14 @@ $technologies = $templateManager->getTechnologyFilters();
             listViewBtn.classList.add('view-btn-inactive');
             
             // Update grid container classes
-            const grid = document.getElementById('templatesGrid');
+            const grid = document.getElementById('servicesGrid');
             if (grid) {
                 grid.className = 'grid md:grid-cols-2 xl:grid-cols-3 gap-6';
                 
-                // Re-render templates in grid view
-                const templates = getCurrentTemplates();
-                if (templates.length > 0) {
-                    updateTemplatesGrid(templates);
+                // Re-render services in grid view
+                const services = getCurrentServices();
+                if (services.length > 0) {
+                    updateServicesGrid(services);
                 }
             }
         }
@@ -712,80 +717,84 @@ $technologies = $templateManager->getTechnologyFilters();
             listViewBtn.classList.add('view-btn-active');
             
             // Update grid container classes
-            const grid = document.getElementById('templatesGrid');
+            const grid = document.getElementById('servicesGrid');
             if (grid) {
-                grid.className = 'templates-list';
+                grid.className = 'services-list';
                 
-                // Re-render templates in list view
-                const templates = getCurrentTemplates();
-                if (templates.length > 0) {
-                    updateTemplatesListView(templates);
+                // Re-render services in list view
+                const services = getCurrentServices();
+                if (services.length > 0) {
+                    updateServicesListView(services);
                 }
             }
         }
 
-        // Get current templates data (for view switching)
-        function getCurrentTemplates() {
+        // Get current services data (for view switching)
+        function getCurrentServices() {
             // Trigger a fresh filter application to get current data and switch view
             applyFilters();
             return [];
         }
 
-        // Update templates grid
-        function updateTemplatesGrid(templates) {
-            const grid = document.getElementById('templatesGrid');
+        // Update services grid
+        function updateServicesGrid(services) {
+            const grid = document.getElementById('servicesGrid');
             if (!grid) return;
             
-            if (templates.length === 0) {
-                grid.innerHTML = '<div class="col-span-full text-center py-12"><p class="text-gray-500">No templates found matching your criteria.</p></div>';
+            if (services.length === 0) {
+                grid.innerHTML = '<div class="col-span-full text-center py-12"><p class="text-gray-500">No services found matching your criteria.</p></div>';
                 return;
             }
             
             if (currentView === 'list') {
-                updateTemplatesListView(templates);
+                updateServicesListView(services);
                 return;
             }
             
-            grid.innerHTML = templates.map(template => `
-                <div class="template-card rounded-2xl overflow-hidden">
+            grid.innerHTML = services.map(service => `
+                <div class="service-card rounded-2xl overflow-hidden">
                     <div class="relative">
-                        <img src="${escapeHtml(template.preview_image)}" alt="${escapeHtml(template.title)}" class="template-image">
+                        <img src="${escapeHtml(service.preview_image)}" alt="${escapeHtml(service.title)}" class="service-image">
                         <div class="absolute top-3 right-3">
                             <button class="w-8 h-8 bg-white/80 rounded-full flex items-center justify-center hover:bg-white transition-colors">
                                 <i class="ri-heart-line text-gray-600"></i>
                             </button>
                         </div>
-                        ${template.is_featured ? '<div class="absolute top-3 left-3"><span class="px-2 py-1 bg-red-500 text-white text-xs rounded-button font-medium">Best Seller</span></div>' : ''}
+                        ${service.is_featured ? '<div class="absolute top-3 left-3"><span class="px-2 py-1 bg-red-500 text-white text-xs rounded-button font-medium">Featured</span></div>' : ''}
                         <div class="absolute bottom-3 left-3 flex space-x-2">
-                            <span class="px-2 py-1 bg-primary text-white text-xs rounded-button font-medium">${escapeHtml(template.technology)}</span>
+                            <span class="px-2 py-1 bg-green-500 text-white text-xs rounded-button font-medium">${escapeHtml(service.delivery_time)}</span>
                         </div>
                     </div>
-                    <div class="template-content">
-                        <div class="template-header">
+                    <div class="service-content">
+                        <div class="service-header">
                             <div class="flex-1">
-                                <div class="flex items-center space-x-2">
-                                    <img src="${escapeHtml(template.profile_image)}" alt="${escapeHtml(template.seller_name)}" class="w-6 h-6 rounded-full object-cover">
-                                    <span class="text-sm text-gray-600">${escapeHtml(template.seller_name)}</span>
+                                <div class="flex items-center space-x-2 mb-2">
+                                    <img src="${escapeHtml(service.profile_image)}" alt="${escapeHtml(service.seller_name)}" class="w-6 h-6 rounded-full object-cover">
+                                    <span class="text-sm text-gray-600">${escapeHtml(service.seller_name)}</span>
                                 </div>
                             </div>
-                            <div>
-                                <span class="text-xl font-bold text-primary template-price">$${template.price}</span>
+                            <div class="text-right">
+                                <div class="text-xs text-gray-500">Starting at</div>
+                                <span class="text-xl font-bold text-primary service-price">$${service.price}</span>
                             </div>
                         </div>
                         <div class="flex-1">
-                            <h3 class="font-semibold text-secondary template-title">${escapeHtml(template.title)}</h3>
-                            <p class="text-sm text-gray-600 template-description">${escapeHtml(template.description)}</p>
+                            <h3 class="font-semibold text-secondary service-title">${escapeHtml(service.title)}</h3>
+                            <p class="text-sm text-gray-600 service-description">${escapeHtml(service.description)}</p>
                         </div>
-                        <div class="template-meta">
+                        <div class="service-meta">
                             <div class="flex items-center space-x-1">
                                 <i class="ri-star-fill text-yellow-400 text-sm"></i>
-                                <span class="text-sm text-gray-600">${template.avg_rating} (${template.review_count})</span>
+                                <span class="text-sm text-gray-600">${service.avg_rating} (${service.review_count})</span>
+                            </div>
+                            <div class="text-xs text-gray-500">
+                                <i class="ri-shopping-bag-line mr-1"></i>${service.orders_count} orders
                             </div>
                         </div>
-                        <div class="template-actions">
-                            <button onclick="handleAddToCart(${template.id}, '${addslashes(template.title)}', ${template.price}, '${addslashes(template.preview_image)}', '${addslashes(template.seller_name)}')" 
+                        <div class="service-actions">
+                            <button onclick="handleOrderService(${service.id}, '${addslashes(service.title)}', ${service.price}, '${addslashes(service.preview_image)}', '${addslashes(service.seller_name)}')" 
                                     class="flex-1 bg-primary text-white py-2 px-4 rounded-button text-sm font-medium hover:bg-primary/90 transition-colors whitespace-nowrap">
-                                <i class="ri-shopping-cart-line mr-1"></i>Add to Cart
+                                <i class="ri-shopping-cart-line mr-1"></i>Order Now
                             </button>
                             <button class="px-4 py-2 border border-gray-200 rounded-button text-sm font-medium hover:bg-gray-50 transition-colors whitespace-nowrap">
                                 <i class="ri-eye-line"></i>
@@ -796,54 +805,58 @@ $technologies = $templateManager->getTechnologyFilters();
             `).join('');
         }
 
-        // Update templates in list view
-        function updateTemplatesListView(templates) {
-            const grid = document.getElementById('templatesGrid');
+        // Update services in list view
+        function updateServicesListView(services) {
+            const grid = document.getElementById('servicesGrid');
             if (!grid) return;
             
-            if (templates.length === 0) {
-                grid.innerHTML = '<div class="text-center py-12"><p class="text-gray-500">No templates found matching your criteria.</p></div>';
+            if (services.length === 0) {
+                grid.innerHTML = '<div class="text-center py-12"><p class="text-gray-500">No services found matching your criteria.</p></div>';
                 return;
             }
             
-            grid.innerHTML = templates.map(template => `
-                <div class="template-card-list">
+            grid.innerHTML = services.map(service => `
+                <div class="service-card-list">
                     <div class="relative">
-                        <img src="${escapeHtml(template.preview_image)}" alt="${escapeHtml(template.title)}" class="template-image">
+                        <img src="${escapeHtml(service.preview_image)}" alt="${escapeHtml(service.title)}" class="service-image">
                         <div class="absolute top-3 right-3">
                             <button class="w-8 h-8 bg-white/80 rounded-full flex items-center justify-center hover:bg-white transition-colors">
                                 <i class="ri-heart-line text-gray-600"></i>
                             </button>
                         </div>
-                        ${template.is_featured ? '<div class="absolute top-3 left-3"><span class="px-2 py-1 bg-red-500 text-white text-xs rounded-button font-medium">Best Seller</span></div>' : ''}
+                        ${service.is_featured ? '<div class="absolute top-3 left-3"><span class="px-2 py-1 bg-red-500 text-white text-xs rounded-button font-medium">Featured</span></div>' : ''}
                         <div class="absolute bottom-3 left-3 flex space-x-2">
-                            <span class="px-2 py-1 bg-primary text-white text-xs rounded-button font-medium">${escapeHtml(template.technology)}</span>
+                            <span class="px-2 py-1 bg-green-500 text-white text-xs rounded-button font-medium">${escapeHtml(service.delivery_time)}</span>
                         </div>
                     </div>
-                    <div class="template-content">
-                        <div class="template-header">
+                    <div class="service-content">
+                        <div class="service-header">
                             <div class="flex-1">
-                                <h3 class="template-title">${escapeHtml(template.title)}</h3>
+                                <h3 class="service-title">${escapeHtml(service.title)}</h3>
                                 <div class="flex items-center space-x-2 mb-3">
-                                    <img src="${escapeHtml(template.profile_image)}" alt="${escapeHtml(template.seller_name)}" class="w-6 h-6 rounded-full object-cover">
-                                    <span class="text-sm text-gray-600">${escapeHtml(template.seller_name)}</span>
+                                    <img src="${escapeHtml(service.profile_image)}" alt="${escapeHtml(service.seller_name)}" class="w-6 h-6 rounded-full object-cover">
+                                    <span class="text-sm text-gray-600">${escapeHtml(service.seller_name)}</span>
                                 </div>
                             </div>
                             <div class="text-right">
-                                <div class="template-price mb-2">$${template.price}</div>
-                                <div class="flex items-center space-x-1 justify-end">
+                                <div class="text-xs text-gray-500 mb-1">Starting at</div>
+                                <div class="service-price mb-2">$${service.price}</div>
+                                <div class="flex items-center space-x-1 justify-end mb-2">
                                     <i class="ri-star-fill text-yellow-400 text-sm"></i>
-                                    <span class="text-sm text-gray-600">${template.avg_rating} (${template.review_count})</span>
+                                    <span class="text-sm text-gray-600">${service.avg_rating} (${service.review_count})</span>
+                                </div>
+                                <div class="text-xs text-gray-500">
+                                    <i class="ri-shopping-bag-line mr-1"></i>${service.orders_count} orders
                                 </div>
                             </div>
                         </div>
                         <div class="flex-1">
-                            <p class="template-description">${escapeHtml(template.description)}</p>
+                            <p class="service-description">${escapeHtml(service.description)}</p>
                         </div>
-                        <div class="template-actions">
-                            <button onclick="handleAddToCart(${template.id}, '${addslashes(template.title)}', ${template.price}, '${addslashes(template.preview_image)}', '${addslashes(template.seller_name)}')" 
+                        <div class="service-actions">
+                            <button onclick="handleOrderService(${service.id}, '${addslashes(service.title)}', ${service.price}, '${addslashes(service.preview_image)}', '${addslashes(service.seller_name)}')" 
                                     class="bg-primary text-white py-2 px-6 rounded-button text-sm font-medium hover:bg-primary/90 transition-colors whitespace-nowrap">
-                                <i class="ri-shopping-cart-line mr-2"></i>Add to Cart
+                                <i class="ri-shopping-cart-line mr-2"></i>Order Now
                             </button>
                             <button class="px-4 py-2 border border-gray-200 rounded-button text-sm font-medium hover:bg-gray-50 transition-colors whitespace-nowrap">
                                 <i class="ri-eye-line mr-2"></i>Preview
@@ -997,7 +1010,7 @@ $technologies = $templateManager->getTechnologyFilters();
             }
         }
 
-        // Apply filters function
+        // Apply filters function - update to use services endpoint
         function applyFilters() {
             if (isLoading) return;
             
@@ -1007,16 +1020,16 @@ $technologies = $templateManager->getTechnologyFilters();
             // Collect filter data
             const filters = collectFilters();
             
-            // Make AJAX request
-            fetch('templates.php?ajax=1&' + new URLSearchParams(filters))
+            // Make AJAX request to services endpoint
+            fetch('services.php?ajax=1&' + new URLSearchParams(filters))
                 .then(response => response.json())
                 .then(data => {
-                    updateTemplatesGrid(data.templates);
+                    updateServicesGrid(data.services);
                     updatePagination(data.pagination);
                     updateResultsCount(data.pagination.total_count);
                 })
                 .catch(error => {
-                    console.error('Error loading templates:', error);
+                    console.error('Error loading services:', error);
                 })
                 .finally(() => {
                     isLoading = false;
@@ -1163,24 +1176,24 @@ $technologies = $templateManager->getTechnologyFilters();
             currentPage = page;
             applyFilters();
             
-            // Scroll to top of templates grid
-            const grid = document.getElementById('templatesGrid');
+            // Scroll to top of services grid
+            const grid = document.getElementById('servicesGrid');
             if (grid) {
                 grid.scrollIntoView({ behavior: 'smooth', block: 'start' });
             }
         }
 
-        // Update results count
+        // Update results count for services
         function updateResultsCount(totalCount) {
             const resultsCount = document.getElementById('resultsCount');
             if (resultsCount) {
-                resultsCount.textContent = `Showing ${totalCount} templates`;
+                resultsCount.textContent = `Showing ${totalCount} services`;
             }
         }
 
         // Show loading state
         function showLoading() {
-            const grid = document.getElementById('templatesGrid');
+            const grid = document.getElementById('servicesGrid');
             if (grid) {
                 grid.style.opacity = '0.5';
             }
@@ -1188,81 +1201,33 @@ $technologies = $templateManager->getTechnologyFilters();
 
         // Hide loading state
         function hideLoading() {
-            const grid = document.getElementById('templatesGrid');
+            const grid = document.getElementById('servicesGrid');
             if (grid) {
                 grid.style.opacity = '1';
             }
         }
 
-        // Clear all filters
-        function clearAllFilters() {
-            // Reset category to "All Templates"
-            const allCategoryBtn = document.querySelector('#categoryPills button[data-category="all"]');
-            if (allCategoryBtn) {
-                allCategoryBtn.click();
-            }
-            
-            // Clear search
-            const searchInput = document.getElementById('searchInput');
-            if (searchInput) {
-                searchInput.value = '';
-            }
-            
-            // Reset all checkboxes and radios
-            const checkboxes = document.querySelectorAll('input[type="checkbox"], input[type="radio"]:not([name="category"])');
-            checkboxes.forEach(input => {
-                input.checked = false;
-            });
-            
-            // Reset category to "all"
-            const allCategoryRadio = document.querySelector('input[name="category"][value="all"]');
-            if (allCategoryRadio) {
-                allCategoryRadio.checked = true;
-            }
-            
-            // Clear price inputs
-            const minPrice = document.getElementById('minPrice');
-            const maxPrice = document.getElementById('maxPrice');
-            if (minPrice) minPrice.value = '';
-            if (maxPrice) maxPrice.value = '';
-            
-            // Reset sort to popular
-            const sortSelect = document.getElementById('sortSelect');
-            if (sortSelect) {
-                sortSelect.value = 'popular';
-            }
-            
-            // Apply filters (will show all templates)
-            applyFilters();
-        }
-
-        // Utility function to escape HTML
-        function escapeHtml(text) {
-            const div = document.createElement('div');
-            div.textContent = text;
-            return div.innerHTML;
-        }
-        
-        // Handle Add to Cart function
-        function handleAddToCart(id, title, price, image, seller) {
-            // Check if user is logged in (cart system is only available for logged in users)
+        // Handle Order Service function
+        function handleOrderService(id, title, price, image, seller) {
+            // Check if user is logged in
             if (typeof cart === 'undefined') {
                 // If cart is not defined, user is not logged in
                 window.location.href = 'auth.php?redirect=' + encodeURIComponent(window.location.href);
                 return;
             }
             
-            // Create template data object
-            const templateData = {
+            // Create service data object
+            const serviceData = {
                 id: id,
                 title: title,
                 price: price,
                 image: image,
-                seller: seller
+                seller: seller,
+                type: 'service' // Distinguish from templates
             };
             
             // Add to cart using the global cart system
-            cart.addItem(templateData);
+            cart.addItem(serviceData);
         }
         
         // Helper function for JavaScript addslashes equivalent
