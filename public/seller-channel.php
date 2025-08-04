@@ -26,82 +26,164 @@ if (isset($_SESSION['user_id']) && isset($_SESSION['user_type']) && $_SESSION['u
     <style>
         .dashboard-container {
             min-height: 100vh;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #FF5F1F 0%, #FF8C42 50%, #FFB366 100%);
+            padding: 0;
+            padding-top: 100px; /* Increased spacing from header */
         }
         .sidebar {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 8px 32px rgba(255, 95, 31, 0.1);
+            border-radius: 24px;
+            margin: 24px;
+            margin-right: 12px;
+            padding: 20px 20px 80px; /* extra bottom padding for Settings and Logout */
+            height: 100vh; /* Adjusted for new padding */
+            overflow: visible; /* Disable scrolling */
         }
         .content-area {
-            background: rgba(255, 255, 255, 0.9);
-            backdrop-filter: blur(10px);
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 24px;
+            margin: 24px;
+            margin-left: 12px;
+            padding: 32px;
+            min-height: calc(100vh - 200px); /* Adjusted for new padding */
         }
         .nav-item {
             transition: all 0.3s ease;
             cursor: pointer;
+            border-radius: 16px;
+            padding: 16px 20px;
+            margin-bottom: 8px;
+            backdrop-filter: blur(10px);
+            background: rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            display: flex;
+            align-items: center;
+            gap: 12px;
         }
-        .nav-item:hover, .nav-item.active {
-            background-color: #FF5F1F;
+        .nav-item:hover {
+            background: rgba(255, 255, 255, 0.25);
+            border-color: rgba(255, 255, 255, 0.4);
+            transform: translateX(8px);
+            box-shadow: 0 4px 15px rgba(255, 95, 31, 0.2);
+        }
+        .nav-item.active {
+            background: rgba(255, 255, 255, 0.9);
+            color: #FF5F1F;
+            border-color: rgba(255, 95, 31, 0.5);
+            box-shadow: 0 8px 25px rgba(255, 95, 31, 0.3);
+        }
+        .nav-item.active:hover {
+            transform: translateX(0);
+        }
+        .sidebar h2 {
             color: white;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+        .sidebar p {
+            color: rgba(255, 255, 255, 0.9);
+        }
+        .nav-item span {
+            color: rgba(255, 255, 255, 0.95);
+            font-weight: 500;
+        }
+        .nav-item.active span {
+            color: #FF5F1F;
+            font-weight: 600;
+        }
+        .nav-item i {
+            color: rgba(255, 255, 255, 0.8);
+        }
+        .nav-item.active i {
+            color: #FF5F1F;
+        }
+        .logout-section {
+            margin-top: 32px;
+            padding-top: 32px;
+            border-top: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        .logout-link {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: rgba(255, 255, 255, 0.9);
+            padding: 16px 20px;
+            border-radius: 16px;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            background: rgba(220, 38, 38, 0.15);
+            border: 1px solid rgba(220, 38, 38, 0.3);
+            backdrop-filter: blur(10px);
+        }
+        .logout-link:hover {
+            background: rgba(220, 38, 38, 0.25);
+            color: white;
+            transform: translateX(8px);
+            box-shadow: 0 4px 15px rgba(220, 38, 38, 0.2);
         }
     </style>
     
-    <div class="dashboard-container pt-20">
+    <div class="dashboard-container">
         <div class="flex min-h-screen">
             <!-- Sidebar -->
-            <div class="sidebar w-64 p-6">
+            <div class="sidebar w-80">
                 <div class="mb-8">
-                    <h2 class="text-2xl font-bold text-gray-800 mb-2">Xin chào, <?php echo htmlspecialchars($seller_name); ?>!</h2>
-                    <p class="text-gray-600">Seller Dashboard</p>
+                    <h2 class="text-2xl font-bold mb-2">Hello, <?php echo htmlspecialchars($seller_name); ?>!</h2>
+                    <p class="text-lg">Seller Dashboard</p>
                 </div>
                 
                 <nav class="space-y-2">
-                    <div class="nav-item active rounded-lg px-4 py-3 flex items-center space-x-3" onclick="loadSection('overview')">
+                    <div class="nav-item active" onclick="loadSection('overview')" data-section="overview">
                         <i class="ri-dashboard-line text-xl"></i>
-                        <span>Tổng quan</span>
+                        <span>Overview</span>
                     </div>
-                    <div class="nav-item rounded-lg px-4 py-3 flex items-center space-x-3" onclick="loadSection('products')">
+                    <div class="nav-item" onclick="loadSection('products')" data-section="products">
                         <i class="ri-store-line text-xl"></i>
-                        <span>Sản phẩm</span>
+                        <span>Products</span>
                     </div>
-                    <div class="nav-item rounded-lg px-4 py-3 flex items-center space-x-3" onclick="loadSection('orders')">
+                    <div class="nav-item" onclick="loadSection('orders')" data-section="orders">
                         <i class="ri-shopping-cart-line text-xl"></i>
-                        <span>Đơn hàng</span>
+                        <span>Orders</span>
                     </div>
-                    <div class="nav-item rounded-lg px-4 py-3 flex items-center space-x-3" onclick="loadSection('analytics')">
+                    <div class="nav-item" onclick="loadSection('analytics')" data-section="analytics">
                         <i class="ri-bar-chart-line text-xl"></i>
-                        <span>Thống kê</span>
+                        <span>Analytics</span>
                     </div>
-                    <div class="nav-item rounded-lg px-4 py-3 flex items-center space-x-3" onclick="loadSection('earnings')">
+                    <div class="nav-item" onclick="loadSection('earnings')" data-section="earnings">
                         <i class="ri-money-dollar-circle-line text-xl"></i>
-                        <span>Thu nhập</span>
+                        <span>Earnings</span>
                     </div>
-                    <div class="nav-item rounded-lg px-4 py-3 flex items-center space-x-3" onclick="loadSection('messages')">
+                    <div class="nav-item" onclick="loadSection('messages')" data-section="messages">
                         <i class="ri-message-line text-xl"></i>
-                        <span>Tin nhắn</span>
+                        <span>Messages</span>
                     </div>
-                    <div class="nav-item rounded-lg px-4 py-3 flex items-center space-x-3" onclick="loadSection('reviews')">
+                    <div class="nav-item" onclick="loadSection('reviews')" data-section="reviews">
                         <i class="ri-star-line text-xl"></i>
-                        <span>Đánh giá</span>
+                        <span>Reviews</span>
                     </div>
-                    <div class="nav-item rounded-lg px-4 py-3 flex items-center space-x-3" onclick="loadSection('settings')">
+                    <div class="nav-item" onclick="loadSection('settings')" data-section="settings">
                         <i class="ri-settings-line text-xl"></i>
-                        <span>Cài đặt</span>
+                        <span>Settings</span>
                     </div>
                 </nav>
                 
-                <div class="mt-8 pt-8 border-t">
-                    <a href="logout.php" class="flex items-center space-x-3 text-red-600 hover:text-red-700 px-4 py-3 rounded-lg hover:bg-red-50 transition-colors">
+                <div class="logout-section">
+                    <a href="logout.php" class="logout-link">
                         <i class="ri-logout-box-line text-xl"></i>
-                        <span>Đăng xuất</span>
+                        <span>Logout</span>
                     </a>
                 </div>
             </div>
             
             <!-- Main Content -->
-            <div class="flex-1 p-6">
-                <div class="content-area rounded-2xl p-8 min-h-full">
+            <div class="flex-1">
+                <div class="content-area">
                     <div id="dashboard-content">
                         <!-- Content will be loaded here -->
                     </div>
@@ -117,13 +199,13 @@ if (isset($_SESSION['user_id']) && isset($_SESSION['user_type']) && $_SESSION['u
             document.querySelectorAll('.nav-item').forEach(item => {
                 item.classList.remove('active');
             });
-            event.target.closest('.nav-item').classList.add('active');
+            document.querySelector(`[data-section="${section}"]`).classList.add('active');
             
             // Load section content
             const content = document.getElementById('dashboard-content');
             
             // Show loading
-            content.innerHTML = '<div class="text-center py-12"><i class="ri-loader-line text-4xl text-primary animate-spin"></i><p class="mt-4 text-gray-600">Đang tải...</p></div>';
+            content.innerHTML = '<div class="text-center py-12"><i class="ri-loader-line text-4xl text-white animate-spin"></i><p class="mt-4 text-white">Loading...</p></div>';
             
             // Load section via AJAX
             fetch(`sections/seller-${section}.php`)
@@ -132,12 +214,12 @@ if (isset($_SESSION['user_id']) && isset($_SESSION['user_type']) && $_SESSION['u
                     content.innerHTML = html;
                 })
                 .catch(error => {
-                    content.innerHTML = '<div class="text-center py-12 text-red-600"><i class="ri-error-warning-line text-4xl"></i><p class="mt-4">Có lỗi xảy ra khi tải nội dung</p></div>';
+                    content.innerHTML = '<div class="text-center py-12 text-red-300"><i class="ri-error-warning-line text-4xl"></i><p class="mt-4">Error loading content</p></div>';
                     console.error('Error loading section:', error);
                 });
         }
         
-        // Load overview by default
+        // Load overview by default when page loads
         document.addEventListener('DOMContentLoaded', function() {
             loadSection('overview');
         });
