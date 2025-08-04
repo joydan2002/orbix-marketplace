@@ -1,321 +1,408 @@
 <?php
 /**
- * Seller Messages & Customer Support
- * Handle customer inquiries and communications
+ * Seller Messages Management
+ * Display real messages from database
  */
+
+// Load real data from database
+require_once 'seller-data-loader.php';
 ?>
 
-<div class="space-y-8">
-    <!-- Header -->
-    <div class="flex items-center justify-between">
+<!-- Messages Management Header -->
+<div class="mb-8">
+    <div class="flex items-center justify-between mb-6">
         <div>
             <h1 class="text-3xl font-bold text-secondary mb-2">Messages</h1>
-            <p class="text-gray-600">Manage customer inquiries and support</p>
+            <p class="text-gray-600">Communicate with your customers</p>
         </div>
         <div class="flex items-center space-x-4">
-            <div class="relative" x-data="{ open: false }">
-                <button @click="open = !open" class="bg-white border border-gray-300 px-4 py-2 rounded-lg flex items-center space-x-2 hover:bg-gray-50">
-                    <i class="ri-filter-line"></i>
-                    <span>All Messages</span>
-                    <i class="ri-arrow-down-s-line"></i>
-                </button>
-                <div x-show="open" @click.away="open = false" class="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border py-2 z-10">
-                    <a href="?section=messages&filter=all" class="block px-4 py-2 text-sm hover:bg-gray-100">All Messages</a>
-                    <a href="?section=messages&filter=unread" class="block px-4 py-2 text-sm hover:bg-gray-100">Unread</a>
-                    <a href="?section=messages&filter=urgent" class="block px-4 py-2 text-sm hover:bg-gray-100">Urgent</a>
-                    <a href="?section=messages&filter=archived" class="block px-4 py-2 text-sm hover:bg-gray-100">Archived</a>
-                </div>
+            <?php if ($unreadMessages > 0): ?>
+            <div class="bg-red-100 text-red-600 px-3 py-2 rounded-lg text-sm font-medium">
+                <?= $unreadMessages ?> unread messages
             </div>
-            <button onclick="composeMessage()" class="bg-primary text-white px-4 py-2 rounded-lg hover:bg-primary/90 flex items-center space-x-2">
-                <i class="ri-mail-add-line"></i>
+            <?php endif; ?>
+            <button onclick="composeMessage()" 
+                    class="bg-primary text-white px-6 py-3 rounded-xl hover:bg-primary/90 transition-colors flex items-center space-x-2">
+                <i class="ri-mail-line text-lg"></i>
                 <span>New Message</span>
-            </button>
-        </div>
-    </div>
-
-    <!-- Message Stats -->
-    <div class="grid md:grid-cols-4 gap-6">
-        <div class="bg-white rounded-xl shadow-sm border p-6">
-            <div class="flex items-center space-x-4">
-                <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
-                    <i class="ri-mail-line text-xl text-blue-600"></i>
-                </div>
-                <div>
-                    <div class="text-2xl font-bold text-secondary"><?= number_format($message_stats['total']) ?></div>
-                    <div class="text-sm text-gray-600">Total Messages</div>
-                </div>
-            </div>
-        </div>
-
-        <div class="bg-white rounded-xl shadow-sm border p-6">
-            <div class="flex items-center space-x-4">
-                <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
-                    <div class="w-3 h-3 bg-green-500 rounded-full"></div>
-                </div>
-                <div>
-                    <div class="text-2xl font-bold text-secondary"><?= number_format($message_stats['unread']) ?></div>
-                    <div class="text-sm text-gray-600">Unread Messages</div>
-                </div>
-            </div>
-        </div>
-
-        <div class="bg-white rounded-xl shadow-sm border p-6">
-            <div class="flex items-center space-x-4">
-                <div class="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center">
-                    <i class="ri-time-line text-xl text-orange-600"></i>
-                </div>
-                <div>
-                    <div class="text-2xl font-bold text-secondary"><?= $message_stats['avg_response'] ?>h</div>
-                    <div class="text-sm text-gray-600">Avg Response Time</div>
-                </div>
-            </div>
-        </div>
-
-        <div class="bg-white rounded-xl shadow-sm border p-6">
-            <div class="flex items-center space-x-4">
-                <div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
-                    <i class="ri-star-line text-xl text-purple-600"></i>
-                </div>
-                <div>
-                    <div class="text-2xl font-bold text-secondary"><?= number_format($message_stats['satisfaction'], 1) ?>%</div>
-                    <div class="text-sm text-gray-600">Satisfaction Rate</div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Messages Layout -->
-    <div class="grid lg:grid-cols-3 gap-8">
-        <!-- Message List -->
-        <div class="lg:col-span-1">
-            <div class="bg-white rounded-xl shadow-sm border">
-                <div class="p-6 border-b">
-                    <div class="relative">
-                        <i class="ri-search-line absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
-                        <input type="text" placeholder="Search messages..." 
-                               class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent">
-                    </div>
-                </div>
-                <div class="max-h-96 overflow-y-auto">
-                    <?php foreach ($messages as $message): ?>
-                    <div class="message-item p-4 border-b hover:bg-gray-50 cursor-pointer <?= !$message['is_read'] ? 'bg-blue-50' : '' ?>" 
-                         onclick="openMessage(<?= $message['id'] ?>)">
-                        <div class="flex items-start space-x-3">
-                            <img src="<?= htmlspecialchars($message['customer_avatar']) ?>" alt="Customer" 
-                                 class="w-10 h-10 rounded-full object-cover">
-                            <div class="flex-1 min-w-0">
-                                <div class="flex items-center justify-between mb-1">
-                                    <h4 class="font-medium text-secondary truncate"><?= htmlspecialchars($message['customer_name']) ?></h4>
-                                    <span class="text-xs text-gray-500"><?= $message['time_ago'] ?></span>
-                                </div>
-                                <p class="text-sm text-gray-600 truncate"><?= htmlspecialchars($message['subject']) ?></p>
-                                <p class="text-xs text-gray-500 truncate mt-1"><?= htmlspecialchars($message['preview']) ?></p>
-                                <div class="flex items-center justify-between mt-2">
-                                    <div class="flex items-center space-x-2">
-                                        <?php if (!$message['is_read']): ?>
-                                        <div class="w-2 h-2 bg-blue-500 rounded-full"></div>
-                                        <?php endif; ?>
-                                        <?php if ($message['is_urgent']): ?>
-                                        <i class="ri-alarm-warning-line text-red-500 text-xs"></i>
-                                        <?php endif; ?>
-                                        <?php if ($message['has_attachment']): ?>
-                                        <i class="ri-attachment-line text-gray-400 text-xs"></i>
-                                        <?php endif; ?>
-                                    </div>
-                                    <span class="text-xs px-2 py-1 bg-gray-100 text-gray-600 rounded">
-                                        <?= ucfirst($message['category']) ?>
-                                    </span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <?php endforeach; ?>
-                </div>
-            </div>
-        </div>
-
-        <!-- Message Detail -->
-        <div class="lg:col-span-2">
-            <div id="message-detail" class="bg-white rounded-xl shadow-sm border">
-                <div class="p-6 border-b">
-                    <div class="flex items-center justify-between">
-                        <div class="flex items-center space-x-4">
-                            <img src="https://ui-avatars.com/api/?name=John+Doe&background=3B82F6&color=fff" alt="Customer" 
-                                 class="w-12 h-12 rounded-full object-cover">
-                            <div>
-                                <h3 class="font-semibold text-secondary">John Doe</h3>
-                                <p class="text-sm text-gray-600">john.doe@example.com</p>
-                            </div>
-                        </div>
-                        <div class="flex items-center space-x-2">
-                            <button class="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg">
-                                <i class="ri-archive-line"></i>
-                            </button>
-                            <button class="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg">
-                                <i class="ri-delete-bin-line"></i>
-                            </button>
-                            <button class="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg">
-                                <i class="ri-more-line"></i>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Message Thread -->
-                <div class="p-6 max-h-96 overflow-y-auto">
-                    <div class="space-y-6">
-                        <!-- Customer Message -->
-                        <div class="flex space-x-3">
-                            <img src="https://ui-avatars.com/api/?name=John+Doe&background=3B82F6&color=fff" alt="Customer" 
-                                 class="w-8 h-8 rounded-full object-cover flex-shrink-0">
-                            <div class="flex-1">
-                                <div class="bg-gray-100 rounded-lg p-4">
-                                    <div class="flex items-center justify-between mb-2">
-                                        <span class="font-medium text-sm">John Doe</span>
-                                        <span class="text-xs text-gray-500">2 hours ago</span>
-                                    </div>
-                                    <p class="text-sm text-gray-800">Hi, I'm having trouble with my recent order. The download link doesn't seem to be working. Can you help me with this?</p>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Your Reply -->
-                        <div class="flex space-x-3 justify-end">
-                            <div class="flex-1 max-w-md">
-                                <div class="bg-primary text-white rounded-lg p-4">
-                                    <div class="flex items-center justify-between mb-2">
-                                        <span class="font-medium text-sm">You</span>
-                                        <span class="text-xs opacity-80">1 hour ago</span>
-                                    </div>
-                                    <p class="text-sm">Hi John! I'm sorry to hear about the issue. I've resent the download link to your email. Please check your inbox (and spam folder) and let me know if you still have any problems!</p>
-                                </div>
-                            </div>
-                            <img src="https://ui-avatars.com/api/?name=Seller&background=10B981&color=fff" alt="You" 
-                                 class="w-8 h-8 rounded-full object-cover flex-shrink-0">
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Reply Form -->
-                <div class="p-6 border-t bg-gray-50">
-                    <form onsubmit="sendReply(event)">
-                        <div class="space-y-4">
-                            <div class="flex items-center justify-between">
-                                <div class="flex items-center space-x-4">
-                                    <button type="button" class="text-gray-400 hover:text-gray-600">
-                                        <i class="ri-attachment-line"></i>
-                                    </button>
-                                    <button type="button" class="text-gray-400 hover:text-gray-600">
-                                        <i class="ri-emotion-line"></i>
-                                    </button>
-                                    <button type="button" class="text-gray-400 hover:text-gray-600">
-                                        <i class="ri-image-line"></i>
-                                    </button>
-                                </div>
-                                <div class="flex items-center space-x-2">
-                                    <button type="button" class="text-sm px-3 py-1 text-gray-600 hover:bg-gray-200 rounded">
-                                        Save Draft
-                                    </button>
-                                    <select class="text-sm border border-gray-300 rounded px-2 py-1">
-                                        <option>Normal Priority</option>
-                                        <option>High Priority</option>
-                                        <option>Urgent</option>
-                                    </select>
-                                </div>
-                            </div>
-                            <textarea rows="4" placeholder="Type your reply..." 
-                                      class="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-primary focus:border-transparent resize-none"></textarea>
-                            <div class="flex items-center justify-between">
-                                <div class="flex items-center space-x-2">
-                                    <label class="flex items-center space-x-2 text-sm">
-                                        <input type="checkbox" class="rounded">
-                                        <span>Close ticket after sending</span>
-                                    </label>
-                                </div>
-                                <div class="flex items-center space-x-2">
-                                    <button type="button" class="px-4 py-2 text-gray-600 hover:bg-gray-200 rounded-lg">
-                                        Cancel
-                                    </button>
-                                    <button type="submit" class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90">
-                                        Send Reply
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Quick Actions -->
-    <div class="bg-white rounded-xl shadow-sm border p-6">
-        <h3 class="text-lg font-semibold text-secondary mb-4">Quick Actions</h3>
-        <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
-            <button class="p-4 border border-gray-200 rounded-lg hover:bg-gray-50 text-left">
-                <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center mb-3">
-                    <i class="ri-customer-service-line text-blue-600"></i>
-                </div>
-                <h4 class="font-medium text-secondary mb-1">Create FAQ</h4>
-                <p class="text-sm text-gray-600">Add common questions</p>
-            </button>
-            <button class="p-4 border border-gray-200 rounded-lg hover:bg-gray-50 text-left">
-                <div class="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center mb-3">
-                    <i class="ri-mail-send-line text-green-600"></i>
-                </div>
-                <h4 class="font-medium text-secondary mb-1">Send Newsletter</h4>
-                <p class="text-sm text-gray-600">Update customers</p>
-            </button>
-            <button class="p-4 border border-gray-200 rounded-lg hover:bg-gray-50 text-left">
-                <div class="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center mb-3">
-                    <i class="ri-settings-line text-purple-600"></i>
-                </div>
-                <h4 class="font-medium text-secondary mb-1">Auto Responses</h4>
-                <p class="text-sm text-gray-600">Set up templates</p>
-            </button>
-            <button class="p-4 border border-gray-200 rounded-lg hover:bg-gray-50 text-left">
-                <div class="w-10 h-10 bg-orange-100 rounded-lg flex items-center justify-center mb-3">
-                    <i class="ri-file-text-line text-orange-600"></i>
-                </div>
-                <h4 class="font-medium text-secondary mb-1">Export Messages</h4>
-                <p class="text-sm text-gray-600">Download history</p>
             </button>
         </div>
     </div>
 </div>
 
+<!-- Messages List -->
+<div class="bg-white rounded-2xl shadow-sm border overflow-hidden">
+    <!-- Search and Filter -->
+    <div class="p-6 border-b border-gray-100">
+        <div class="flex items-center justify-between mb-4">
+            <h3 class="text-lg font-semibold text-secondary">All Messages</h3>
+            <div class="flex items-center space-x-3">
+                <!-- Search -->
+                <div class="relative">
+                    <input type="text" 
+                           id="messageSearch"
+                           placeholder="Search messages..." 
+                           class="pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary w-64">
+                    <i class="ri-search-line absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                </div>
+                
+                <!-- Status Filter -->
+                <select id="messageStatusFilter" class="px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary">
+                    <option value="">All Messages</option>
+                    <option value="unread">Unread</option>
+                    <option value="read">Read</option>
+                </select>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Messages Container -->
+    <div id="messagesContainer">
+        <?php if (empty($sellerMessages)): ?>
+        <div class="text-center py-16">
+            <div class="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                <i class="ri-message-line text-3xl text-gray-400"></i>
+            </div>
+            <h3 class="text-xl font-semibold text-secondary mb-2">No Messages Yet</h3>
+            <p class="text-gray-600 mb-6">Messages from customers will appear here</p>
+        </div>
+        <?php else: ?>
+        
+        <!-- Messages List -->
+        <div class="divide-y divide-gray-100">
+            <?php foreach ($sellerMessages as $message): ?>
+            <div class="message-item p-6 hover:bg-gray-50 transition-colors cursor-pointer <?= !$message['is_read'] ? 'bg-blue-50 border-l-4 border-blue-400' : '' ?>" 
+                 data-read="<?= $message['is_read'] ? 'read' : 'unread' ?>"
+                 onclick="openMessage(<?= $message['id'] ?>)">
+                
+                <div class="flex items-start space-x-4">
+                    <!-- Sender Avatar -->
+                    <div class="w-12 h-12 bg-gray-200 rounded-full flex items-center justify-center flex-shrink-0">
+                        <span class="text-sm font-medium text-gray-600">
+                            <?= strtoupper(substr($message['first_name'], 0, 1) . substr($message['last_name'], 0, 1)) ?>
+                        </span>
+                    </div>
+                    
+                    <!-- Message Content -->
+                    <div class="flex-1 min-w-0">
+                        <div class="flex items-center justify-between mb-2">
+                            <div class="flex items-center space-x-3">
+                                <h4 class="text-lg font-semibold text-secondary">
+                                    <?= htmlspecialchars($message['first_name'] . ' ' . $message['last_name']) ?>
+                                </h4>
+                                <?php if (!$message['is_read']): ?>
+                                <span class="w-2 h-2 bg-blue-500 rounded-full"></span>
+                                <?php endif; ?>
+                            </div>
+                            <div class="text-sm text-gray-500">
+                                <?= date('M j, Y \a\t g:i A', strtotime($message['created_at'])) ?>
+                            </div>
+                        </div>
+                        
+                        <!-- Subject -->
+                        <div class="text-base font-medium text-gray-800 mb-2">
+                            <?= htmlspecialchars($message['subject']) ?>
+                        </div>
+                        
+                        <!-- Message Preview -->
+                        <div class="text-gray-600 line-clamp-2 mb-3">
+                            <?= htmlspecialchars(substr($message['message'], 0, 150)) ?><?= strlen($message['message']) > 150 ? '...' : '' ?>
+                        </div>
+                        
+                        <!-- Message Actions -->
+                        <div class="flex items-center space-x-4">
+                            <button onclick="event.stopPropagation(); replyToMessage(<?= $message['id'] ?>)" 
+                                    class="text-sm text-primary hover:text-primary/80 font-medium">
+                                Reply
+                            </button>
+                            
+                            <?php if (!$message['is_read']): ?>
+                            <button onclick="event.stopPropagation(); markAsRead(<?= $message['id'] ?>)" 
+                                    class="text-sm text-blue-600 hover:text-blue-700">
+                                Mark as Read
+                            </button>
+                            <?php endif; ?>
+                            
+                            <button onclick="event.stopPropagation(); archiveMessage(<?= $message['id'] ?>)" 
+                                    class="text-sm text-gray-500 hover:text-gray-700">
+                                Archive
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <?php endforeach; ?>
+        </div>
+        <?php endif; ?>
+    </div>
+</div>
+
+<!-- Message Modal -->
+<div id="messageModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
+    <div class="bg-white rounded-2xl max-w-4xl w-full mx-4 max-h-[90vh] overflow-hidden">
+        <div class="p-6 border-b border-gray-100">
+            <div class="flex items-center justify-between">
+                <h3 class="text-xl font-semibold text-secondary">Message Details</h3>
+                <button onclick="closeMessageModal()" class="text-gray-400 hover:text-gray-600">
+                    <i class="ri-close-line text-xl"></i>
+                </button>
+            </div>
+        </div>
+        <div class="p-6 overflow-y-auto max-h-[70vh]" id="messageContent">
+            <!-- Message content will be loaded here -->
+        </div>
+    </div>
+</div>
+
+<!-- Reply Modal -->
+<div id="replyModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
+    <div class="bg-white rounded-2xl max-w-2xl w-full mx-4">
+        <div class="p-6 border-b border-gray-100">
+            <div class="flex items-center justify-between">
+                <h3 class="text-xl font-semibold text-secondary">Reply to Message</h3>
+                <button onclick="closeReplyModal()" class="text-gray-400 hover:text-gray-600">
+                    <i class="ri-close-line text-xl"></i>
+                </button>
+            </div>
+        </div>
+        <div class="p-6">
+            <form id="replyForm" onsubmit="sendReply(event)">
+                <input type="hidden" id="replyMessageId" value="">
+                <input type="hidden" id="replyRecipientId" value="">
+                
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Subject</label>
+                    <input type="text" 
+                           id="replySubject"
+                           class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary"
+                           placeholder="Re: Original subject">
+                </div>
+                
+                <div class="mb-6">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Message</label>
+                    <textarea id="replyMessage" rows="6"
+                              class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary"
+                              placeholder="Type your reply..."></textarea>
+                </div>
+                
+                <div class="flex items-center justify-end space-x-4">
+                    <button type="button" onclick="closeReplyModal()" 
+                            class="px-6 py-2 text-gray-600 hover:text-gray-800 transition-colors">
+                        Cancel
+                    </button>
+                    <button type="submit" 
+                            class="bg-primary text-white px-6 py-2 rounded-lg hover:bg-primary/90 transition-colors">
+                        Send Reply
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Messages Management Scripts -->
 <script>
+// Search and Filter functionality
+document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.getElementById('messageSearch');
+    const statusFilter = document.getElementById('messageStatusFilter');
+    const messageItems = document.querySelectorAll('.message-item');
+    
+    function filterMessages() {
+        const searchTerm = searchInput.value.toLowerCase();
+        const statusFilter_val = statusFilter.value;
+        
+        messageItems.forEach(item => {
+            const sender = item.querySelector('h4').textContent.toLowerCase();
+            const subject = item.querySelector('.font-medium').textContent.toLowerCase();
+            const content = item.querySelector('.line-clamp-2').textContent.toLowerCase();
+            const status = item.dataset.read;
+            
+            const matchesSearch = sender.includes(searchTerm) || subject.includes(searchTerm) || content.includes(searchTerm);
+            const matchesStatus = !statusFilter_val || status === statusFilter_val;
+            
+            if (matchesSearch && matchesStatus) {
+                item.style.display = 'block';
+            } else {
+                item.style.display = 'none';
+            }
+        });
+    }
+    
+    searchInput.addEventListener('input', filterMessages);
+    statusFilter.addEventListener('change', filterMessages);
+});
+
+// Message management functions
 function openMessage(messageId) {
-    // Load message details via AJAX
-    fetch(`/api/messages/${messageId}`)
+    fetch(`seller-api.php?action=get_message&message_id=${messageId}`)
         .then(response => response.json())
         .then(data => {
-            // Update message detail view
-            document.getElementById('message-detail').innerHTML = data.html;
+            if (data.success) {
+                showMessageModal(data.message);
+                if (!data.message.is_read) {
+                    markAsRead(messageId);
+                }
+            } else {
+                showToast('Error loading message', 'error');
+            }
+        })
+        .catch(error => {
+            showToast('Error loading message', 'error');
+            console.error('Error:', error);
         });
+}
+
+function showMessageModal(message) {
+    const modal = document.getElementById('messageModal');
+    const content = document.getElementById('messageContent');
+    
+    content.innerHTML = `
+        <div class="space-y-6">
+            <div class="flex items-center space-x-4">
+                <div class="w-12 h-12 bg-gray-200 rounded-full flex items-center justify-center">
+                    <span class="text-sm font-medium text-gray-600">
+                        ${message.first_name.charAt(0).toUpperCase()}${message.last_name.charAt(0).toUpperCase()}
+                    </span>
+                </div>
+                <div>
+                    <div class="font-semibold text-lg">${message.first_name} ${message.last_name}</div>
+                    <div class="text-sm text-gray-600">${new Date(message.created_at).toLocaleString()}</div>
+                </div>
+            </div>
+            
+            <div>
+                <h4 class="text-xl font-semibold text-gray-900 mb-4">${message.subject}</h4>
+                <div class="prose max-w-none text-gray-700 whitespace-pre-wrap">${message.message}</div>
+            </div>
+            
+            <div class="flex items-center space-x-4 pt-4 border-t">
+                <button onclick="replyToMessage(${message.id})" 
+                        class="bg-primary text-white px-6 py-2 rounded-lg hover:bg-primary/90">
+                    Reply
+                </button>
+                <button onclick="archiveMessage(${message.id})" 
+                        class="text-gray-600 hover:text-gray-800">
+                    Archive
+                </button>
+            </div>
+        </div>
+    `;
+    
+    modal.classList.remove('hidden');
+}
+
+function closeMessageModal() {
+    document.getElementById('messageModal').classList.add('hidden');
+}
+
+function replyToMessage(messageId) {
+    fetch(`seller-api.php?action=get_message&message_id=${messageId}`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                showReplyModal(data.message);
+                closeMessageModal();
+            }
+        });
+}
+
+function showReplyModal(message) {
+    const modal = document.getElementById('replyModal');
+    
+    document.getElementById('replyMessageId').value = message.id;
+    document.getElementById('replyRecipientId').value = message.sender_id;
+    document.getElementById('replySubject').value = 'Re: ' + message.subject;
+    
+    modal.classList.remove('hidden');
+}
+
+function closeReplyModal() {
+    document.getElementById('replyModal').classList.add('hidden');
+    document.getElementById('replyForm').reset();
 }
 
 function sendReply(event) {
     event.preventDefault();
-    // Handle reply submission
-    const formData = new FormData(event.target);
     
-    fetch('/api/messages/reply', {
+    const recipientId = document.getElementById('replyRecipientId').value;
+    const subject = document.getElementById('replySubject').value;
+    const message = document.getElementById('replyMessage').value;
+    
+    if (!subject.trim() || !message.trim()) {
+        showToast('Please fill in all fields', 'error');
+        return;
+    }
+    
+    fetch('seller-api.php', {
         method: 'POST',
-        body: formData
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            action: 'send_message',
+            recipient_id: recipientId,
+            subject: subject,
+            message: message
+        })
     })
     .then(response => response.json())
     .then(data => {
         if (data.success) {
-            // Show success message and refresh
-            showToast('Reply sent successfully!', 'success');
-            location.reload();
+            showToast('Reply sent successfully', 'success');
+            closeReplyModal();
+            setTimeout(() => window.location.reload(), 1000);
+        } else {
+            showToast(data.message, 'error');
         }
     });
 }
 
+function markAsRead(messageId) {
+    fetch('seller-api.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            action: 'mark_message_read',
+            message_id: messageId
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Update UI
+            const messageItem = document.querySelector(`[onclick*="${messageId}"]`);
+            if (messageItem) {
+                messageItem.classList.remove('bg-blue-50', 'border-l-4', 'border-blue-400');
+                messageItem.dataset.read = 'read';
+                const unreadDot = messageItem.querySelector('.bg-blue-500');
+                if (unreadDot) unreadDot.remove();
+            }
+        }
+    });
+}
+
+function archiveMessage(messageId) {
+    if (confirm('Are you sure you want to archive this message?')) {
+        fetch('seller-api.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                action: 'archive_message',
+                message_id: messageId
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                showToast('Message archived successfully', 'success');
+                setTimeout(() => window.location.reload(), 1000);
+            } else {
+                showToast(data.message, 'error');
+            }
+        });
+    }
+}
+
 function composeMessage() {
-    // Open compose modal
-    document.getElementById('compose-modal').classList.remove('hidden');
+    showToast('Compose message feature coming soon', 'info');
 }
 </script>

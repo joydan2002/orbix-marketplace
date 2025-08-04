@@ -22,6 +22,9 @@ if (isset($_SESSION['user_id']) && isset($_SESSION['user_type']) && $_SESSION['u
     $seller_id = $_SESSION['user_id'];
     $seller_name = $_SESSION['first_name'] ?? 'Seller';
     
+    // Include seller data initialization
+    include 'sections/seller-init.php';
+    
     ?>
     <style>
         .dashboard-container {
@@ -193,6 +196,80 @@ if (isset($_SESSION['user_id']) && isset($_SESSION['user_type']) && $_SESSION['u
     </div>
     
     <script>
+        // Global modal and toast functions for seller dashboard
+        function showModal(modalId) {
+            const modal = document.getElementById(modalId);
+            if (modal) {
+                modal.classList.remove('hidden');
+            }
+        }
+
+        function hideModal(modalId) {
+            const modal = document.getElementById(modalId);
+            if (modal) {
+                modal.classList.add('hidden');
+            }
+        }
+
+        function showAddProductModal() {
+            showModal('addProductModal');
+        }
+
+        function showSuccessToast(message) {
+            showToast(message, 'success');
+        }
+
+        function showErrorToast(message) {
+            showToast(message, 'error');
+        }
+
+        function showToast(message, type = 'info') {
+            // Create toast notification
+            const toast = document.createElement('div');
+            toast.className = `fixed top-4 right-4 z-50 p-4 rounded-lg shadow-lg max-w-sm transform transition-all duration-300 translate-x-full`;
+            
+            // Set background color based on type
+            switch(type) {
+                case 'success':
+                    toast.className += ' bg-green-500 text-white';
+                    break;
+                case 'error':
+                    toast.className += ' bg-red-500 text-white';
+                    break;
+                case 'warning':
+                    toast.className += ' bg-yellow-500 text-white';
+                    break;
+                default:
+                    toast.className += ' bg-blue-500 text-white';
+            }
+            
+            toast.innerHTML = `
+                <div class="flex items-center">
+                    <div class="flex-1">${message}</div>
+                    <button onclick="this.parentElement.parentElement.remove()" class="ml-4 text-white/80 hover:text-white">
+                        <i class="ri-close-line"></i>
+                    </button>
+                </div>
+            `;
+            
+            document.body.appendChild(toast);
+            
+            // Animate in
+            setTimeout(() => {
+                toast.classList.remove('translate-x-full');
+            }, 100);
+            
+            // Auto remove after 5 seconds
+            setTimeout(() => {
+                toast.classList.add('translate-x-full');
+                setTimeout(() => {
+                    if (toast.parentElement) {
+                        toast.remove();
+                    }
+                }, 300);
+            }, 5000);
+        }
+
         // Load dashboard sections
         function loadSection(section) {
             // Update active nav item
@@ -223,7 +300,161 @@ if (isset($_SESSION['user_id']) && isset($_SESSION['user_type']) && $_SESSION['u
         document.addEventListener('DOMContentLoaded', function() {
             loadSection('overview');
         });
+
+        // Product management functions for seller dashboard
+        // Note: editProduct function is defined in edit-product-modal.php
+        
+        function viewProductModal(id, type = 'template') {
+            // Fetch product data first
+            fetch(`seller-api.php?action=get_product&id=${id}&type=${type}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        const product = data.product;
+                        
+                        // Fill view modal with product data
+                        const titleEl = document.getElementById('viewProductTitle');
+                        const priceEl = document.getElementById('viewProductPrice');
+                        const statusEl = document.getElementById('viewProductStatus');
+                        const descEl = document.getElementById('viewProductDescription');
+                        
+                        if (titleEl) titleEl.textContent = product.title;
+                        if (priceEl) priceEl.textContent = `$${parseFloat(product.price).toFixed(2)}`;
+                        if (statusEl) statusEl.textContent = product.status.charAt(0).toUpperCase() + product.status.slice(1);
+                        if (descEl) descEl.textContent = product.description;
+                        
+                        // Show modal
+                        showModal('viewProductModal');
+                    } else {
+                        showErrorToast(data.error || 'Failed to load product data');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    showErrorToast('Error loading product data');
+                });
+        }
+
+        function duplicateProduct(type, id) {
+            if (confirm('Are you sure you want to duplicate this product?')) {
+                fetch('seller-api.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        action: 'duplicate_product',
+                        type: type,
+                        id: id
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        showSuccessToast('Product duplicated successfully');
+                        setTimeout(() => loadSection('products'), 1000);
+                    } else {
+                        showErrorToast(data.message || 'Failed to duplicate product');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    showErrorToast('Error duplicating product');
+                });
+            }
+        }
+
+        function deleteProduct(type, id) {
+            if (confirm('Are you sure you want to delete this product? This action cannot be undone.')) {
+                fetch('seller-api.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        action: 'delete_product',
+                        type: type,
+                        id: id
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        showSuccessToast('Product deleted successfully');
+                        setTimeout(() => loadSection('products'), 1000);
+                    } else {
+                        showErrorToast(data.message || 'Failed to delete product');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    showErrorToast('Error deleting product');
+                });
+            }
+        }
+
+        function toggleProductMenu(id) {
+            const menu = document.getElementById(`productMenu-${id}`);
+            const allMenus = document.querySelectorAll('[id^="productMenu-"]');
+            
+            // Close other menus
+            allMenus.forEach(m => {
+                if (m.id !== `productMenu-${id}`) {
+                    m.classList.add('hidden');
+                }
+            });
+            
+            if (menu) {
+                menu.classList.toggle('hidden');
+            }
+        }
+
+        // Close menus when clicking outside
+        document.addEventListener('click', function(event) {
+            if (!event.target.closest('[id^="productMenu-"]') && !event.target.closest('button[onclick*="toggleProductMenu"]')) {
+                document.querySelectorAll('[id^="productMenu-"]').forEach(menu => {
+                    menu.classList.add('hidden');
+                });
+            }
+        });
+
+        // Additional helper functions
+        function promoteProduct(type, id) {
+            showToast('Promote feature coming soon!', 'info');
+        }
+
+        function downloadAnalytics(type, id) {
+            showToast('Analytics download coming soon!', 'info');
+        }
+
+        // Make functions globally available
+        window.editProduct = editProduct;
+        window.viewProductModal = viewProductModal;
+        window.duplicateProduct = duplicateProduct;
+        window.deleteProduct = deleteProduct;
+        window.toggleProductMenu = toggleProductMenu;
+        window.promoteProduct = promoteProduct;
+        window.downloadAnalytics = downloadAnalytics;
     </script>
+    
+    <!-- Include Modal Files for Dashboard -->
+    <?php
+    // Include all modal files needed for seller dashboard
+    if (file_exists('modals/add-product-modal.php')) {
+        include 'modals/add-product-modal.php';
+    }
+    if (file_exists('modals/edit-product-modal.php')) {
+        include 'modals/edit-product-modal.php';
+    }
+    if (file_exists('modals/promote-modal.php')) {
+        include 'modals/promote-modal.php';
+    }
+    if (file_exists('modals/message-modal.php')) {
+        include 'modals/message-modal.php';
+    }
+    if (file_exists('modals/notification-modal.php')) {
+        include 'modals/notification-modal.php';
+    }
+    if (file_exists('modals/order-details-modal.php')) {
+        include 'modals/order-details-modal.php';
+    }
+    ?>
     
     <?php
     require_once '../includes/footer.php';

@@ -1,7 +1,7 @@
 <?php
 /**
  * Seller Services Management
- * Manage all seller services with CRUD operations
+ * Manage all seller services with real data from database
  */
 ?>
 
@@ -10,7 +10,7 @@
     <div class="flex items-center justify-between mb-6">
         <div>
             <h1 class="text-3xl font-bold text-secondary mb-2">My Services</h1>
-            <p class="text-gray-600">Manage your digital services and track performance</p>
+            <p class="text-gray-600">Manage your service offerings and track orders</p>
         </div>
         <div class="flex items-center space-x-4">
             <button onclick="showAddServiceModal()" 
@@ -29,7 +29,7 @@
                     <div class="text-sm text-gray-600">Total Services</div>
                 </div>
                 <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
-                    <i class="ri-tools-line text-xl text-blue-600"></i>
+                    <i class="ri-service-line text-xl text-blue-600"></i>
                 </div>
             </div>
         </div>
@@ -49,11 +49,11 @@
         <div class="bg-white rounded-xl p-6 shadow-sm border">
             <div class="flex items-center justify-between">
                 <div>
-                    <div class="text-2xl font-bold text-orange-600"><?= $serviceStats['pending'] ?></div>
-                    <div class="text-sm text-gray-600">Pending Review</div>
+                    <div class="text-2xl font-bold text-orange-600"><?= $serviceStats['total_orders'] ?></div>
+                    <div class="text-sm text-gray-600">Total Orders</div>
                 </div>
                 <div class="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center">
-                    <i class="ri-time-line text-xl text-orange-600"></i>
+                    <i class="ri-shopping-cart-line text-xl text-orange-600"></i>
                 </div>
             </div>
         </div>
@@ -61,18 +61,18 @@
         <div class="bg-white rounded-xl p-6 shadow-sm border">
             <div class="flex items-center justify-between">
                 <div>
-                    <div class="text-2xl font-bold text-purple-600"><?= number_format($serviceStats['total_orders']) ?></div>
-                    <div class="text-sm text-gray-600">Total Orders</div>
+                    <div class="text-2xl font-bold text-purple-600">$<?= number_format($serviceStats['total_revenue'], 2) ?></div>
+                    <div class="text-sm text-gray-600">Services Revenue</div>
                 </div>
                 <div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
-                    <i class="ri-shopping-cart-line text-xl text-purple-600"></i>
+                    <i class="ri-money-dollar-circle-line text-xl text-purple-600"></i>
                 </div>
             </div>
         </div>
     </div>
 </div>
 
-<!-- Services Table -->
+<!-- Services Grid -->
 <div class="bg-white rounded-2xl shadow-sm border overflow-hidden">
     <!-- Table Header with Filters -->
     <div class="p-6 border-b border-gray-100">
@@ -88,225 +88,185 @@
                     <i class="ri-search-line absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
                 </div>
                 
-                <!-- Status Filter -->
-                <select id="statusFilter" class="px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary">
-                    <option value="">All Status</option>
-                    <option value="active">Active</option>
-                    <option value="pending">Pending</option>
-                    <option value="rejected">Rejected</option>
-                    <option value="draft">Draft</option>
-                </select>
-                
                 <!-- Category Filter -->
-                <select id="categoryFilter" class="px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary">
+                <select id="serviceCategoryFilter" class="px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary">
                     <option value="">All Categories</option>
                     <?php foreach ($serviceCategories as $category): ?>
                     <option value="<?= $category['id'] ?>"><?= htmlspecialchars($category['name']) ?></option>
                     <?php endforeach; ?>
                 </select>
+                
+                <!-- Status Filter -->
+                <select id="serviceStatusFilter" class="px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary">
+                    <option value="">All Status</option>
+                    <option value="active">Active</option>
+                    <option value="pending">Pending</option>
+                    <option value="paused">Paused</option>
+                    <option value="draft">Draft</option>
+                </select>
             </div>
         </div>
     </div>
     
-    <!-- Services List -->
+    <!-- Services Container -->
     <div id="servicesContainer">
         <?php if (empty($sellerServices)): ?>
         <div class="text-center py-16">
             <div class="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6">
-                <i class="ri-tools-line text-3xl text-gray-400"></i>
+                <i class="ri-service-line text-3xl text-gray-400"></i>
             </div>
             <h3 class="text-xl font-semibold text-secondary mb-2">No Services Yet</h3>
-            <p class="text-gray-600 mb-6">Start building your service portfolio to attract customers</p>
+            <p class="text-gray-600 mb-6">Start offering services to build your business</p>
             <button onclick="showAddServiceModal()" 
                     class="bg-primary text-white px-6 py-3 rounded-xl font-semibold hover:bg-primary/90 transition-colors">
                 Create Your First Service
             </button>
         </div>
         <?php else: ?>
-        <div class="divide-y divide-gray-100">
-            <?php foreach ($sellerServices as $service): ?>
-            <div class="p-6 service-item" data-status="<?= $service['status'] ?>" data-category="<?= $service['category_id'] ?>">
-                <div class="flex items-start space-x-4">
-                    <!-- Service Image -->
-                    <div class="w-20 h-20 bg-gray-100 rounded-xl overflow-hidden flex-shrink-0">
-                        <?php if ($service['image_url']): ?>
-                        <img src="<?= htmlspecialchars($service['image_url']) ?>" 
-                             alt="<?= htmlspecialchars($service['title']) ?>"
-                             class="w-full h-full object-cover">
-                        <?php else: ?>
-                        <div class="w-full h-full flex items-center justify-center">
-                            <i class="ri-tools-line text-2xl text-gray-400"></i>
-                        </div>
-                        <?php endif; ?>
-                    </div>
+        
+        <!-- Services Grid -->
+        <div class="p-6">
+            <div class="grid lg:grid-cols-2 gap-6">
+                <?php foreach ($sellerServices as $service): ?>
+                <div class="service-item bg-white rounded-xl border hover:shadow-lg transition-all duration-300 overflow-hidden" 
+                     data-status="<?= $service['status'] ?>" 
+                     data-category="<?= $service['category_id'] ?>">
                     
-                    <!-- Service Info -->
-                    <div class="flex-1 min-w-0">
-                        <div class="flex items-start justify-between mb-2">
+                    <!-- Service Header -->
+                    <div class="p-6 border-b border-gray-100">
+                        <div class="flex items-start justify-between">
                             <div class="flex-1">
-                                <h4 class="text-lg font-semibold text-secondary mb-1 truncate">
+                                <div class="flex items-center space-x-2 mb-2">
+                                    <?php
+                                    $statusClasses = [
+                                        'active' => 'bg-green-500',
+                                        'pending' => 'bg-orange-500',
+                                        'paused' => 'bg-gray-500',
+                                        'draft' => 'bg-gray-400'
+                                    ];
+                                    $statusClass = $statusClasses[$service['status']] ?? 'bg-gray-500';
+                                    ?>
+                                    <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium text-white <?= $statusClass ?>">
+                                        <?= ucfirst($service['status']) ?>
+                                    </span>
+                                    
+                                    <?php if ($service['is_featured']): ?>
+                                    <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                                        Featured
+                                    </span>
+                                    <?php endif; ?>
+                                </div>
+                                
+                                <h4 class="text-lg font-semibold text-secondary mb-2">
                                     <?= htmlspecialchars($service['title']) ?>
                                 </h4>
-                                <p class="text-sm text-gray-600 mb-2 line-clamp-2">
-                                    <?= htmlspecialchars($service['description']) ?>
+                                
+                                <p class="text-sm text-gray-600 mb-3 line-clamp-2">
+                                    <?= htmlspecialchars($service['short_description'] ?? $service['description']) ?>
                                 </p>
                                 
                                 <!-- Service Meta -->
-                                <div class="flex items-center space-x-4 text-sm text-gray-500">
+                                <div class="flex items-center justify-between text-sm text-gray-500">
                                     <span class="flex items-center">
                                         <i class="ri-folder-line mr-1"></i>
-                                        <?= htmlspecialchars($service['category_name']) ?>
+                                        <?= htmlspecialchars($service['category_name'] ?? 'General') ?>
                                     </span>
                                     <span class="flex items-center">
                                         <i class="ri-time-line mr-1"></i>
-                                        <?= $service['delivery_days'] ?> days delivery
-                                    </span>
-                                    <span class="flex items-center">
-                                        <i class="ri-eye-line mr-1"></i>
-                                        <?= number_format($service['views']) ?> views
-                                    </span>
-                                    <span class="flex items-center">
-                                        <i class="ri-shopping-cart-line mr-1"></i>
-                                        <?= number_format($service['orders_count']) ?> orders
+                                        <?= $service['delivery_time_days'] ?> days delivery
                                     </span>
                                 </div>
                             </div>
                             
-                            <!-- Price & Status -->
-                            <div class="text-right ml-4">
-                                <div class="text-xl font-bold text-secondary mb-2">
-                                    $<?= number_format($service['price'], 2) ?>
-                                </div>
-                                
-                                <!-- Status Badge -->
-                                <?php
-                                $statusClasses = [
-                                    'active' => 'bg-green-100 text-green-800',
-                                    'pending' => 'bg-orange-100 text-orange-800',
-                                    'rejected' => 'bg-red-100 text-red-800',
-                                    'draft' => 'bg-gray-100 text-gray-800'
-                                ];
-                                $statusClass = $statusClasses[$service['status']] ?? 'bg-gray-100 text-gray-800';
-                                ?>
-                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium <?= $statusClass ?>">
-                                    <?= ucfirst($service['status']) ?>
-                                </span>
-                                
-                                <!-- Rating -->
-                                <?php if ($service['rating'] > 0): ?>
-                                <div class="flex items-center mt-2">
-                                    <div class="flex items-center">
-                                        <?php for ($i = 1; $i <= 5; $i++): ?>
-                                        <i class="ri-star-<?= $i <= $service['rating'] ? 'fill' : 'line' ?> text-yellow-400 text-sm"></i>
-                                        <?php endfor; ?>
-                                    </div>
-                                    <span class="text-xs text-gray-500 ml-1">
-                                        (<?= $service['reviews_count'] ?>)
-                                    </span>
-                                </div>
-                                <?php endif; ?>
-                            </div>
-                        </div>
-                        
-                        <!-- Action Buttons -->
-                        <div class="flex items-center space-x-2 mt-4">
-                            <button onclick="editService(<?= $service['id'] ?>)" 
-                                    class="px-4 py-2 text-sm bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors flex items-center">
-                                <i class="ri-edit-line mr-1"></i>Edit
-                            </button>
-                            
-                            <button onclick="viewServiceOrders(<?= $service['id'] ?>)" 
-                                    class="px-4 py-2 text-sm bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition-colors flex items-center">
-                                <i class="ri-shopping-cart-line mr-1"></i>Orders (<?= $service['orders_count'] ?>)
-                            </button>
-                            
-                            <button onclick="viewServiceAnalytics(<?= $service['id'] ?>)" 
-                                    class="px-4 py-2 text-sm bg-purple-100 text-purple-700 rounded-lg hover:bg-purple-200 transition-colors flex items-center">
-                                <i class="ri-bar-chart-line mr-1"></i>Analytics
-                            </button>
-                            
-                            <?php if ($service['status'] === 'active'): ?>
-                            <button onclick="toggleServiceStatus(<?= $service['id'] ?>, 'inactive')" 
-                                    class="px-4 py-2 text-sm bg-orange-100 text-orange-700 rounded-lg hover:bg-orange-200 transition-colors flex items-center">
-                                <i class="ri-pause-line mr-1"></i>Deactivate
-                            </button>
-                            <?php elseif ($service['status'] === 'draft'): ?>
-                            <button onclick="publishService(<?= $service['id'] ?>)" 
-                                    class="px-4 py-2 text-sm bg-green-100 text-green-700 rounded-lg hover:bg-green-200 transition-colors flex items-center">
-                                <i class="ri-send-plane-line mr-1"></i>Publish
-                            </button>
-                            <?php endif; ?>
-                            
-                            <div class="relative">
-                                <button onclick="toggleServiceMenu(<?= $service['id'] ?>)" 
-                                        class="px-3 py-2 text-sm text-gray-500 hover:text-gray-700 rounded-lg hover:bg-gray-100 transition-colors">
-                                    <i class="ri-more-line"></i>
-                                </button>
-                                
-                                <!-- Dropdown Menu -->
-                                <div id="serviceMenu<?= $service['id'] ?>" 
-                                     class="hidden absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-100 z-10">
-                                    <div class="py-1">
-                                        <button onclick="duplicateService(<?= $service['id'] ?>)" 
-                                                class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
-                                            <i class="ri-file-copy-line mr-2"></i>Duplicate
-                                        </button>
-                                        <button onclick="promoteService(<?= $service['id'] ?>)" 
-                                                class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
-                                            <i class="ri-megaphone-line mr-2"></i>Promote
-                                        </button>
-                                        <button onclick="exportServiceData(<?= $service['id'] ?>)" 
-                                                class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
-                                            <i class="ri-download-line mr-2"></i>Export Data
-                                        </button>
-                                        <hr class="my-1">
-                                        <button onclick="deleteService(<?= $service['id'] ?>)" 
-                                                class="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50">
-                                            <i class="ri-delete-bin-line mr-2"></i>Delete
-                                        </button>
+                            <!-- Service Actions -->
+                            <div class="ml-4">
+                                <div class="relative">
+                                    <button onclick="toggleServiceMenu(<?= $service['id'] ?>)" 
+                                            class="p-2 text-gray-400 hover:text-gray-600 rounded-lg hover:bg-gray-100 transition-colors">
+                                        <i class="ri-more-line"></i>
+                                    </button>
+                                    
+                                    <!-- Dropdown Menu -->
+                                    <div id="serviceMenu<?= $service['id'] ?>" 
+                                         class="hidden absolute right-0 top-full mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-100 z-10">
+                                        <div class="py-1">
+                                            <button onclick="editService(<?= $service['id'] ?>)" 
+                                                    class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
+                                                <i class="ri-edit-line mr-2"></i>Edit Service
+                                            </button>
+                                            <button onclick="duplicateService(<?= $service['id'] ?>)" 
+                                                    class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
+                                                <i class="ri-file-copy-line mr-2"></i>Duplicate
+                                            </button>
+                                            <button onclick="viewServiceAnalytics(<?= $service['id'] ?>)" 
+                                                    class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
+                                                <i class="ri-bar-chart-line mr-2"></i>Analytics
+                                            </button>
+                                            <hr class="my-1">
+                                            <button onclick="toggleServiceStatus(<?= $service['id'] ?>, '<?= $service['status'] ?>')" 
+                                                    class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
+                                                <i class="ri-toggle-line mr-2"></i>
+                                                <?= $service['status'] === 'active' ? 'Pause' : 'Activate' ?>
+                                            </button>
+                                            <button onclick="deleteService(<?= $service['id'] ?>)" 
+                                                    class="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50">
+                                                <i class="ri-delete-bin-line mr-2"></i>Delete
+                                            </button>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                </div>
-            </div>
-            <?php endforeach; ?>
-        </div>
-        
-        <!-- Pagination -->
-        <?php if ($totalPages > 1): ?>
-        <div class="p-6 border-t border-gray-100">
-            <div class="flex items-center justify-between">
-                <div class="text-sm text-gray-600">
-                    Showing <?= ($currentPage - 1) * $perPage + 1 ?> to <?= min($currentPage * $perPage, $totalServices) ?> of <?= $totalServices ?> services
-                </div>
-                
-                <div class="flex items-center space-x-2">
-                    <?php if ($currentPage > 1): ?>
-                    <a href="?section=services&page=<?= $currentPage - 1 ?>" 
-                       class="px-3 py-2 text-sm text-gray-600 hover:text-primary rounded-lg hover:bg-gray-50">
-                        <i class="ri-arrow-left-line"></i>
-                    </a>
-                    <?php endif; ?>
                     
-                    <?php for ($i = max(1, $currentPage - 2); $i <= min($totalPages, $currentPage + 2); $i++): ?>
-                    <a href="?section=services&page=<?= $i ?>" 
-                       class="px-3 py-2 text-sm rounded-lg <?= $i === $currentPage ? 'bg-primary text-white' : 'text-gray-600 hover:text-primary hover:bg-gray-50' ?>">
-                        <?= $i ?>
-                    </a>
-                    <?php endfor; ?>
-                    
-                    <?php if ($currentPage < $totalPages): ?>
-                    <a href="?section=services&page=<?= $currentPage + 1 ?>" 
-                       class="px-3 py-2 text-sm text-gray-600 hover:text-primary rounded-lg hover:bg-gray-50">
-                        <i class="ri-arrow-right-line"></i>
-                    </a>
-                    <?php endif; ?>
+                    <!-- Service Stats -->
+                    <div class="p-6">
+                        <div class="grid grid-cols-3 gap-4 mb-4">
+                            <div class="text-center">
+                                <div class="text-2xl font-bold text-primary">$<?= number_format($service['price'], 2) ?></div>
+                                <div class="text-xs text-gray-500">Starting Price</div>
+                            </div>
+                            <div class="text-center">
+                                <div class="text-2xl font-bold text-blue-600"><?= number_format($service['orders_count']) ?></div>
+                                <div class="text-xs text-gray-500">Orders</div>
+                            </div>
+                            <div class="text-center">
+                                <div class="text-2xl font-bold text-green-600"><?= number_format($service['views_count']) ?></div>
+                                <div class="text-xs text-gray-500">Views</div>
+                            </div>
+                        </div>
+                        
+                        <!-- Rating -->
+                        <?php if ($service['rating'] > 0): ?>
+                        <div class="flex items-center justify-center mb-4">
+                            <div class="flex items-center">
+                                <?php for ($i = 1; $i <= 5; $i++): ?>
+                                <i class="ri-star-<?= $i <= $service['rating'] ? 'fill' : 'line' ?> text-yellow-400 text-sm"></i>
+                                <?php endfor; ?>
+                            </div>
+                            <span class="text-sm text-gray-600 ml-2">
+                                <?= number_format($service['rating'], 1) ?> (<?= $service['reviews_count'] ?> reviews)
+                            </span>
+                        </div>
+                        <?php endif; ?>
+                        
+                        <!-- Action Buttons -->
+                        <div class="flex items-center space-x-2">
+                            <button onclick="editService(<?= $service['id'] ?>)" 
+                                    class="flex-1 px-4 py-2 text-sm bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors text-center">
+                                Edit Service
+                            </button>
+                            
+                            <button onclick="viewServiceAnalytics(<?= $service['id'] ?>)" 
+                                    class="flex-1 px-4 py-2 text-sm bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition-colors text-center">
+                                View Analytics
+                            </button>
+                        </div>
+                    </div>
                 </div>
+                <?php endforeach; ?>
             </div>
         </div>
-        <?php endif; ?>
         <?php endif; ?>
     </div>
 </div>
@@ -316,14 +276,14 @@
 // Search and Filter functionality
 document.addEventListener('DOMContentLoaded', function() {
     const searchInput = document.getElementById('serviceSearch');
-    const statusFilter = document.getElementById('statusFilter');
-    const categoryFilter = document.getElementById('categoryFilter');
+    const categoryFilter = document.getElementById('serviceCategoryFilter');
+    const statusFilter = document.getElementById('serviceStatusFilter');
     const serviceItems = document.querySelectorAll('.service-item');
     
     function filterServices() {
         const searchTerm = searchInput.value.toLowerCase();
-        const statusFilter_val = statusFilter.value;
         const categoryFilter_val = categoryFilter.value;
+        const statusFilter_val = statusFilter.value;
         
         serviceItems.forEach(item => {
             const title = item.querySelector('h4').textContent.toLowerCase();
@@ -332,10 +292,10 @@ document.addEventListener('DOMContentLoaded', function() {
             const category = item.dataset.category;
             
             const matchesSearch = title.includes(searchTerm) || description.includes(searchTerm);
-            const matchesStatus = !statusFilter_val || status === statusFilter_val;
             const matchesCategory = !categoryFilter_val || category === categoryFilter_val;
+            const matchesStatus = !statusFilter_val || status === statusFilter_val;
             
-            if (matchesSearch && matchesStatus && matchesCategory) {
+            if (matchesSearch && matchesCategory && matchesStatus) {
                 item.style.display = 'block';
             } else {
                 item.style.display = 'none';
@@ -344,8 +304,8 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     searchInput.addEventListener('input', filterServices);
-    statusFilter.addEventListener('change', filterServices);
     categoryFilter.addEventListener('change', filterServices);
+    statusFilter.addEventListener('change', filterServices);
 });
 
 // Service management functions
@@ -364,47 +324,8 @@ function editService(serviceId) {
     window.location.href = `service-editor.php?id=${serviceId}`;
 }
 
-function viewServiceOrders(serviceId) {
-    window.location.href = `?section=orders&service_id=${serviceId}`;
-}
-
 function viewServiceAnalytics(serviceId) {
     window.location.href = `?section=analytics&service_id=${serviceId}`;
-}
-
-function toggleServiceStatus(serviceId, status) {
-    if (confirm(`Are you sure you want to ${status} this service?`)) {
-        fetch('seller-api.php', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                action: 'toggle_service_status',
-                service_id: serviceId,
-                status: status
-            })
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                showToast(data.message, 'success');
-                setTimeout(() => window.location.reload(), 1000);
-            } else {
-                showToast(data.message, 'error');
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            showToast('An error occurred', 'error');
-        });
-    }
-}
-
-function publishService(serviceId) {
-    if (confirm('Are you sure you want to publish this service?')) {
-        toggleServiceStatus(serviceId, 'pending');
-    }
 }
 
 function duplicateService(serviceId) {
@@ -429,6 +350,31 @@ function duplicateService(serviceId) {
             }
         });
     }
+}
+
+function toggleServiceStatus(serviceId, currentStatus) {
+    const newStatus = currentStatus === 'active' ? 'paused' : 'active';
+    
+    fetch('seller-api.php', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            action: 'toggle_service_status',
+            service_id: serviceId,
+            status: newStatus
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            showToast(`Service ${newStatus} successfully`, 'success');
+            setTimeout(() => window.location.reload(), 1000);
+        } else {
+            showToast(data.message, 'error');
+        }
+    });
 }
 
 function deleteService(serviceId) {

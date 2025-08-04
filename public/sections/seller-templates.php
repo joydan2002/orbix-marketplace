@@ -145,7 +145,7 @@
                      data-category="<?= $template['category_id'] ?>">
                     
                     <!-- Template Preview -->
-                    <div class="aspect-video bg-gray-100 relative overflow-hidden">
+                    <div class="aspect-video bg-gray-100 relative overflow-hidden group">
                         <?php if ($template['preview_image']): ?>
                         <img src="<?= htmlspecialchars($template['preview_image']) ?>" 
                              alt="<?= htmlspecialchars($template['title']) ?>"
@@ -159,7 +159,7 @@
                         <!-- Status Badge -->
                         <?php
                         $statusClasses = [
-                            'active' => 'bg-green-500',
+                            'approved' => 'bg-green-500',
                             'pending' => 'bg-orange-500',
                             'rejected' => 'bg-red-500',
                             'draft' => 'bg-gray-500'
@@ -172,25 +172,11 @@
                             </span>
                         </div>
                         
-                        <!-- Quick Actions -->
-                        <div class="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity">
-                            <div class="flex items-center space-x-2">
-                                <button onclick="previewTemplate(<?= $template['id'] ?>)" 
-                                        class="w-8 h-8 bg-white/90 hover:bg-white rounded-full flex items-center justify-center text-gray-700 shadow-sm">
-                                    <i class="ri-eye-line text-sm"></i>
-                                </button>
-                                <button onclick="editTemplate(<?= $template['id'] ?>)" 
-                                        class="w-8 h-8 bg-white/90 hover:bg-white rounded-full flex items-center justify-center text-gray-700 shadow-sm">
-                                    <i class="ri-edit-line text-sm"></i>
-                                </button>
-                            </div>
-                        </div>
-                        
                         <!-- Download Count -->
                         <div class="absolute bottom-3 left-3">
                             <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-black/60 text-white">
                                 <i class="ri-download-line mr-1"></i>
-                                <?= number_format($template['downloads']) ?>
+                                <?= number_format($template['downloads_count']) ?>
                             </span>
                         </div>
                     </div>
@@ -209,11 +195,11 @@
                         <div class="flex items-center justify-between text-sm text-gray-500 mb-3">
                             <span class="flex items-center">
                                 <i class="ri-folder-line mr-1"></i>
-                                <?= htmlspecialchars($template['category_name']) ?>
+                                <?= htmlspecialchars($template['category_name'] ?? 'Uncategorized') ?>
                             </span>
                             <span class="flex items-center">
                                 <i class="ri-file-line mr-1"></i>
-                                <?= strtoupper($template['file_format']) ?>
+                                <?= strtoupper($template['technology'] ?? 'N/A') ?>
                             </span>
                         </div>
                         

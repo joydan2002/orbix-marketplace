@@ -348,5 +348,54 @@ class SellerManager {
             return false;
         }
     }
+
+    /**
+     * Delete a product (template or service) if owned by seller
+     */
+    public function deleteProduct($sellerId, $type, $productId) {
+        try {
+            $table = $type === 'service' ? 'services' : 'templates';
+            $stmt = $this->pdo->prepare("DELETE FROM {$table} WHERE id = ? AND seller_id = ?");
+            return $stmt->execute([$productId, $sellerId]);
+        } catch (Exception $e) {
+            error_log("Delete product error: " . $e->getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Duplicate a product (template or service) for the seller
+     */
+    public function duplicateProduct($sellerId, $type, $productId) {
+        try {
+            $table = $type === 'service' ? 'services' : 'templates';
+            // Fetch original product
+            $stmt = $this->pdo->prepare("SELECT * FROM {$table} WHERE id = ? AND seller_id = ?");
+            $stmt->execute([$productId, $sellerId]);
+            $orig = $stmt->fetch(PDO::FETCH_ASSOC);
+            if (!$orig) {
+                return false;
+            }
+            // Prepare data for new product
+            $data = [
+                'title' => 'Copy of ' . $orig['title'],
+                'description' => $orig['description'],
+                'price' => $orig['price'],
+                'category' => $orig['category_id'] ?? $orig['category'],
+                'preview_image' => $orig['preview_image'] ?? null,
+            ];
+            if ($type === 'template') {
+                $data['technology'] = $orig['technology'];
+                $data['demo_url'] = $orig['demo_url'];
+            } else {
+                $data['delivery_time'] = $orig['delivery_time'] ?? null;
+            }
+            // Create new product as pending
+            return $this->createProduct($sellerId, $data, $type);
+        } catch (Exception $e) {
+            error_log("Duplicate product error: " . $e->getMessage());
+            return false;
+        }
+    }
 }
 ?>

@@ -141,6 +141,55 @@ document.addEventListener('DOMContentLoaded', () => {
     window.orbixMarket = new OrbixMarket();
 });
 
+// Modal functions
+function showModal(modalId) {
+    const modal = document.getElementById(modalId);
+    if (modal) {
+        modal.classList.remove('hidden');
+        modal.style.display = 'flex';
+        document.body.style.overflow = 'hidden'; // Prevent background scrolling
+    }
+}
+
+function hideModal(modalId) {
+    const modal = document.getElementById(modalId);
+    if (modal) {
+        modal.classList.add('hidden');
+        modal.style.display = 'none';
+        document.body.style.overflow = ''; // Restore scrolling
+    }
+}
+
+// Specific function for Add Product modal to match the button onclick
+function showAddProductModal() {
+    showModal('addProductModal');
+}
+
+// Close modal when clicking outside
+document.addEventListener('click', function(e) {
+    if (e.target.classList.contains('fixed') && e.target.classList.contains('inset-0')) {
+        // This is the modal backdrop
+        const modals = document.querySelectorAll('[id$="Modal"]');
+        modals.forEach(modal => {
+            if (!modal.classList.contains('hidden')) {
+                hideModal(modal.id);
+            }
+        });
+    }
+});
+
+// Close modal with Escape key
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+        const modals = document.querySelectorAll('[id$="Modal"]');
+        modals.forEach(modal => {
+            if (!modal.classList.contains('hidden')) {
+                hideModal(modal.id);
+            }
+        });
+    }
+});
+
 // Auto-refresh functionality for development
 if (typeof AutoRefresh !== 'undefined') {
     new AutoRefresh({
