@@ -235,11 +235,18 @@ try {
                 $features = isset($_POST['features']) ? implode(',', array_filter($_POST['features'])) : '';
                 
                 // Convert tags to JSON format
-                $tags = '';
+                $tags = null; // Default to NULL for JSON column
                 if (!empty($_POST['tags'])) {
                     $tagArray = array_map('trim', explode(',', $_POST['tags']));
                     $tagArray = array_filter($tagArray); // Remove empty tags
-                    $tags = json_encode($tagArray);
+                    if (!empty($tagArray)) {
+                        $tags = json_encode($tagArray);
+                        error_log('📝 Tags processed: ' . $tags);
+                    } else {
+                        error_log('📝 Tags array empty after filtering, setting to NULL');
+                    }
+                } else {
+                    error_log('📝 No tags provided, setting to NULL');
                 }
                 
                 // Create slug from title
@@ -272,11 +279,18 @@ try {
                 $deliveryTime = intval($_POST['delivery_time'] ?? 7);
                 
                 // Convert tags to JSON format
-                $tags = '';
+                $tags = null; // Default to NULL for JSON column
                 if (!empty($_POST['tags'])) {
                     $tagArray = array_map('trim', explode(',', $_POST['tags']));
                     $tagArray = array_filter($tagArray); // Remove empty tags
-                    $tags = json_encode($tagArray);
+                    if (!empty($tagArray)) {
+                        $tags = json_encode($tagArray);
+                        error_log('📝 Tags processed: ' . $tags);
+                    } else {
+                        error_log('📝 Tags array empty after filtering, setting to NULL');
+                    }
+                } else {
+                    error_log('📝 No tags provided, setting to NULL');
                 }
                 
                 // Create slug from title  
@@ -443,13 +457,198 @@ try {
             }
             echo json_encode(['success' => true, 'message' => 'Product duplicated successfully']);
             break;
+
+        case 'update_product':
+            // Update an existing product
+            if (!isset($_SESSION['user_id'])) {
+                throw new Exception('Not authenticated');
+            }
+            
+            $productId = intval($_POST['product_id'] ?? 0);
+            $productType = $_POST['product_type'] ?? 'template';
+            
+            if (!$productId) {
+                throw new Exception('Product ID is required');
+            }
+            
+            // Validate required fields
+            $requiredFields = ['title', 'description', 'price', 'category'];
+            foreach ($requiredFields as $field) {
+                if (empty($_POST[$field])) {
+                    throw new Exception("Field '$field' is required");
+                }
+            }
+            
+            // Map category slug to category_id
+            $categoryMap = [
+                'web-design' => 1,      // Business
+                'mobile-app' => 2,      // Mobile Apps
+                'ui-ux' => 3,           // Portfolio
+                'graphics' => 4,        // Landing Page
+                'development' => 5,     // Admin Dashboard
+                'marketing' => 9,       // E-commerce
+                'business' => 12,       // Blog
+                'other' => 13           // SaaS
+            ];
+            
+            $categorySlug = $_POST['category'];
+            $categoryId = $categoryMap[$categorySlug] ?? 1;
+            
+            // Handle file uploads
+            $previewImagePath = null;
+            $productFilePath = null;
+            
+            // Upload new preview image if provided
+            if (isset($_FILES['preview_image']) && $_FILES['preview_image']['error'] === 0) {
+                $uploadDir = '../uploads/products/';
+                if (!is_dir($uploadDir)) {
+                    mkdir($uploadDir, 0755, true);
+                }
+                
+                $file = $_FILES['preview_image'];
+                $allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+                
+                if (in_array($file['type'], $allowedTypes) && $file['size'] <= 5 * 1024 * 1024) {
+                    $extension = pathinfo($file['name'], PATHINFO_EXTENSION);
+                    $filename = 'preview_' . $_SESSION['user_id'] . '_' . time() . '.' . $extension;
+                    $filepath = $uploadDir . $filename;
+                    
+                    if (move_uploaded_file($file['tmp_name'], $filepath)) {
+                        $previewImagePath = 'uploads/products/' . $filename;
+                    }
+                }
+            }
+            
+            // Upload new product files if provided (for templates)
+            if ($productType === 'template' && isset($_FILES['product_files']) && $_FILES['product_files']['error'] === 0) {
+                $uploadDir = '../uploads/products/';
+                $file = $_FILES['product_files'];
+                $allowedTypes = ['application/zip', 'application/x-zip-compressed', 'application/x-rar-compressed'];
+                
+                if (in_array($file['type'], $allowedTypes) && $file['size'] <= 100 * 1024 * 1024) {
+                    $extension = pathinfo($file['name'], PATHINFO_EXTENSION);
+                    $filename = 'product_' . $_SESSION['user_id'] . '_' . time() . '.' . $extension;
+                    $filepath = $uploadDir . $filename;
+                    
+                    if (move_uploaded_file($file['tmp_name'], $filepath)) {
+                        $productFilePath = 'uploads/products/' . $filename;
+                    }
+                }
+            }
+            
+            // Convert tags to JSON format
+            $tags = null; // Default to NULL for JSON column
+            if (!empty($_POST['tags'])) {
+                $tagArray = array_map('trim', explode(',', $_POST['tags']));
+                $tagArray = array_filter($tagArray); // Remove empty tags
+                if (!empty($tagArray)) {
+                    $tags = json_encode($tagArray);
+                }
+            }
+            
+            // Validate and sanitize status
+            $allowedStatuses = ['draft', 'pending', 'approved', 'rejected'];
+            $status = $_POST['status'] ?? 'draft';
+            if (!in_array($status, $allowedStatuses)) {
+                $status = 'draft';
+            }
+            
+            // Update based on product type
+            if ($productType === 'template') {
+                $features = isset($_POST['features']) ? implode(',', array_filter($_POST['features'])) : '';
+                
+                // Build update query for templates
+                $updateFields = [
+                    'title = ?', 'description = ?', 'price = ?', 'category_id = ?',
+                    'technology = ?', 'demo_url = ?', 'tags = ?', 'status = ?', 'updated_at = NOW()'
+                ];
+                $updateValues = [
+                    $_POST['title'],
+                    $_POST['description'],
+                    floatval($_POST['price']),
+                    $categoryId,
+                    $_POST['technology'] ?? '',
+                    $_POST['demo_url'] ?? null,
+                    $tags,
+                    $status
+                ];
+                
+                // Add preview image if uploaded
+                if ($previewImagePath) {
+                    $updateFields[] = 'preview_image = ?';
+                    $updateValues[] = $previewImagePath;
+                }
+                
+                // Add product files if uploaded
+                if ($productFilePath) {
+                    $updateFields[] = 'download_file = ?';
+                    $updateValues[] = $productFilePath;
+                }
+                
+                $updateValues[] = $productId;
+                $updateValues[] = $_SESSION['user_id'];
+                
+                $query = "UPDATE templates SET " . implode(', ', $updateFields) . " WHERE id = ? AND seller_id = ?";
+                $stmt = $pdo->prepare($query);
+                
+            } else { // service
+                $features = isset($_POST['features']) ? implode(',', array_filter($_POST['features'])) : '';
+                $deliveryTime = intval($_POST['delivery_time'] ?? 7);
+                
+                // Build update query for services
+                $updateFields = [
+                    'title = ?', 'description = ?', 'price = ?', 'category_id = ?',
+                    'delivery_time = ?', 'demo_url = ?', 'tags = ?', 'features = ?', 
+                    'status = ?', 'updated_at = NOW()'
+                ];
+                $updateValues = [
+                    $_POST['title'],
+                    $_POST['description'],
+                    floatval($_POST['price']),
+                    $categoryId,
+                    $deliveryTime,
+                    $_POST['demo_url'] ?? null,
+                    $tags,
+                    $features,
+                    $status
+                ];
+                
+                // Add preview image if uploaded
+                if ($previewImagePath) {
+                    $updateFields[] = 'preview_image = ?';
+                    $updateValues[] = $previewImagePath;
+                }
+                
+                $updateValues[] = $productId;
+                $updateValues[] = $_SESSION['user_id'];
+                
+                $query = "UPDATE services SET " . implode(', ', $updateFields) . " WHERE id = ? AND seller_id = ?";
+                $stmt = $pdo->prepare($query);
+            }
+            
+            $result = $stmt->execute($updateValues);
+            
+            if (!$result) {
+                $errorInfo = $stmt->errorInfo();
+                throw new Exception('Failed to update product - Database error: ' . $errorInfo[2]);
+            }
+            
+            $rowsAffected = $stmt->rowCount();
+            if ($rowsAffected === 0) {
+                throw new Exception('Product not found or you do not have permission to update it');
+            }
+            
+            echo json_encode([
+                'success' => true,
+                'message' => ucfirst($productType) . ' updated successfully'
+            ]);
+            break;
             
         default:
             throw new Exception('Invalid action');
     }
-    
 } catch (Exception $e) {
-    http_response_code(400);
+    // Handle exceptions and return error response
     echo json_encode([
         'success' => false,
         'error' => $e->getMessage()

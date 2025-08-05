@@ -32,7 +32,7 @@
                 </div>
                 
                 <!-- Product Form -->
-                <form id="editProductForm">
+                <form id="editProductForm" action="javascript:void(0)" onsubmit="return false;">
                     <input type="hidden" name="product_id" id="edit-product-id">
                     <input type="hidden" name="product_type" id="edit-product-type">
                     
@@ -112,10 +112,10 @@
                                     <label class="block text-sm font-medium text-gray-700 mb-2">Status</label>
                                     <select name="status" id="edit-status"
                                             class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors">
-                                        <option value="active">Active</option>
                                         <option value="draft">Draft</option>
-                                        <option value="paused">Paused</option>
                                         <option value="pending">Pending Review</option>
+                                        <option value="approved">Approved</option>
+                                        <option value="rejected">Rejected</option>
                                     </select>
                                 </div>
                             </div>
@@ -277,7 +277,7 @@
                                     class="px-6 py-3 text-gray-600 hover:text-gray-800 font-medium">
                                 Cancel
                             </button>
-                            <button type="submit" 
+                            <button type="button" onclick="submitEditForm()" 
                                     class="bg-primary text-white px-8 py-3 rounded-lg font-semibold hover:bg-primary/90 transition-colors flex items-center">
                                 <i class="ri-save-line mr-2"></i>
                                 Update Product
@@ -513,42 +513,92 @@ function duplicateCurrentProduct() {
     }
 }
 
-// Handle edit form submission
-document.getElementById('editProductForm').addEventListener('submit', function(e) {
-    e.preventDefault();
+// New submit function to handle button click
+function submitEditForm() {
+    console.log('🔧 submitEditForm called');
     
-    const formData = new FormData(this);
+    const form = document.getElementById('editProductForm');
+    if (!form) {
+        console.error('❌ Form not found');
+        return;
+    }
+    
+    console.log('🔄 Manual edit form submit');
+    console.log('📦 Product ID:', currentEditingProductId);
+    console.log('📦 Product Type:', editProductType);
+    
+    const formData = new FormData(form);
     formData.append('action', 'update_product');
     
     // Show loading state
-    const submitBtn = this.querySelector('button[type="submit"]');
-    const originalText = submitBtn.innerHTML;
-    submitBtn.innerHTML = '<i class="ri-loader-4-line mr-2 animate-spin"></i>Updating...';
-    submitBtn.disabled = true;
-    
-    fetch('seller-api.php', {
-        method: 'POST',
-        body: formData
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            showSuccessToast('Product updated successfully!');
-            hideModal('editProductModal');
-            setTimeout(() => loadSection('products'), 1500);
-        } else {
-            throw new Error(data.error || 'Failed to update product');
-        }
-    })
-    .catch(error => {
-        console.error('Update product error:', error);
-        showErrorToast(error.message || 'Failed to update product');
-    })
-    .finally(() => {
-        submitBtn.innerHTML = originalText;
-        submitBtn.disabled = false;
-    });
-});
+    const submitBtn = document.querySelector('button[onclick="submitEditForm()"]');
+    if (submitBtn) {
+        const originalText = submitBtn.innerHTML;
+        submitBtn.innerHTML = '<i class="ri-loader-4-line mr-2 animate-spin"></i>Updating...';
+        submitBtn.disabled = true;
+        
+        console.log('🚀 Sending manual request to seller-api.php');
+        
+        fetch('seller-api.php', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => {
+            console.log('📡 Manual response status:', response.status);
+            
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            
+            return response.json();
+        })
+        .then(data => {
+            console.log('✅ Manual parsed response data:', data);
+            
+            if (data && data.success) {
+                console.log('🎉 Manual update successful!');
+                showSuccessToast('Product updated successfully!');
+                hideModal('editProductModal');
+                
+                // Reload products section after successful update
+                setTimeout(() => {
+                    console.log('🔄 Manual reloading section/page...');
+                    
+                    const currentUrl = window.location.href;
+                    console.log('📍 Manual current URL:', currentUrl);
+                    
+                    if (currentUrl.includes('seller-channel.php')) {
+                        console.log('📂 Manual in seller-channel, calling loadSection');
+                        if (typeof loadSection === 'function') {
+                            loadSection('products');
+                        } else {
+                            console.log('❌ Manual loadSection not available, reloading page');
+                            window.location.reload();
+                        }
+                    } else if (currentUrl.includes('section=products') || currentUrl.includes('products')) {
+                        console.log('🔃 Manual in products section, reloading page');
+                        window.location.reload();
+                    } else {
+                        console.log('🔃 Manual fallback: reloading current page');
+                        window.location.reload();
+                    }
+                }, 1000);
+            } else {
+                console.error('❌ Manual server returned error:', data ? data.error : 'No data');
+                throw new Error((data && data.error) || 'Failed to update product');
+            }
+        })
+        .catch(error => {
+            console.error('💥 Manual update product error:', error);
+            showErrorToast(error.message || 'Failed to update product');
+        })
+        .finally(() => {
+            console.log('🏁 Manual request completed, restoring button');
+            submitBtn.innerHTML = originalText;
+            submitBtn.disabled = false;
+        });
+    }
+}
 
 // File upload preview for edit modal
 document.getElementById('edit-preview-upload').addEventListener('change', function(e) {

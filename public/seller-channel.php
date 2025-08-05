@@ -424,13 +424,24 @@ if (isset($_SESSION['user_id']) && isset($_SESSION['user_type']) && $_SESSION['u
         }
 
         // Make functions globally available
-        window.editProduct = editProduct;
         window.viewProductModal = viewProductModal;
         window.duplicateProduct = duplicateProduct;
         window.deleteProduct = deleteProduct;
         window.toggleProductMenu = toggleProductMenu;
         window.promoteProduct = promoteProduct;
         window.downloadAnalytics = downloadAnalytics;
+        
+        // editProduct will be defined after modal is loaded
+        window.editProduct = function(id, type = 'template') {
+            console.log('🔧 Placeholder editProduct called:', id, type);
+            // This will be replaced after modal loads
+            if (typeof window.actualEditProduct === 'function') {
+                window.actualEditProduct(id, type);
+            } else {
+                console.warn('⚠️ Modal not loaded yet, retrying...');
+                setTimeout(() => window.editProduct(id, type), 100);
+            }
+        };
     </script>
     
     <!-- Include Modal Files for Dashboard -->
@@ -455,6 +466,28 @@ if (isset($_SESSION['user_id']) && isset($_SESSION['user_type']) && $_SESSION['u
         include 'modals/order-details-modal.php';
     }
     ?>
+    
+    <!-- Replace placeholder with actual function AFTER modal is loaded -->
+    <script>
+        // Wait for DOM to be fully loaded
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🔧 Setting up actual editProduct function');
+            
+            // Check if editProduct function exists in the modal
+            if (typeof editProduct !== 'undefined') {
+                console.log('✅ Found editProduct function from modal');
+                window.actualEditProduct = editProduct;
+                window.editProduct = editProduct; // Replace placeholder
+            } else {
+                console.error('❌ editProduct function not found in modal');
+                // Create a fallback function
+                window.editProduct = function(id, type = 'template') {
+                    console.error('❌ editProduct fallback called - modal may not be loaded');
+                    alert('Edit function not available. Please reload the page.');
+                };
+            }
+        });
+    </script>
     
     <?php
     require_once '../includes/footer.php';
