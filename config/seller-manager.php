@@ -354,12 +354,76 @@ class SellerManager {
      */
     public function deleteProduct($sellerId, $type, $productId) {
         try {
+            // Log the delete attempt
+            error_log("🗑️ Attempting to delete product - Seller: $sellerId, Type: $type, Product ID: $productId");
+            
+            // Validate inputs
+            if (!$sellerId || !$type || !$productId) {
+                error_log("❌ Invalid parameters for delete");
+                return false;
+            }
+            
             $table = $type === 'service' ? 'services' : 'templates';
+            
+            // First check if product exists and belongs to seller
+            $checkStmt = $this->pdo->prepare("SELECT id, title FROM {$table} WHERE id = ? AND seller_id = ?");
+            $checkStmt->execute([$productId, $sellerId]);
+            $product = $checkStmt->fetch(PDO::FETCH_ASSOC);
+            
+            if (!$product) {
+                error_log("❌ Product not found or doesn't belong to seller");
+                return false;
+            }
+            
+            error_log("✅ Product found: ID {$product['id']}, Title: {$product['title']}");
+            
+            // Check if product has orders (for templates) or bookings (for services)
+            if ($type === 'template') {
+                $orderCheckStmt = $this->pdo->prepare("SELECT COUNT(*) as count FROM order_items WHERE template_id = ?");
+                $orderCheckStmt->execute([$productId]);
+                $orderCount = $orderCheckStmt->fetch()['count'];
+                
+                if ($orderCount > 0) {
+                    error_log("❌ Cannot delete template - has $orderCount orders");
+                    throw new Exception("Cannot delete this template because it has $orderCount order(s). Products with existing orders cannot be deleted to maintain order history.");
+                }
+            } else {
+                // Check for service orders/bookings if you have such a table
+                // For now, we'll proceed with deletion for services
+            }
+            
+            // Try to delete the product
             $stmt = $this->pdo->prepare("DELETE FROM {$table} WHERE id = ? AND seller_id = ?");
-            return $stmt->execute([$productId, $sellerId]);
+            $result = $stmt->execute([$productId, $sellerId]);
+            
+            if ($result) {
+                $rowsAffected = $stmt->rowCount();
+                error_log("✅ Delete executed - Result: " . ($result ? 'TRUE' : 'FALSE') . ", Rows affected: $rowsAffected");
+                
+                if ($rowsAffected > 0) {
+                    error_log("🎉 Delete successful - Product {$product['title']} removed");
+                    return true;
+                } else {
+                    error_log("❌ No rows affected - Delete failed");
+                    return false;
+                }
+            } else {
+                error_log("❌ Delete execution failed");
+                $errorInfo = $stmt->errorInfo();
+                error_log("SQL Error: " . print_r($errorInfo, true));
+                return false;
+            }
         } catch (Exception $e) {
-            error_log("Delete product error: " . $e->getMessage());
-            return false;
+            error_log("❌ Delete product exception: " . $e->getMessage());
+            error_log("Stack trace: " . $e->getTraceAsString());
+            
+            // If it's a foreign key constraint error, throw a user-friendly message
+            if (strpos($e->getMessage(), 'foreign key constraint fails') !== false) {
+                throw new Exception("Cannot delete this product because it has existing orders. Products with order history cannot be deleted to maintain data integrity.");
+            }
+            
+            // For other exceptions, re-throw them
+            throw $e;
         }
     }
 

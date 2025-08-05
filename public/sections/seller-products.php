@@ -40,7 +40,7 @@ foreach ($services as $service) {
         'reviews' => $service['reviews_count'],
         'created_at' => $service['created_at'],
         'preview_image' => $service['preview_image'] ?? null,
-        'technology' => $service['delivery_time_days'] . ' days delivery'
+        'technology' => $service['delivery_time'] ? $service['delivery_time'] . ' days delivery' : '7 days delivery'
     ];
 }
 
@@ -251,7 +251,7 @@ usort($allProducts, function($a, $b) {
                     
                     <!-- Actions -->
                     <div class="flex items-center space-x-2">
-                        <button onclick="editProduct(<?= $product['id'] ?>)" 
+                        <button onclick="editProductFromList(<?= $product['id'] ?>)" 
                                 class="flex-1 bg-primary/10 text-primary px-3 py-2 rounded-lg hover:bg-primary/20 transition-colors text-sm font-medium">
                             Edit
                         </button>
@@ -342,78 +342,103 @@ document.addEventListener('DOMContentLoaded', function() {
     statusFilter.addEventListener('change', filterProducts);
 });
 
-function editProduct(id) {
-    // Load product data and show the new edit modal
+function editProductFromList(id) {
+    // Get product data to determine type
     const product = getProductById(id);
     
-    // Fill the new modal with product data
-    currentEditingProductId = id;
-    editProductType = product.type;
+    console.log('🔧 editProductFromList called with:', { id, type: product.type, product });
     
-    // Set basic information
-    document.getElementById('edit-product-id').value = id;
-    document.getElementById('edit-product-type').value = product.type;
-    document.getElementById('edit-title').value = product.title;
-    document.getElementById('edit-price').value = product.price;
-    document.getElementById('edit-status').value = product.status;
-    document.getElementById('edit-description').value = product.description;
-    
-    // Set product type display
-    const typeIcon = document.getElementById('typeIcon');
-    const typeName = document.getElementById('typeName');
-    const typeDescription = document.getElementById('typeDescription');
-    
-    if (product.type === 'template') {
-        typeIcon.innerHTML = '<i class="ri-layout-grid-line text-2xl text-blue-500"></i>';
-        typeName.textContent = 'Template';
-        typeDescription.textContent = 'Digital template product';
-        
-        // Show template-specific fields
-        document.querySelectorAll('.edit-template-only').forEach(el => el.classList.remove('hidden'));
-        document.querySelectorAll('.edit-service-only').forEach(el => el.classList.add('hidden'));
+    // Call the global editProduct function with correct type
+    if (typeof window.editProduct === 'function') {
+        console.log('✅ Calling global editProduct with type:', product.type);
+        window.editProduct(id, product.type);
     } else {
-        typeIcon.innerHTML = '<i class="ri-tools-line text-2xl text-green-500"></i>';
-        typeName.textContent = 'Service';
-        typeDescription.textContent = 'Professional service offering';
+        console.error('❌ Global editProduct function not found');
+        // Fallback: make direct API call to load product data
+        console.log('🔧 Using fallback API call with type:', product.type);
         
-        // Show service-specific fields
-        document.querySelectorAll('.edit-service-only').forEach(el => el.classList.remove('hidden'));
-        document.querySelectorAll('.edit-template-only').forEach(el => el.classList.add('hidden'));
+        fetch(`seller-api.php?action=get_product&id=${id}&type=${product.type}`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                const product = data.product;
+                
+                // Fill the modal with product data
+                currentEditingProductId = id;
+                editProductType = product.type;
+                
+                // Set basic information
+                document.getElementById('edit-product-id').value = id;
+                document.getElementById('edit-product-type').value = product.type;
+                document.getElementById('edit-title').value = product.title;
+                document.getElementById('edit-price').value = product.price;
+                document.getElementById('edit-status').value = product.status;
+                document.getElementById('edit-description').value = product.description;
+                
+                // Set product type display
+                const typeIcon = document.getElementById('typeIcon');
+                const typeName = document.getElementById('typeName');
+                const typeDescription = document.getElementById('typeDescription');
+                
+                if (product.type === 'template') {
+                    typeIcon.innerHTML = '<i class="ri-layout-grid-line text-2xl text-blue-500"></i>';
+                    typeName.textContent = 'Template';
+                    typeDescription.textContent = 'Digital template product';
+                    
+                    // Show template-specific fields
+                    document.querySelectorAll('.edit-template-only').forEach(el => el.classList.remove('hidden'));
+                    document.querySelectorAll('.edit-service-only').forEach(el => el.classList.add('hidden'));
+                } else {
+                    typeIcon.innerHTML = '<i class="ri-tools-line text-2xl text-green-500"></i>';
+                    typeName.textContent = 'Service';
+                    typeDescription.textContent = 'Professional service offering';
+                    
+                    // Show service-specific fields
+                    document.querySelectorAll('.edit-service-only').forEach(el => el.classList.remove('hidden'));
+                    document.querySelectorAll('.edit-template-only').forEach(el => el.classList.add('hidden'));
+                }
+                
+                // Set statistics
+                document.getElementById('edit-views').textContent = product.views || '0';
+                document.getElementById('edit-sales').textContent = product.sales || '0';
+                document.getElementById('edit-rating').textContent = (product.rating || 0).toFixed(1);
+                document.getElementById('edit-revenue').textContent = '$' + ((product.price * product.sales) || 0).toFixed(2);
+                
+                // Set preview image if exists
+                if (product.preview_image) {
+                    document.getElementById('current-preview-img').src = product.preview_image;
+                    document.getElementById('current-preview-container').style.display = 'block';
+                } else {
+                    document.getElementById('current-preview-container').style.display = 'none';
+                }
+                
+                // Show the modal
+                showModal('editProductModal');
+            } else {
+                showToast('Failed to load product data', 'error');
+            }
+        })
+        .catch(error => {
+            console.error('Error loading product:', error);
+            showToast('Error loading product data', 'error');
+        });
     }
-    
-    // Set statistics
-    document.getElementById('edit-views').textContent = product.views || '0';
-    document.getElementById('edit-sales').textContent = product.sales || '0';
-    document.getElementById('edit-rating').textContent = (product.rating || 0).toFixed(1);
-    document.getElementById('edit-revenue').textContent = '$' + ((product.price * product.sales) || 0).toFixed(2);
-    
-    // Set preview image if exists
-    if (product.preview_image) {
-        document.getElementById('current-preview-img').src = product.preview_image;
-        document.getElementById('current-preview-container').style.display = 'block';
-    } else {
-        document.getElementById('current-preview-container').style.display = 'none';
-    }
-    
-    // Show the new modal
-    showModal('editProductModal');
 }
 
 function viewProductModal(id) {
-    // Open view product modal
-    // Load product data into the modal via AJAX or pre-fill if using a framework
-    const product = getProductById(id); // Implement this function to get product data
-    const modal = document.getElementById('viewProductModal');
+    // Get product data to determine type
+    const product = getProductById(id);
     
-    // Set modal fields by ID
-    document.getElementById('viewProductTitle').textContent = product.title;
-    document.getElementById('viewProductPrice').textContent = `$${product.price.toFixed(2)}`;
-    document.getElementById('viewProductStatus').textContent = product.status.charAt(0).toUpperCase() + product.status.slice(1);
-    document.getElementById('viewProductDescription').textContent = product.description;
-     
-    // Show modal
-    modal.classList.remove('hidden');
-    modal.classList.add('flex');
+    console.log('👁️ viewProductModal called with:', { id, type: product.type, product });
+    
+    // Call the global viewProduct function with correct type
+    if (typeof window.viewProduct === 'function') {
+        console.log('✅ Calling global viewProduct with type:', product.type);
+        window.viewProduct(id, product.type);
+    } else {
+        console.error('❌ Global viewProduct function not found');
+        showErrorToast('View function not available');
+    }
 }
 
 function toggleProductMenu(id) {
@@ -485,45 +510,3 @@ document.addEventListener('click', function(event) {
     }
 });
 </script>
-
-<?php 
-// Include the comprehensive edit product modal
-include '../modals/edit-product-modal.php'; 
-?>
-
-<!-- View Product Modal -->
-<div id="viewProductModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black bg-opacity-50">
-    <div class="bg-white rounded-lg shadow-lg max-w-lg w-full p-6">
-        <h3 class="text-lg font-semibold text-secondary mb-4">Product Details</h3>
-        
-        <!-- Product Info -->
-        <div class="mb-4">
-            <span class="text-sm font-medium text-gray-700">Title:</span>
-            <span class="text-sm text-gray-600" id="viewProductTitle"></span>
-        </div>
-        
-        <div class="mb-4">
-            <span class="text-sm font-medium text-gray-700">Price:</span>
-            <span class="text-sm text-gray-600" id="viewProductPrice"></span>
-        </div>
-        
-        <div class="mb-4">
-            <span class="text-sm font-medium text-gray-700">Status:</span>
-            <span class="text-sm text-gray-600" id="viewProductStatus"></span>
-        </div>
-        
-        <div class="mb-4">
-            <span class="text-sm font-medium text-gray-700">Description:</span>
-            <p class="text-sm text-gray-600" id="viewProductDescription"></p>
-        </div>
-        
-        <!-- Add other fields as necessary -->
-        
-        <div class="flex justify-end">
-            <button type="button" onclick="document.getElementById('viewProductModal').classList.add('hidden')" 
-                    class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors">
-                Close
-            </button>
-        </div>
-    </div>
-</div>

@@ -148,7 +148,7 @@ if (isset($_SESSION['user_id']) && isset($_SESSION['user_type']) && $_SESSION['u
                     </div>
                     <div class="nav-item" onclick="loadSection('products')" data-section="products">
                         <i class="ri-store-line text-xl"></i>
-                        <span>Products</span>
+                        <span>All Products</span>
                     </div>
                     <div class="nav-item" onclick="loadSection('orders')" data-section="orders">
                         <i class="ri-shopping-cart-line text-xl"></i>
@@ -430,6 +430,72 @@ if (isset($_SESSION['user_id']) && isset($_SESSION['user_type']) && $_SESSION['u
         window.toggleProductMenu = toggleProductMenu;
         window.promoteProduct = promoteProduct;
         window.downloadAnalytics = downloadAnalytics;
+        
+        // Add editProductFromList as global function
+        window.editProductFromList = function(id) {
+            console.log('🔧 Global editProductFromList called with ID:', id);
+            
+            // Try to get product data from current section's data
+            let product = null;
+            
+            // Check if productsData exists (from seller-products.php)
+            if (typeof productsData !== 'undefined') {
+                product = productsData.find(p => p.id === id);
+                console.log('📋 Found product in productsData:', product);
+            }
+            
+            // If not found, try to detect type from DOM element
+            if (!product) {
+                const productElement = document.querySelector(`[data-id="${id}"]`);
+                if (productElement) {
+                    const type = productElement.dataset.type;
+                    console.log('🔍 Detected type from DOM:', type);
+                    product = { id: id, type: type };
+                }
+            }
+            
+            // Fallback: make API call to determine type
+            if (!product || !product.type) {
+                console.log('⚠️ No product data found, trying API fallback');
+                // Try both types to see which one works
+                fetch(`seller-api.php?action=get_product&id=${id}&type=template`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        window.editProduct(id, 'template');
+                    } else {
+                        // Try service type
+                        return fetch(`seller-api.php?action=get_product&id=${id}&type=service`);
+                    }
+                })
+                .then(response => {
+                    if (response) {
+                        return response.json();
+                    }
+                })
+                .then(data => {
+                    if (data && data.success) {
+                        window.editProduct(id, 'service');
+                    } else {
+                        showErrorToast('Product not found');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    showErrorToast('Error loading product data');
+                });
+                return;
+            }
+            
+            // Call the global editProduct function with correct type
+            console.log('✅ Calling global editProduct with type:', product.type);
+            if (typeof window.editProduct === 'function') {
+                window.editProduct(id, product.type);
+            } else {
+                console.error('❌ Global editProduct function not found');
+                showErrorToast('Edit function not available');
+            }
+        };
         
         // editProduct will be defined after modal is loaded
         window.editProduct = function(id, type = 'template') {

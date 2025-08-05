@@ -39,9 +39,9 @@ try {
     $stmt->execute([$seller_id]);
     $templates = $stmt->fetchAll(PDO::FETCH_ASSOC);
     
-    // Get services
+    // Get services - FIX: Use 'services' table instead of 'seller_services'
     $stmt = $pdo->prepare("
-        SELECT * FROM seller_services 
+        SELECT * FROM services 
         WHERE seller_id = ? 
         ORDER BY created_at DESC
     ");
@@ -61,11 +61,11 @@ try {
     $stmt->execute([$seller_id]);
     $templateOrders = $stmt->fetchAll(PDO::FETCH_ASSOC);
     
-    // Get service orders
+    // Get service orders - FIX: Use 'services' table
     $stmt = $pdo->prepare("
-        SELECT so.*, ss.title as service_title, u.first_name, u.last_name
+        SELECT so.*, s.title as service_title, u.first_name, u.last_name
         FROM service_orders so
-        JOIN seller_services ss ON so.service_id = ss.id
+        JOIN services s ON so.service_id = s.id
         JOIN users u ON so.buyer_id = u.id
         WHERE so.seller_id = ?
         ORDER BY so.created_at DESC
@@ -85,7 +85,7 @@ try {
     $stmt->execute([$seller_id]);
     $templateReviews = $stmt->fetchAll(PDO::FETCH_ASSOC);
     
-    // Get service reviews  
+    // Get service reviews - FIX: Use 'services' table  
     $stmt = $pdo->prepare("
         SELECT sr.*, s.title as service_title, u.first_name, u.last_name
         FROM service_reviews sr
@@ -167,11 +167,14 @@ try {
         'draft' => count(array_filter($templates, function($t) { return $t['status'] === 'draft'; }))
     ];
     
-    // Service stats
+    // Service stats - FIX: Use correct status values from 'services' table
     $serviceStats = [
-        'active' => count(array_filter($services, function($s) { return $s['status'] === 'active'; })),
+        'total' => count($services),
+        'active' => count(array_filter($services, function($s) { return $s['status'] === 'approved'; })),
         'pending' => count(array_filter($services, function($s) { return $s['status'] === 'pending'; })),
-        'draft' => count(array_filter($services, function($s) { return $s['status'] === 'draft'; }))
+        'draft' => count(array_filter($services, function($s) { return $s['status'] === 'draft'; })),
+        'total_orders' => array_sum(array_column($services, 'orders_count')),
+        'total_revenue' => array_sum(array_map(function($s) { return $s['price'] * $s['orders_count']; }, $services))
     ];
     
     // Recent activity

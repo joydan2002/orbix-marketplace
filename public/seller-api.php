@@ -433,14 +433,63 @@ try {
         case 'delete_product':
             // Delete a seller's product
             if (!isset($_SESSION['user_id'])) {
-                throw new Exception('Not authenticated');
+                throw new Exception('Not authenticated - Please log in to delete products');
             }
+            
             $type = $input['type'] ?? '';
             $id = intval($input['id'] ?? 0);
-            $result = $sellerManager->deleteProduct($_SESSION['user_id'], $type, $id);
-            if (!$result) {
-                throw new Exception('Failed to delete product');
+            
+            // Super detailed logging for debugging
+            error_log("🗑️ DELETE REQUEST START ==================");
+            error_log("User ID: " . $_SESSION['user_id']);
+            error_log("Raw input: " . file_get_contents('php://input'));
+            error_log("Parsed input: " . json_encode($input));
+            error_log("Type: '$type'");
+            error_log("ID: $id");
+            error_log("==========================================");
+            
+            if (!$type) {
+                throw new Exception('Product type is required (template or service)');
             }
+            
+            if (!$id) {
+                throw new Exception('Product ID is required');
+            }
+            
+            // Check if product exists and belongs to this seller
+            $table = $type === 'service' ? 'services' : 'templates';
+            error_log("Using table: $table");
+            
+            $checkStmt = $pdo->prepare("SELECT id, title FROM {$table} WHERE id = ? AND seller_id = ?");
+            $checkStmt->execute([$id, $_SESSION['user_id']]);
+            $product = $checkStmt->fetch(PDO::FETCH_ASSOC);
+            
+            error_log("Product check result: " . json_encode($product));
+            
+            if (!$product) {
+                // Let's see what products actually exist for this user
+                $debugStmt = $pdo->prepare("SELECT id, title FROM {$table} WHERE seller_id = ? LIMIT 5");
+                $debugStmt->execute([$_SESSION['user_id']]);
+                $userProducts = $debugStmt->fetchAll(PDO::FETCH_ASSOC);
+                error_log("Available products for user {$_SESSION['user_id']} in $table: " . json_encode($userProducts));
+                
+                throw new Exception('Product not found or you do not have permission to delete it');
+            }
+            
+            error_log("Product found: ID {$product['id']}, Title: {$product['title']}");
+            
+            // Call deleteProduct function
+            error_log("Calling deleteProduct({$_SESSION['user_id']}, '$type', $id)");
+            $result = $sellerManager->deleteProduct($_SESSION['user_id'], $type, $id);
+            error_log("deleteProduct returned: " . ($result ? 'TRUE' : 'FALSE'));
+            
+            if (!$result) {
+                error_log("❌ deleteProduct returned FALSE");
+                throw new Exception('Failed to delete product - Database operation failed');
+            }
+            
+            error_log("✅ Delete successful - ID: $id, Title: {$product['title']}");
+            error_log("🗑️ DELETE REQUEST END ====================");
             echo json_encode(['success' => true, 'message' => 'Product deleted successfully']);
             break;
 

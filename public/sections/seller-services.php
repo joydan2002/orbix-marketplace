@@ -127,7 +127,7 @@
         <!-- Services Grid -->
         <div class="p-6">
             <div class="grid lg:grid-cols-2 gap-6">
-                <?php foreach ($sellerServices as $service): ?>
+                <?php foreach ($services as $service): ?>
                 <div class="service-item bg-white rounded-xl border hover:shadow-lg transition-all duration-300 overflow-hidden" 
                      data-status="<?= $service['status'] ?>" 
                      data-category="<?= $service['category_id'] ?>">
@@ -139,10 +139,10 @@
                                 <div class="flex items-center space-x-2 mb-2">
                                     <?php
                                     $statusClasses = [
-                                        'active' => 'bg-green-500',
+                                        'approved' => 'bg-green-500',
                                         'pending' => 'bg-orange-500',
-                                        'paused' => 'bg-gray-500',
-                                        'draft' => 'bg-gray-400'
+                                        'draft' => 'bg-gray-400',
+                                        'rejected' => 'bg-red-500'
                                     ];
                                     $statusClass = $statusClasses[$service['status']] ?? 'bg-gray-500';
                                     ?>
@@ -162,18 +162,18 @@
                                 </h4>
                                 
                                 <p class="text-sm text-gray-600 mb-3 line-clamp-2">
-                                    <?= htmlspecialchars($service['short_description'] ?? $service['description']) ?>
+                                    <?= htmlspecialchars($service['description']) ?>
                                 </p>
                                 
                                 <!-- Service Meta -->
                                 <div class="flex items-center justify-between text-sm text-gray-500">
                                     <span class="flex items-center">
                                         <i class="ri-folder-line mr-1"></i>
-                                        <?= htmlspecialchars($service['category_name'] ?? 'General') ?>
+                                        Category ID: <?= $service['category_id'] ?>
                                     </span>
                                     <span class="flex items-center">
                                         <i class="ri-time-line mr-1"></i>
-                                        <?= $service['delivery_time_days'] ?> days delivery
+                                        <?= $service['delivery_time'] ?? 7 ?> days delivery
                                     </span>
                                 </div>
                             </div>
@@ -206,7 +206,7 @@
                                             <button onclick="toggleServiceStatus(<?= $service['id'] ?>, '<?= $service['status'] ?>')" 
                                                     class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
                                                 <i class="ri-toggle-line mr-2"></i>
-                                                <?= $service['status'] === 'active' ? 'Pause' : 'Activate' ?>
+                                                <?= $service['status'] === 'approved' ? 'Pause' : 'Activate' ?>
                                             </button>
                                             <button onclick="deleteService(<?= $service['id'] ?>)" 
                                                     class="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50">
@@ -321,7 +321,13 @@ function toggleServiceMenu(serviceId) {
 }
 
 function editService(serviceId) {
-    window.location.href = `service-editor.php?id=${serviceId}`;
+    // Use the unified editProduct function for services
+    if (typeof editProduct === 'function') {
+        editProduct(serviceId, 'service');
+    } else {
+        console.error('editProduct function not found');
+        showToast('Edit function not available', 'error');
+    }
 }
 
 function viewServiceAnalytics(serviceId) {
@@ -336,8 +342,9 @@ function duplicateService(serviceId) {
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify({
-                action: 'duplicate_service',
-                service_id: serviceId
+                action: 'duplicate_product',
+                type: 'service',
+                id: serviceId
             })
         })
         .then(response => response.json())
@@ -385,8 +392,9 @@ function deleteService(serviceId) {
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify({
-                action: 'delete_service',
-                service_id: serviceId
+                action: 'delete_product',
+                type: 'service',
+                id: serviceId
             })
         })
         .then(response => response.json())
