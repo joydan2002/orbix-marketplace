@@ -6,6 +6,7 @@
 
 // Load real data from database
 require_once 'seller-data-loader.php';
+require_once '../../config/cloudinary-config.php'; // Fix path for Cloudinary support
 
 // Combine templates and services for unified product view
 $allProducts = [];
@@ -170,17 +171,18 @@ usort($allProducts, function($a, $b) {
         <!-- Products Grid -->
         <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6 p-6">
             <?php foreach ($allProducts as $product): ?>
-            <div class="product-item bg-white rounded-xl border border-gray-200 overflow-hidden hover:shadow-lg transition-shadow" 
+            <div class="product-item bg-white rounded-xl border border-gray-200 overflow-hidden hover:shadow-lg transition-all duration-300 h-full flex flex-col" 
                  data-id="<?= $product['id'] ?>"
                  data-type="<?= $product['type'] ?>" 
                  data-status="<?= $product['status'] ?>">
                 
                 <!-- Product Image -->
-                <div class="relative h-48 bg-gradient-to-br from-primary/10 to-primary/5">
+                <div class="relative h-48 bg-gradient-to-br from-primary/10 to-primary/5 flex-shrink-0">
                     <?php if ($product['preview_image']): ?>
-                    <img src="<?= htmlspecialchars($product['preview_image']) ?>" 
+                    <img src="<?= getOptimizedImageUrl($product['preview_image'], 'thumb') ?>" 
                          alt="<?= htmlspecialchars($product['title']) ?>"
-                         class="w-full h-full object-cover">
+                         class="w-full h-full object-cover"
+                         loading="lazy">
                     <?php else: ?>
                     <div class="w-full h-full flex items-center justify-center">
                         <i class="ri-<?= $product['type'] === 'template' ? 'layout' : 'tools' ?>-line text-4xl text-primary/60"></i>
@@ -189,7 +191,7 @@ usort($allProducts, function($a, $b) {
                     
                     <!-- Status Badge -->
                     <div class="absolute top-3 left-3">
-                        <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium
+                        <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium
                                <?php 
                                switch($product['status']) {
                                    case 'approved':
@@ -212,80 +214,86 @@ usort($allProducts, function($a, $b) {
                     
                     <!-- Type Badge -->
                     <div class="absolute top-3 right-3">
-                        <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium <?= $product['type'] === 'template' ? 'bg-purple-100 text-purple-800' : 'bg-blue-100 text-blue-800' ?>">
+                        <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium <?= $product['type'] === 'template' ? 'bg-purple-100 text-purple-800' : 'bg-blue-100 text-blue-800' ?>">
                             <?= ucfirst($product['type']) ?>
                         </span>
                     </div>
                 </div>
                 
                 <!-- Product Content -->
-                <div class="p-4">
-                    <h3 class="text-lg font-semibold text-secondary mb-2 line-clamp-2">
-                        <?= htmlspecialchars($product['title']) ?>
-                    </h3>
-                    
-                    <div class="text-sm text-gray-600 mb-3">
-                        <?= htmlspecialchars($product['technology']) ?>
-                    </div>
-                    
-                    <!-- Stats -->
-                    <div class="flex items-center justify-between mb-4">
-                        <div class="flex items-center space-x-4 text-sm text-gray-600">
-                            <div class="flex items-center space-x-1">
-                                <i class="ri-eye-line"></i>
-                                <span><?= number_format($product['views']) ?></span>
-                            </div>
-                            <div class="flex items-center space-x-1">
-                                <i class="ri-shopping-cart-line"></i>
-                                <span><?= number_format($product['sales']) ?></span>
-                            </div>
-                            <div class="flex items-center space-x-1">
-                                <i class="ri-star-fill text-yellow-400"></i>
-                                <span><?= number_format($product['rating'], 1) ?></span>
-                            </div>
-                        </div>
-                        <div class="text-lg font-bold text-primary">
-                            $<?= number_format($product['price'], 2) ?>
-                        </div>
-                    </div>
-                    
-                    <!-- Actions -->
-                    <div class="flex items-center space-x-2">
-                        <button onclick="editProductFromList(<?= $product['id'] ?>)" 
-                                class="flex-1 bg-primary/10 text-primary px-3 py-2 rounded-lg hover:bg-primary/20 transition-colors text-sm font-medium">
-                            Edit
-                        </button>
-
-                        <button onclick="viewProductModal(<?= $product['id'] ?>)" 
-                                class="flex-1 bg-gray-100 text-gray-700 px-3 py-2 rounded-lg hover:bg-gray-200 transition-colors text-sm font-medium">
-                            View
-                        </button>
+                <div class="p-5 flex flex-col flex-grow">
+                    <!-- Title Section -->
+                    <div class="mb-3">
+                        <h3 class="text-lg font-semibold text-secondary mb-2 line-clamp-2 min-h-[3.5rem] leading-7">
+                            <?= htmlspecialchars($product['title']) ?>
+                        </h3>
                         
-                        <div class="relative">
-                            <button onclick="toggleProductMenu(<?= $product['id'] ?>)" 
-                                    class="p-2 text-gray-400 hover:text-gray-600 rounded-lg">
-                                <i class="ri-more-2-line"></i>
+                        <div class="text-sm text-gray-600 h-5 flex items-center">
+                            <?= htmlspecialchars($product['technology']) ?>
+                        </div>
+                    </div>
+                    
+                    <!-- Stats Section -->
+                    <div class="mb-4 flex-grow">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center space-x-4 text-sm text-gray-600">
+                                <div class="flex items-center space-x-1">
+                                    <i class="ri-eye-line text-gray-400"></i>
+                                    <span><?= number_format($product['views']) ?></span>
+                                </div>
+                                <div class="flex items-center space-x-1">
+                                    <i class="ri-shopping-cart-line text-gray-400"></i>
+                                    <span><?= number_format($product['sales']) ?></span>
+                                </div>
+                                <div class="flex items-center space-x-1">
+                                    <i class="ri-star-fill text-yellow-400"></i>
+                                    <span><?= number_format($product['rating'], 1) ?></span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Price Section -->
+                        <div class="mt-3">
+                            <div class="text-xl font-bold text-primary">
+                                $<?= number_format($product['price'], 2) ?>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Actions Section - Always at bottom -->
+                    <div class="mt-auto pt-4 border-t border-gray-100">
+                        <div class="flex items-center space-x-2">
+                            <button onclick="editProductFromList(<?= $product['id'] ?>)" 
+                                    class="flex-1 bg-primary/10 text-primary px-4 py-2.5 rounded-lg hover:bg-primary/20 transition-colors text-sm font-medium">
+                                Edit
                             </button>
                             
-                            <!-- Dropdown Menu -->
-                            <div id="productMenu-<?= $product['id'] ?>" class="hidden absolute right-0 top-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-10 min-w-40">
-                                <button onclick="duplicateProduct('<?= $product['type'] ?>', <?= $product['id'] ?>)" 
-                                        class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                                    Duplicate
+                            <div class="relative">
+                                <button onclick="toggleProductMenu(<?= $product['id'] ?>)" 
+                                        class="p-2.5 text-gray-400 hover:text-gray-600 hover:bg-gray-50 rounded-lg transition-colors">
+                                    <i class="ri-more-2-line text-lg"></i>
                                 </button>
-                                <button onclick="promoteProduct('<?= $product['type'] ?>', <?= $product['id'] ?>)" 
-                                        class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                                    Promote
-                                </button>
-                                <button onclick="downloadAnalytics('<?= $product['type'] ?>', <?= $product['id'] ?>)" 
-                                        class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                                    Analytics
-                                </button>
-                                <hr class="my-1">
-                                <button onclick="deleteProduct('<?= $product['type'] ?>', <?= $product['id'] ?>)" 
-                                        class="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50">
-                                    Delete
-                                </button>
+                                
+                                <!-- Dropdown Menu -->
+                                <div id="productMenu-<?= $product['id'] ?>" class="hidden absolute right-0 top-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-10 min-w-40">
+                                    <button onclick="duplicateProduct('<?= $product['type'] ?>', <?= $product['id'] ?>)" 
+                                            class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-t-lg">
+                                        <i class="ri-file-copy-line mr-2"></i>Duplicate
+                                    </button>
+                                    <button onclick="promoteProduct('<?= $product['type'] ?>', <?= $product['id'] ?>)" 
+                                            class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                        <i class="ri-megaphone-line mr-2"></i>Promote
+                                    </button>
+                                    <button onclick="downloadAnalytics('<?= $product['type'] ?>', <?= $product['id'] ?>)" 
+                                            class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                        <i class="ri-bar-chart-line mr-2"></i>Analytics
+                                    </button>
+                                    <hr class="my-1">
+                                    <button onclick="deleteProduct('<?= $product['type'] ?>', <?= $product['id'] ?>)" 
+                                            class="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 rounded-b-lg">
+                                        <i class="ri-delete-bin-line mr-2"></i>Delete
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </div>

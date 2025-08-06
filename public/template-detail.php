@@ -17,6 +17,7 @@ if (session_status() === PHP_SESSION_NONE) {
 try {
     require_once __DIR__ . '/../config/database.php';
     require_once __DIR__ . '/../config/template-manager.php';
+    require_once __DIR__ . '/../config/cloudinary-config.php'; // Add Cloudinary support
 } catch (Exception $e) {
     die('Error loading required files: ' . $e->getMessage());
 }
@@ -62,18 +63,33 @@ try {
     $relatedTemplates = [];
 }
 
-// Get template images
+// Get template images with Cloudinary optimization
 $images = [];
 if (!empty($template['gallery_images'])) {
     // Check if gallery_images is already an array or a JSON string
     if (is_array($template['gallery_images'])) {
-        $images = $template['gallery_images'];
+        $galleryImages = $template['gallery_images'];
     } else {
-        $images = json_decode($template['gallery_images'], true) ?: [];
+        $galleryImages = json_decode($template['gallery_images'], true) ?: [];
+    }
+    
+    // Convert each gallery image to optimized URL
+    foreach ($galleryImages as $image) {
+        $images[] = getOptimizedImageUrl($image, 'large');
     }
 }
+
+// Add preview image as first image if not already in gallery
 if (!empty($template['preview_image'])) {
-    array_unshift($images, $template['preview_image']);
+    $previewUrl = getOptimizedImageUrl($template['preview_image'], 'large');
+    if (!in_array($previewUrl, $images)) {
+        array_unshift($images, $previewUrl);
+    }
+}
+
+// Ensure we have at least one image
+if (empty($images)) {
+    $images[] = getOptimizedImageUrl('/orbix/assets/images/default-template.jpg', 'large');
 }
 
 // Get template tags
@@ -98,9 +114,10 @@ if (!empty($template['features'])) {
     }
 }
 
-// Set default values for missing fields
+// Set default values for missing fields with optimized images
 $template['seller_name'] = $template['seller_name'] ?? 'Unknown';
-$template['profile_image'] = $template['profile_image'] ?? '/assets/images/default-avatar.png';
+$template['profile_image'] = getOptimizedImageUrl($template['profile_image'] ?? '/assets/images/default-avatar.png', 'avatar');
+$template['preview_image_optimized'] = getOptimizedImageUrl($template['preview_image'], 'large');
 $template['avg_rating'] = $template['avg_rating'] ?? 4.5;
 $template['review_count'] = $template['review_count'] ?? 0;
 $template['views_count'] = $template['views_count'] ?? 0;
@@ -363,7 +380,7 @@ $template['category_slug'] = $template['category_slug'] ?? 'general';
                         <!-- Template Images -->
                         <div class="mb-8">
                             <div class="zoom-container mb-6">
-                                <img id="mainImage" src="<?= htmlspecialchars($images[0] ?? $template['preview_image']) ?>" alt="<?= htmlspecialchars($template['title']) ?>" class="template-image zoom-image">
+                                <img id="mainImage" src="<?= htmlspecialchars($images[0] ?? $template['preview_image_optimized']) ?>" alt="<?= htmlspecialchars($template['title']) ?>" class="template-image zoom-image">
                             </div>
                             
                             <?php if (count($images) > 1): ?>
@@ -476,7 +493,7 @@ $template['category_slug'] = $template['category_slug'] ?? 'general';
                             </div>
 
                             <div class="space-y-4 mb-8">
-                                <button onclick="handlePurchaseTemplate(<?= $template['id'] ?>, '<?= addslashes($template['title']) ?>', <?= $template['price'] ?>, '<?= addslashes($template['preview_image']) ?>', '<?= addslashes($template['seller_name']) ?>')" 
+                                <button onclick="handlePurchaseTemplate(<?= $template['id'] ?>, '<?= addslashes($template['title']) ?>', <?= $template['price'] ?>, '<?= addslashes($template['preview_image_optimized']) ?>', '<?= addslashes($template['seller_name']) ?>')" 
                                         class="w-full btn-primary">
                                     <i class="ri-shopping-cart-line mr-2"></i>Add to Cart
                                 </button>
@@ -555,7 +572,7 @@ $template['category_slug'] = $template['category_slug'] ?? 'general';
                 <?php foreach ($relatedTemplates as $related): ?>
                 <div class="template-card overflow-hidden">
                     <div class="relative">
-                        <img src="<?= htmlspecialchars($related['preview_image']) ?>" alt="<?= htmlspecialchars($related['title']) ?>" class="w-full h-64 object-cover object-top">
+                        <img src="<?= htmlspecialchars(getOptimizedImageUrl($related['preview_image'], 'medium')) ?>" alt="<?= htmlspecialchars($related['title']) ?>" class="w-full h-64 object-cover object-top">
                         <div class="absolute top-4 right-4">
                             <button class="w-10 h-10 bg-white/90 rounded-full flex items-center justify-center hover:bg-white transition-colors shadow-lg">
                                 <i class="ri-heart-line text-gray-600"></i>
@@ -572,7 +589,7 @@ $template['category_slug'] = $template['category_slug'] ?? 'general';
                     </div>
                     <div class="p-6">
                         <div class="flex items-center space-x-2 mb-3">
-                            <img src="<?= htmlspecialchars($related['profile_image']) ?>" alt="<?= htmlspecialchars($related['seller_name']) ?>" class="w-6 h-6 rounded-full object-cover">
+                            <img src="<?= htmlspecialchars(getOptimizedImageUrl($related['profile_image'], 'avatar')) ?>" alt="<?= htmlspecialchars($related['seller_name']) ?>" class="w-6 h-6 rounded-full object-cover">
                             <span class="text-sm text-gray-600 font-medium"><?= htmlspecialchars($related['seller_name']) ?></span>
                         </div>
                         <h4 class="text-xl font-bold text-secondary mb-2"><?= htmlspecialchars($related['title']) ?></h4>
@@ -593,7 +610,7 @@ $template['category_slug'] = $template['category_slug'] ?? 'general';
                                 <button onclick="window.location.href='template-detail.php?id=<?= $related['id'] ?>'" class="w-10 h-10 flex items-center justify-center border-2 border-gray-200 rounded-lg hover:border-primary hover:text-primary transition-colors">
                                     <i class="ri-eye-line"></i>
                                 </button>
-                                <button onclick="handlePurchaseTemplate(<?= $related['id'] ?>, '<?= addslashes($related['title']) ?>', <?= $related['price'] ?>, '<?= addslashes($related['preview_image']) ?>', '<?= addslashes($related['seller_name']) ?>')" 
+                                <button onclick="handlePurchaseTemplate(<?= $related['id'] ?>, '<?= addslashes($related['title']) ?>', <?= $related['price'] ?>, '<?= addslashes(getOptimizedImageUrl($related['preview_image'], 'medium')) ?>', '<?= addslashes($related['seller_name']) ?>')" 
                                         class="w-10 h-10 flex items-center justify-center bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors">
                                     <i class="ri-shopping-cart-line"></i>
                                 </button>

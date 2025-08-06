@@ -15,7 +15,7 @@ class ServiceManager {
      * Get services with filters, sorting, and pagination
      */
     public function getServices($filters = [], $sort = "popular", $limit = 12, $offset = 0) {
-        $whereConditions = ["s.status = 'approved'"];
+        $whereConditions = ["s.status = 'approved'", "u.user_type = 'seller'"]; // Only show services from sellers
         $params = [];
         
         // Apply filters
@@ -116,7 +116,7 @@ class ServiceManager {
      * Get total count of services matching filters
      */
     public function getTotalCount($filters = []) {
-        $whereConditions = ["s.status = 'approved'"];
+        $whereConditions = ["s.status = 'approved'", "u.user_type = 'seller'"]; // Only show services from sellers
         $params = [];
         
         // Apply same filters as getServices
@@ -174,6 +174,7 @@ class ServiceManager {
         $sql = "
             SELECT COUNT(*) as total
             FROM services s
+            LEFT JOIN users u ON s.seller_id = u.id
             LEFT JOIN service_categories sc ON s.category_id = sc.id
             {$whereClause}
         ";
@@ -195,7 +196,8 @@ class ServiceManager {
                 COUNT(s.id) as service_count
             FROM service_categories sc
             LEFT JOIN services s ON sc.id = s.category_id AND s.status = 'approved'
-            WHERE sc.is_active = 1
+            LEFT JOIN users u ON s.seller_id = u.id
+            WHERE sc.is_active = 1 AND (s.id IS NULL OR u.user_type = 'seller')
             GROUP BY sc.id
             ORDER BY sc.sort_order ASC
         ";
@@ -223,7 +225,8 @@ class ServiceManager {
                 s.technology, 
                 COUNT(*) as count
             FROM services s
-            WHERE s.status = 'approved' AND s.technology IS NOT NULL AND s.technology != ''
+            LEFT JOIN users u ON s.seller_id = u.id
+            WHERE s.status = 'approved' AND u.user_type = 'seller' AND s.technology IS NOT NULL AND s.technology != ''
             GROUP BY s.technology
             ORDER BY count DESC
         ";
@@ -241,7 +244,8 @@ class ServiceManager {
                 s.delivery_time, 
                 COUNT(*) as count
             FROM services s
-            WHERE s.status = 'approved' AND s.delivery_time IS NOT NULL AND s.delivery_time != ''
+            LEFT JOIN users u ON s.seller_id = u.id
+            WHERE s.status = 'approved' AND u.user_type = 'seller' AND s.delivery_time IS NOT NULL AND s.delivery_time != ''
             GROUP BY s.delivery_time
             ORDER BY 
                 CASE 

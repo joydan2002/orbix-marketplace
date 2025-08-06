@@ -11,6 +11,7 @@ header('Access-Control-Allow-Headers: Content-Type, Authorization');
 
 require_once '../config/database.php';
 require_once __DIR__ . '/../config/template-manager.php';
+require_once __DIR__ . '/../config/cloudinary-config.php'; // Add Cloudinary support
 
 // Start session for user authentication
 if (session_status() === PHP_SESSION_NONE) {
@@ -95,7 +96,7 @@ function getTemplates($pdo) {
             FROM templates t 
             LEFT JOIN categories c ON t.category_id = c.id 
             LEFT JOIN users u ON t.seller_id = u.id 
-            WHERE t.status = 'approved'";
+            WHERE t.status = 'approved' AND u.user_type = 'seller'"; // Add seller filter
     
     $params = [];
     
@@ -121,10 +122,16 @@ function getTemplates($pdo) {
     $stmt->execute();
     $templates = $stmt->fetchAll(PDO::FETCH_ASSOC);
     
-    // Process tags from JSON
+    // Process templates and optimize image URLs for Cloudinary
     foreach ($templates as &$template) {
         $template['tags'] = json_decode($template['tags'] ?? '[]', true);
         $template['seller_name'] = trim($template['first_name'] . ' ' . $template['last_name']);
+        
+        // Convert image URLs to optimized Cloudinary URLs
+        $template['preview_image'] = getOptimizedImageUrl($template['preview_image'], 'thumb');
+        if (!empty($template['profile_image'])) {
+            $template['profile_image'] = getOptimizedImageUrl($template['profile_image'], 'avatar_small');
+        }
     }
     
     echo json_encode(['success' => true, 'data' => $templates]);
@@ -134,11 +141,11 @@ function getFeaturedTemplates($pdo) {
     $limit = intval($_GET['limit'] ?? 4);
     
     $sql = "SELECT t.*, c.name as category_name,
-                   u.first_name, u.last_name
+                   u.first_name, u.last_name, u.profile_image
             FROM templates t 
             LEFT JOIN categories c ON t.category_id = c.id 
             LEFT JOIN users u ON t.seller_id = u.id 
-            WHERE t.status = 'approved' AND t.is_featured = 1
+            WHERE t.status = 'approved' AND t.is_featured = 1 AND u.user_type = 'seller'
             ORDER BY t.views_count DESC, t.created_at DESC 
             LIMIT :limit";
     
@@ -148,9 +155,16 @@ function getFeaturedTemplates($pdo) {
     
     $templates = $stmt->fetchAll(PDO::FETCH_ASSOC);
     
+    // Process templates and optimize image URLs for Cloudinary
     foreach ($templates as &$template) {
         $template['tags'] = json_decode($template['tags'] ?? '[]', true);
         $template['seller_name'] = trim($template['first_name'] . ' ' . $template['last_name']);
+        
+        // Convert image URLs to optimized Cloudinary URLs
+        $template['preview_image'] = getOptimizedImageUrl($template['preview_image'], 'medium');
+        if (!empty($template['profile_image'])) {
+            $template['profile_image'] = getOptimizedImageUrl($template['profile_image'], 'avatar_small');
+        }
     }
     
     echo json_encode(['success' => true, 'data' => $templates]);
@@ -173,16 +187,20 @@ function getServices($pdo) {
 }
 
 function getStats($pdo) {
-    // Get template count
-    $stmt = $pdo->query("SELECT COUNT(*) as count FROM templates WHERE status = 'approved'");
+    // Get template count from sellers only
+    $stmt = $pdo->query("SELECT COUNT(*) as count FROM templates t 
+                         LEFT JOIN users u ON t.seller_id = u.id 
+                         WHERE t.status = 'approved' AND u.user_type = 'seller'");
     $templateCount = $stmt->fetch(PDO::FETCH_ASSOC)['count'];
     
     // Get seller count
     $stmt = $pdo->query("SELECT COUNT(*) as count FROM users WHERE user_type = 'seller' AND is_verified = 1");
     $sellerCount = $stmt->fetch(PDO::FETCH_ASSOC)['count'];
     
-    // Get total downloads (sum of all template downloads)
-    $stmt = $pdo->query("SELECT SUM(downloads_count) as total FROM templates WHERE status = 'approved'");
+    // Get total downloads from sellers' templates only
+    $stmt = $pdo->query("SELECT SUM(t.downloads_count) as total FROM templates t 
+                         LEFT JOIN users u ON t.seller_id = u.id 
+                         WHERE t.status = 'approved' AND u.user_type = 'seller'");
     $totalDownloads = $stmt->fetch(PDO::FETCH_ASSOC)['total'] ?? 0;
     
     $stats = [
@@ -426,6 +444,12 @@ function handleCartGet($pdo) {
     
     $stmt->execute([$userId]);
     $items = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    
+    // Optimize image URLs for cart items
+    foreach ($items as &$item) {
+        $item['preview_image'] = getOptimizedImageUrl($item['preview_image'], 'thumb');
+        $item['seller_name'] = trim($item['first_name'] . ' ' . $item['last_name']);
+    }
     
     // Calculate total
     $total = array_sum(array_column($items, 'price'));

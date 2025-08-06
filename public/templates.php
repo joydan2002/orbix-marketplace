@@ -11,6 +11,7 @@ if (session_status() === PHP_SESSION_NONE) {
 
 require_once __DIR__ . '/../config/database.php';
 require_once __DIR__ . '/../config/template-manager.php';
+require_once __DIR__ . '/../config/cloudinary-config.php'; // Add Cloudinary support
 
 // Get database connection
 try {
@@ -153,6 +154,7 @@ $technologies = $templateManager->getTechnologyFilters();
             margin-right: 0.75rem;
             display: -webkit-box;
             -webkit-line-clamp: 2;
+            line-clamp: 2;
             -webkit-box-orient: vertical;
             overflow: hidden;
         }
@@ -171,6 +173,7 @@ $technologies = $templateManager->getTechnologyFilters();
             flex: 1;
             display: -webkit-box;
             -webkit-line-clamp: 3;
+            line-clamp: 3;
             -webkit-box-orient: vertical;
             overflow: hidden;
             line-height: 1.4;
@@ -301,8 +304,9 @@ $technologies = $templateManager->getTechnologyFilters();
             font-weight: 700;
             color: #1f2937;
             margin-bottom: 0.5rem;
-            display: block;
+            display: -webkit-box;
             -webkit-line-clamp: 2;
+            line-clamp: 2;
             -webkit-box-orient: vertical;
             overflow: hidden;
         }
@@ -314,6 +318,7 @@ $technologies = $templateManager->getTechnologyFilters();
             margin-bottom: 1rem;
             display: -webkit-box;
             -webkit-line-clamp: 3;
+            line-clamp: 3;
             -webkit-box-orient: vertical;
             overflow: hidden;
         }
@@ -562,7 +567,11 @@ $technologies = $templateManager->getTechnologyFilters();
                         <?php foreach ($templates as $template): ?>
                         <div class="template-card rounded-2xl overflow-hidden">
                             <div class="relative">
-                                <img src="<?= htmlspecialchars($template['preview_image']) ?>" alt="<?= htmlspecialchars($template['title']) ?>" class="template-image">
+                                <img src="<?= getOptimizedImageUrl($template['preview_image'], 'thumb') ?>" 
+                                     alt="<?= htmlspecialchars($template['title']) ?>" 
+                                     class="template-image"
+                                     loading="lazy"
+                                     onerror="this.src='../assets/images/default-template.jpg'">
                                 <div class="absolute top-3 right-3">
                                     <button class="w-8 h-8 bg-white/80 rounded-full flex items-center justify-center hover:bg-white transition-colors">
                                         <i class="ri-heart-line text-gray-600"></i>
@@ -581,7 +590,10 @@ $technologies = $templateManager->getTechnologyFilters();
                                 <div class="template-header">
                                     <div class="flex-1">
                                         <div class="flex items-center space-x-2">
-                                            <img src="<?= htmlspecialchars($template['profile_image']) ?>" alt="<?= htmlspecialchars($template['seller_name']) ?>" class="w-6 h-6 rounded-full object-cover">
+                                            <img src="<?= getOptimizedImageUrl($template['profile_image'], 'avatar_small') ?>" 
+                                                 alt="<?= htmlspecialchars($template['seller_name']) ?>" 
+                                                 class="w-6 h-6 rounded-full object-cover"
+                                                 onerror="this.src='../assets/images/default-avatar.png'">
                                             <span class="text-sm text-gray-600"><?= htmlspecialchars($template['seller_name']) ?></span>
                                         </div>
                                     </div>
@@ -600,7 +612,7 @@ $technologies = $templateManager->getTechnologyFilters();
                                     </div>
                                 </div>
                                 <div class="template-actions">
-                                    <button onclick="handleAddToCart(<?= $template['id'] ?>, '<?= addslashes($template['title']) ?>', <?= $template['price'] ?>, '<?= addslashes($template['preview_image']) ?>', '<?= addslashes($template['seller_name']) ?>')" 
+                                    <button onclick="handleAddToCart(<?= $template['id'] ?>, '<?= addslashes($template['title']) ?>', <?= $template['price'] ?>, '<?= addslashes(getOptimizedImageUrl($template['preview_image'], 'thumb')) ?>', '<?= addslashes($template['seller_name']) ?>')" 
                                             class="flex-1 bg-primary text-white py-2 px-4 rounded-button text-sm font-medium hover:bg-primary/90 transition-colors whitespace-nowrap">
                                         <i class="ri-shopping-cart-line mr-1"></i>Add to Cart
                                     </button>
@@ -749,7 +761,11 @@ $technologies = $templateManager->getTechnologyFilters();
             grid.innerHTML = templates.map(template => `
                 <div class="template-card rounded-2xl overflow-hidden">
                     <div class="relative">
-                        <img src="${escapeHtml(template.preview_image)}" alt="${escapeHtml(template.title)}" class="template-image">
+                        <img src="${template.preview_image_url || '../assets/images/default-template.jpg'}" 
+                             alt="${escapeHtml(template.title)}" 
+                             class="template-image"
+                             loading="lazy"
+                             onerror="this.src='../assets/images/default-template.jpg'">
                         <div class="absolute top-3 right-3">
                             <button class="w-8 h-8 bg-white/80 rounded-full flex items-center justify-center hover:bg-white transition-colors">
                                 <i class="ri-heart-line text-gray-600"></i>
@@ -764,7 +780,10 @@ $technologies = $templateManager->getTechnologyFilters();
                         <div class="template-header">
                             <div class="flex-1">
                                 <div class="flex items-center space-x-2">
-                                    <img src="${escapeHtml(template.profile_image)}" alt="${escapeHtml(template.seller_name)}" class="w-6 h-6 rounded-full object-cover">
+                                    <img src="${template.seller_avatar_url || '../assets/images/default-avatar.png'}" 
+                                         alt="${escapeHtml(template.seller_name)}" 
+                                         class="w-6 h-6 rounded-full object-cover"
+                                         onerror="this.src='../assets/images/default-avatar.png'">
                                     <span class="text-sm text-gray-600">${escapeHtml(template.seller_name)}</span>
                                 </div>
                             </div>
@@ -783,7 +802,7 @@ $technologies = $templateManager->getTechnologyFilters();
                             </div>
                         </div>
                         <div class="template-actions">
-                            <button onclick="handleAddToCart(${template.id}, '${addslashes(template.title)}', ${template.price}, '${addslashes(template.preview_image)}', '${addslashes(template.seller_name)}')" 
+                            <button onclick="handleAddToCart(${template.id}, '${addslashes(template.title)}', ${template.price}, '${addslashes(template.preview_image_url || '../assets/images/default-template.jpg')}', '${addslashes(template.seller_name)}')" 
                                     class="flex-1 bg-primary text-white py-2 px-4 rounded-button text-sm font-medium hover:bg-primary/90 transition-colors whitespace-nowrap">
                                 <i class="ri-shopping-cart-line mr-1"></i>Add to Cart
                             </button>
@@ -809,7 +828,11 @@ $technologies = $templateManager->getTechnologyFilters();
             grid.innerHTML = templates.map(template => `
                 <div class="template-card-list">
                     <div class="relative">
-                        <img src="${escapeHtml(template.preview_image)}" alt="${escapeHtml(template.title)}" class="template-image">
+                        <img src="${template.preview_image_url || '../assets/images/default-template.jpg'}" 
+                             alt="${escapeHtml(template.title)}" 
+                             class="template-image"
+                             loading="lazy"
+                             onerror="this.src='../assets/images/default-template.jpg'">
                         <div class="absolute top-3 right-3">
                             <button class="w-8 h-8 bg-white/80 rounded-full flex items-center justify-center hover:bg-white transition-colors">
                                 <i class="ri-heart-line text-gray-600"></i>
@@ -825,7 +848,10 @@ $technologies = $templateManager->getTechnologyFilters();
                             <div class="flex-1">
                                 <h3 class="template-title">${escapeHtml(template.title)}</h3>
                                 <div class="flex items-center space-x-2 mb-3">
-                                    <img src="${escapeHtml(template.profile_image)}" alt="${escapeHtml(template.seller_name)}" class="w-6 h-6 rounded-full object-cover">
+                                    <img src="${template.seller_avatar_url || '../assets/images/default-avatar.png'}" 
+                                         alt="${escapeHtml(template.seller_name)}" 
+                                         class="w-6 h-6 rounded-full object-cover"
+                                         onerror="this.src='../assets/images/default-avatar.png'">
                                     <span class="text-sm text-gray-600">${escapeHtml(template.seller_name)}</span>
                                 </div>
                             </div>
@@ -841,14 +867,14 @@ $technologies = $templateManager->getTechnologyFilters();
                             <p class="template-description">${escapeHtml(template.description)}</p>
                         </div>
                         <div class="template-actions">
-                            <button onclick="handleAddToCart(${template.id}, '${addslashes(template.title)}', ${template.price}, '${addslashes(template.preview_image)}', '${addslashes(template.seller_name)}')" 
+                            <button onclick="handleAddToCart(${template.id}, '${addslashes(template.title)}', ${template.price}, '${addslashes(template.preview_image_url || '../assets/images/default-template.jpg')}', '${addslashes(template.seller_name)}')" 
                                     class="bg-primary text-white py-2 px-6 rounded-button text-sm font-medium hover:bg-primary/90 transition-colors whitespace-nowrap">
                                 <i class="ri-shopping-cart-line mr-2"></i>Add to Cart
                             </button>
-                            <button class="px-4 py-2 border border-gray-200 rounded-button text-sm font-medium hover:bg-gray-50 transition-colors whitespace-nowrap">
+                            <button onclick="window.location.href='template-detail.php?id=${template.id}'" class="px-4 py-2 border border-gray-200 rounded-button text-sm font-medium hover:bg-gray-50 transition-colors whitespace-nowrap">
                                 <i class="ri-eye-line mr-2"></i>Preview
                             </button>
-                            <button class="px-4 py-2 border border-gray-200 rounded-button text-sm font-medium hover:bg-gray-50 transition-colors whitespace-nowrap">
+                            <button onclick="window.location.href='template-detail.php?id=${template.id}'" class="px-4 py-2 border border-gray-200 rounded-button text-sm font-medium hover:bg-gray-50 transition-colors whitespace-nowrap">
                                 <i class="ri-information-line mr-2"></i>Details
                             </button>
                         </div>

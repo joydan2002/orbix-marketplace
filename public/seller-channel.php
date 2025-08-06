@@ -16,6 +16,7 @@ session_start();
 if (isset($_SESSION['user_id']) && isset($_SESSION['user_type']) && $_SESSION['user_type'] === 'seller') {
     // User is logged in as seller, show dashboard
     require_once '../config/database.php';
+    require_once '../config/cloudinary-config.php'; // Add Cloudinary support
     require_once '../includes/header.php';
     
     // Get seller data
@@ -926,7 +927,6 @@ require_once '../includes/header.php';
                 <p class="text-xl text-gray-600 max-w-3xl mx-auto">
                     Our streamlined process gets you up and running quickly, so you can focus on what you do best
                 </p>
-            </div>
 
             <div class="grid md:grid-cols-3 gap-12">
                 <div class="text-center">

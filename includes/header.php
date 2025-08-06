@@ -695,475 +695,566 @@ try {
 <!-- Enhanced JavaScript for Header Interactions -->
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Enhanced dropdown functionality
-    setupDropdowns();
-    
-    // Mobile menu toggle
-    setupMobileMenu();
-    
-    // Smooth animations
-    setupAnimations();
+    try {
+        // Enhanced dropdown functionality
+        setupDropdowns();
+        
+        // Mobile menu toggle
+        setupMobileMenu();
+        
+        // Smooth animations
+        setupAnimations();
+    } catch (error) {
+        console.error('Error initializing header interactions:', error);
+    }
 });
 
 function setupDropdowns() {
-    // Templates dropdown - Sử dụng hiệu ứng mượt mà như user dropdown
-    const templatesDropdown = document.querySelector('.templates-dropdown-container');
-    const templatesMenu = templatesDropdown?.querySelector('.templates-dropdown-menu');
-    
-    if (templatesDropdown && templatesMenu) {
-        let templatesShowTimeout, templatesHideTimeout;
+    try {
+        // Templates dropdown - Sử dụng hiệu ứng mượt mà như user dropdown
+        const templatesDropdown = document.querySelector('.templates-dropdown-container');
+        const templatesMenu = templatesDropdown?.querySelector('.templates-dropdown-menu');
         
-        templatesDropdown.addEventListener('mouseenter', () => {
-            clearTimeout(templatesHideTimeout);
-            templatesShowTimeout = setTimeout(() => {
-                templatesMenu.style.display = 'block';
-                templatesMenu.classList.add('show');
-            }, 100);
+        if (templatesDropdown && templatesMenu) {
+            let templatesShowTimeout, templatesHideTimeout;
+            
+            templatesDropdown.addEventListener('mouseenter', () => {
+                clearTimeout(templatesHideTimeout);
+                templatesShowTimeout = setTimeout(() => {
+                    templatesMenu.style.display = 'block';
+                    templatesMenu.classList.add('show');
+                }, 100);
+            });
+            
+            templatesDropdown.addEventListener('mouseleave', () => {
+                clearTimeout(templatesShowTimeout);
+                templatesHideTimeout = setTimeout(() => {
+                    templatesMenu.classList.remove('show');
+                    setTimeout(() => {
+                        if (!templatesMenu.classList.contains('show')) {
+                            templatesMenu.style.display = 'none';
+                        }
+                    }, 400); // Match CSS transition duration
+                }, 150);
+            });
+        }
+        
+        // User dropdown - Sử dụng ID cụ thể thay vì selector generic
+        const userDropdownContainer = document.getElementById('userDropdownContainer');
+        const userDropdownButton = document.getElementById('userDropdownButton');
+        const userMenu = document.querySelector('.user-dropdown');
+        
+        console.log('User dropdown elements:', {
+            container: userDropdownContainer,
+            button: userDropdownButton,
+            menu: userMenu
         });
         
-        templatesDropdown.addEventListener('mouseleave', () => {
-            clearTimeout(templatesShowTimeout);
-            templatesHideTimeout = setTimeout(() => {
-                templatesMenu.classList.remove('show');
-                setTimeout(() => {
-                    if (!templatesMenu.classList.contains('show')) {
-                        templatesMenu.style.display = 'none';
-                    }
-                }, 400); // Match CSS transition duration
-            }, 150);
-        });
-    }
-    
-    // User dropdown - Sử dụng ID cụ thể thay vì selector generic
-    const userDropdownContainer = document.getElementById('userDropdownContainer');
-    const userDropdownButton = document.getElementById('userDropdownButton');
-    const userMenu = document.querySelector('.user-dropdown');
-    
-    console.log('User dropdown elements:', {
-        container: userDropdownContainer,
-        button: userDropdownButton,
-        menu: userMenu
-    });
-    
-    if (userDropdownContainer && userMenu && userDropdownButton) {
-        let userShowTimeout, userHideTimeout;
-        
-        // Mouse enter trên user dropdown container và menu
-        const showDropdown = () => {
-            clearTimeout(userHideTimeout);
-            userShowTimeout = setTimeout(() => {
-                console.log('Showing user dropdown');
-                userMenu.classList.add('show');
-            }, 100);
-        };
-        
-        const hideDropdown = () => {
-            clearTimeout(userShowTimeout);
-            userHideTimeout = setTimeout(() => {
-                console.log('Hiding user dropdown');
-                userMenu.classList.remove('show');
-            }, 200);
-        };
-        
-        // Event listeners cho container
-        userDropdownContainer.addEventListener('mouseenter', showDropdown);
-        userDropdownContainer.addEventListener('mouseleave', hideDropdown);
-        
-        // Event listeners cho dropdown menu để không bị đóng khi hover vào menu
-        userMenu.addEventListener('mouseenter', () => {
-            clearTimeout(userHideTimeout);
-        });
-        
-        userMenu.addEventListener('mouseleave', hideDropdown);
-        
-        // Click để toggle (cho mobile/touch devices)
-        userDropdownButton.addEventListener('click', (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            console.log('User dropdown button clicked');
-            userMenu.classList.toggle('show');
-        });
-        
-        // Click bên ngoài để đóng
-        document.addEventListener('click', (e) => {
-            if (!userDropdownContainer.contains(e.target) && !userMenu.contains(e.target)) {
-                userMenu.classList.remove('show');
-            }
-        });
-    } else {
-        console.error('User dropdown elements not found:', {
-            container: !!userDropdownContainer,
-            button: !!userDropdownButton,
-            menu: !!userMenu
-        });
+        if (userDropdownContainer && userMenu && userDropdownButton) {
+            let userShowTimeout, userHideTimeout;
+            
+            // Mouse enter trên user dropdown container và menu
+            const showDropdown = () => {
+                clearTimeout(userHideTimeout);
+                userShowTimeout = setTimeout(() => {
+                    console.log('Showing user dropdown');
+                    userMenu.classList.add('show');
+                }, 100);
+            };
+            
+            const hideDropdown = () => {
+                clearTimeout(userShowTimeout);
+                userHideTimeout = setTimeout(() => {
+                    console.log('Hiding user dropdown');
+                    userMenu.classList.remove('show');
+                }, 200);
+            };
+            
+            // Event listeners cho container
+            userDropdownContainer.addEventListener('mouseenter', showDropdown);
+            userDropdownContainer.addEventListener('mouseleave', hideDropdown);
+            
+            // Event listeners cho dropdown menu để không bị đóng khi hover vào menu
+            userMenu.addEventListener('mouseenter', () => {
+                clearTimeout(userHideTimeout);
+            });
+            
+            userMenu.addEventListener('mouseleave', hideDropdown);
+            
+            // Click để toggle (cho mobile/touch devices)
+            userDropdownButton.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                console.log('User dropdown button clicked');
+                userMenu.classList.toggle('show');
+            });
+            
+            // Click bên ngoài để đóng
+            document.addEventListener('click', (e) => {
+                if (!userDropdownContainer.contains(e.target) && !userMenu.contains(e.target)) {
+                    userMenu.classList.remove('show');
+                }
+            });
+        } else {
+            console.error('User dropdown elements not found:', {
+                container: !!userDropdownContainer,
+                button: !!userDropdownButton,
+                menu: !!userMenu
+            });
+        }
+    } catch (error) {
+        console.error('Error in setupDropdowns:', error);
     }
 }
 
 function setupMobileMenu() {
-    const mobileToggle = document.querySelector('button.lg\\:hidden');
-    const nav = document.querySelector('nav.hidden.lg\\:flex');
-    
-    if (mobileToggle && nav) {
-        mobileToggle.addEventListener('click', () => {
-            nav.classList.toggle('hidden');
-            nav.classList.toggle('flex');
-            
-            // Animate icon
-            const icon = mobileToggle.querySelector('i');
-            if (nav.classList.contains('hidden')) {
-                icon.className = 'ri-menu-line text-secondary text-xl';
-            } else {
-                icon.className = 'ri-close-line text-secondary text-xl';
-            }
-        });
+    try {
+        const mobileToggle = document.querySelector('button.lg\\:hidden');
+        const nav = document.querySelector('nav.hidden.lg\\:flex');
+        
+        if (mobileToggle && nav) {
+            mobileToggle.addEventListener('click', () => {
+                nav.classList.toggle('hidden');
+                nav.classList.toggle('flex');
+                
+                // Animate icon
+                const icon = mobileToggle.querySelector('i');
+                if (icon) {
+                    if (nav.classList.contains('hidden')) {
+                        icon.className = 'ri-menu-line text-secondary text-xl';
+                    } else {
+                        icon.className = 'ri-close-line text-secondary text-xl';
+                    }
+                }
+            });
+        }
+    } catch (error) {
+        console.error('Error in setupMobileMenu:', error);
     }
 }
 
 function setupAnimations() {
-    // Add smooth hover effects to menu items
-    const menuItems = document.querySelectorAll('.menu-item');
-    
-    menuItems.forEach(item => {
-        item.addEventListener('mouseenter', function() {
-            this.style.transform = 'translateX(4px)';
+    try {
+        // Add smooth hover effects to menu items
+        const menuItems = document.querySelectorAll('.menu-item');
+        
+        menuItems.forEach(item => {
+            item.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateX(4px)';
+            });
+            
+            item.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateX(0)';
+            });
         });
         
-        item.addEventListener('mouseleave', function() {
-            this.style.transform = 'translateX(0)';
-        });
-    });
-    
-    // Avatar glow effect
-    const avatars = document.querySelectorAll('.avatar-ring');
-    
-    avatars.forEach(avatar => {
-        avatar.addEventListener('mouseenter', function() {
-            this.style.boxShadow = '0 0 20px rgba(255, 95, 31, 0.4)';
-        });
+        // Avatar glow effect
+        const avatars = document.querySelectorAll('.avatar-ring');
         
-        avatar.addEventListener('mouseleave', function() {
-            this.style.boxShadow = 'none';
+        avatars.forEach(avatar => {
+            avatar.addEventListener('mouseenter', function() {
+                this.style.boxShadow = '0 0 20px rgba(255, 95, 31, 0.4)';
+            });
+            
+            avatar.addEventListener('mouseleave', function() {
+                this.style.boxShadow = 'none';
+            });
         });
-    });
+    } catch (error) {
+        console.error('Error in setupAnimations:', error);
+    }
 }
 
 // Enhanced notification system for auth status
 <?php if ($isLoggedIn): ?>
-// User is logged in - show welcome message if first visit
-if (sessionStorage.getItem('showWelcome') !== 'false') {
-    setTimeout(() => {
-        if (window.toast) {
-            window.toast.success('Welcome back, <?= htmlspecialchars($userData['first_name']) ?>!', {
-                duration: 3000,
-                position: 'top-right'
-            });
-        }
-        sessionStorage.setItem('showWelcome', 'false');
-    }, 1000);
-}
-
-// Shopping Cart System - Database-based với real-time updates
-class ShoppingCart {
-    constructor() {
-        this.items = [];
-        this.init();
-    }
-    
-    async init() {
-        await this.loadCartFromServer();
-        this.setupEventListeners();
-    }
-    
-    setupEventListeners() {
-        // Cart button click
-        const cartButton = document.getElementById('cartButton');
-        const cartDropdown = document.getElementById('cartDropdown');
-        
-        if (cartButton && cartDropdown) {
-            cartButton.addEventListener('click', async (e) => {
-                e.stopPropagation();
-                // Refresh cart data khi mở dropdown
-                await this.loadCartFromServer();
-                this.toggleCartDropdown();
-            });
-            
-            // Close cart when clicking outside
-            document.addEventListener('click', (e) => {
-                if (!cartButton.contains(e.target) && !cartDropdown.contains(e.target)) {
-                    this.closeCartDropdown();
-                }
-            });
-        }
-        
-        // Clear cart button
-        const clearCartBtn = document.getElementById('clearCartBtn');
-        if (clearCartBtn) {
-            clearCartBtn.addEventListener('click', () => {
-                this.clearCart();
-            });
-        }
-    }
-    
-    async loadCartFromServer() {
-        try {
-            const response = await fetch('cart-api.php?action=get');
-            const data = await response.json();
-            
-            if (data.success) {
-                this.items = data.items.map(item => ({
-                    id: item.template_id,
-                    title: item.title,
-                    price: parseFloat(item.price),
-                    image: item.preview_image,
-                    seller: item.seller_name,
-                    addedAt: item.added_at
-                }));
-                this.updateCartUI();
-            } else {
-                console.error('Failed to load cart:', data.error);
-                // Reset cart nếu không load được
-                this.items = [];
-                this.updateCartUI();
+try {
+    // User is logged in - show welcome message if first visit
+    if (sessionStorage.getItem('showWelcome') !== 'false') {
+        setTimeout(() => {
+            if (window.toast) {
+                window.toast.success('Welcome back, <?= htmlspecialchars($userData['first_name']) ?>!', {
+                    duration: 3000,
+                    position: 'top-right'
+                });
             }
-        } catch (error) {
-            console.error('Error loading cart from server:', error);
+            sessionStorage.setItem('showWelcome', 'false');
+        }, 1000);
+    }
+
+    // Shopping Cart System - Database-based với real-time updates
+    class ShoppingCart {
+        constructor() {
             this.items = [];
-            this.updateCartUI();
+            this.init();
         }
-    }
-    
-    async addItem(item) {
-        try {
-            const formData = new FormData();
-            formData.append('template_id', item.id);
-            
-            const response = await fetch('cart-api.php?action=add', {
-                method: 'POST',
-                body: formData
-            });
-            
-            const data = await response.json();
-            
-            if (data.success) {
-                // Refresh cart from server để đảm bảo đồng bộ
+        
+        async init() {
+            try {
                 await this.loadCartFromServer();
-                // Xóa thông báo - chỉ highlight button
-                this.highlightCartButton();
-            } else {
-                if (data.redirect) {
-                    // User not logged in, redirect to auth
-                    window.location.href = data.redirect + '?redirect=' + encodeURIComponent(window.location.href);
-                    return;
+                this.setupEventListeners();
+            } catch (error) {
+                console.error('Error initializing shopping cart:', error);
+            }
+        }
+        
+        setupEventListeners() {
+            try {
+                // Cart button click
+                const cartButton = document.getElementById('cartButton');
+                const cartDropdown = document.getElementById('cartDropdown');
+                
+                if (cartButton && cartDropdown) {
+                    cartButton.addEventListener('click', async (e) => {
+                        e.stopPropagation();
+                        try {
+                            // Refresh cart data khi mở dropdown
+                            await this.loadCartFromServer();
+                            this.toggleCartDropdown();
+                        } catch (error) {
+                            console.error('Error handling cart button click:', error);
+                        }
+                    });
+                    
+                    // Close cart when clicking outside
+                    document.addEventListener('click', (e) => {
+                        if (!cartButton.contains(e.target) && !cartDropdown.contains(e.target)) {
+                            this.closeCartDropdown();
+                        }
+                    });
                 }
                 
-                // Xóa tất cả thông báo - chỉ highlight button cho biết đã click
-                this.highlightCartButton();
+                // Clear cart button
+                const clearCartBtn = document.getElementById('clearCartBtn');
+                if (clearCartBtn) {
+                    clearCartBtn.addEventListener('click', () => {
+                        this.clearCart();
+                    });
+                }
+            } catch (error) {
+                console.error('Error setting up cart event listeners:', error);
             }
-        } catch (error) {
-            console.error('Error adding item to cart:', error);
-            // Xóa thông báo lỗi - chỉ log console
         }
-    }
-    
-    async removeItem(itemId) {
-        try {
-            const formData = new FormData();
-            formData.append('template_id', itemId);
-            
-            const response = await fetch('cart-api.php?action=remove', {
-                method: 'POST',
-                body: formData
-            });
-            
-            const data = await response.json();
-            
-            if (data.success) {
-                // Refresh cart from server - xóa thông báo
-                await this.loadCartFromServer();
-            } else {
-                // Xóa thông báo lỗi - chỉ log console
-                console.error('Failed to remove item:', data.error);
-            }
-        } catch (error) {
-            console.error('Error removing item from cart:', error);
-            // Xóa thông báo lỗi - chỉ log console
-        }
-    }
-    
-    async clearCart() {
-        try {
-            const response = await fetch('cart-api.php?action=clear', {
-                method: 'POST'
-            });
-            
-            const data = await response.json();
-            
-            if (data.success) {
+        
+        async loadCartFromServer() {
+            try {
+                const response = await fetch('cart-api.php?action=get');
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    this.items = data.items.map(item => ({
+                        id: item.template_id,
+                        title: item.title,
+                        price: parseFloat(item.price),
+                        image: item.preview_image,
+                        seller: item.seller_name,
+                        addedAt: item.added_at
+                    }));
+                    this.updateCartUI();
+                } else {
+                    console.error('Failed to load cart:', data.error);
+                    // Reset cart nếu không load được
+                    this.items = [];
+                    this.updateCartUI();
+                }
+            } catch (error) {
+                console.error('Error loading cart from server:', error);
                 this.items = [];
                 this.updateCartUI();
-                this.closeCartDropdown();
-                // Xóa thông báo - chỉ cập nhật UI
-            } else {
+            }
+        }
+        
+        async addItem(item) {
+            try {
+                const formData = new FormData();
+                formData.append('template_id', item.id);
+                
+                const response = await fetch('cart-api.php?action=add', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    // Refresh cart from server để đảm bảo đồng bộ
+                    await this.loadCartFromServer();
+                    // Xóa thông báo - chỉ highlight button
+                    this.highlightCartButton();
+                } else {
+                    if (data.redirect) {
+                        // User not logged in, redirect to auth
+                        window.location.href = data.redirect + '?redirect=' + encodeURIComponent(window.location.href);
+                        return;
+                    }
+                    
+                    // Xóa tất cả thông báo - chỉ highlight button cho biết đã click
+                    this.highlightCartButton();
+                }
+            } catch (error) {
+                console.error('Error adding item to cart:', error);
                 // Xóa thông báo lỗi - chỉ log console
-                console.error('Failed to clear cart:', data.error);
             }
+        }
+        
+        async removeItem(itemId) {
+            try {
+                const formData = new FormData();
+                formData.append('template_id', itemId);
+                
+                const response = await fetch('cart-api.php?action=remove', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    // Refresh cart from server - xóa thông báo
+                    await this.loadCartFromServer();
+                } else {
+                    // Xóa thông báo lỗi - chỉ log console
+                    console.error('Failed to remove item:', data.error);
+                }
+            } catch (error) {
+                console.error('Error removing item from cart:', error);
+                // Xóa thông báo lỗi - chỉ log console
+            }
+        }
+        
+        async clearCart() {
+            try {
+                const response = await fetch('cart-api.php?action=clear', {
+                    method: 'POST'
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    this.items = [];
+                    this.updateCartUI();
+                    this.closeCartDropdown();
+                    // Xóa thông báo - chỉ cập nhật UI
+                } else {
+                    // Xóa thông báo lỗi - chỉ log console
+                    console.error('Failed to clear cart:', data.error);
+                }
+            } catch (error) {
+                console.error('Error clearing cart:', error);
+                // Xóa thông báo lỗi - chỉ log console
+            }
+        }
+        
+        updateCartUI() {
+            try {
+                const cartBadge = document.getElementById('cartBadge');
+                const cartItems = document.getElementById('cartItems');
+                const cartFooter = document.getElementById('cartFooter');
+                const cartTotal = document.getElementById('cartTotal');
+                
+                // Update badge
+                if (cartBadge) {
+                    if (this.items.length > 0) {
+                        cartBadge.textContent = this.items.length;
+                        cartBadge.style.transform = 'scale(1)';
+                    } else {
+                        cartBadge.style.transform = 'scale(0)';
+                    }
+                }
+                
+                // Update cart content
+                if (cartItems && cartFooter && cartTotal) {
+                    if (this.items.length === 0) {
+                        cartFooter.style.display = 'none';
+                        cartItems.innerHTML = `
+                            <div class="text-center py-8">
+                                <i class="ri-shopping-cart-line text-4xl text-gray-300 mb-3"></i>
+                                <p class="text-gray-500">Your cart is empty</p>
+                                <p class="text-sm text-gray-400 mt-1">Add some templates to get started!</p>
+                            </div>
+                        `;
+                    } else {
+                        cartFooter.style.display = 'block';
+                        
+                        // Calculate total
+                        const total = this.items.reduce((sum, item) => sum + parseFloat(item.price), 0);
+                        cartTotal.textContent = `$${total.toFixed(2)}`;
+                        
+                        // Render cart items
+                        cartItems.innerHTML = this.items.map(item => `
+                            <div class="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
+                                <img src="${this.escapeHtml(item.image)}" alt="${this.escapeHtml(item.title)}" class="w-12 h-12 rounded-lg object-cover">
+                                <div class="flex-1 min-w-0">
+                                    <h4 class="font-medium text-sm text-gray-900 truncate">${this.escapeHtml(item.title)}</h4>
+                                    <p class="text-xs text-gray-500">by ${this.escapeHtml(item.seller)}</p>
+                                    <p class="text-sm font-semibold text-primary">$${parseFloat(item.price).toFixed(2)}</p>
+                                </div>
+                                <button onclick="cart.removeItem('${item.id}')" class="w-8 h-8 flex items-center justify-center text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-full transition-colors">
+                                    <i class="ri-close-line text-sm"></i>
+                                </button>
+                            </div>
+                        `).join('');
+                    }
+                }
+            } catch (error) {
+                console.error('Error updating cart UI:', error);
+            }
+        }
+        
+        toggleCartDropdown() {
+            try {
+                const cartDropdown = document.getElementById('cartDropdown');
+                if (cartDropdown) {
+                    const isVisible = cartDropdown.style.opacity === '1';
+                    if (isVisible) {
+                        this.closeCartDropdown();
+                    } else {
+                        this.openCartDropdown();
+                    }
+                }
+            } catch (error) {
+                console.error('Error toggling cart dropdown:', error);
+            }
+        }
+        
+        openCartDropdown() {
+            try {
+                const cartDropdown = document.getElementById('cartDropdown');
+                if (cartDropdown) {
+                    cartDropdown.style.opacity = '1';
+                    cartDropdown.style.visibility = 'visible';
+                    cartDropdown.style.transform = 'translateY(0)';
+                }
+            } catch (error) {
+                console.error('Error opening cart dropdown:', error);
+            }
+        }
+        
+        closeCartDropdown() {
+            try {
+                const cartDropdown = document.getElementById('cartDropdown');
+                if (cartDropdown) {
+                    cartDropdown.style.opacity = '0';
+                    cartDropdown.style.visibility = 'hidden';
+                    cartDropdown.style.transform = 'translateY(10px)';
+                }
+            } catch (error) {
+                console.error('Error closing cart dropdown:', error);
+            }
+        }
+        
+        highlightCartButton() {
+            try {
+                const cartButton = document.getElementById('cartButton');
+                if (cartButton) {
+                    cartButton.style.transform = 'scale(1.1)';
+                    cartButton.style.background = 'rgba(255, 95, 31, 0.1)';
+                    
+                    setTimeout(() => {
+                        cartButton.style.transform = 'scale(1)';
+                        cartButton.style.background = '';
+                    }, 300);
+                }
+            } catch (error) {
+                console.error('Error highlighting cart button:', error);
+            }
+        }
+        
+        showNotification(message, type = 'info') {
+            try {
+                // Use existing toast system if available
+                if (window.toast) {
+                    window.toast[type](message, {
+                        duration: 3000,
+                        position: 'top-right'
+                    });
+                } else {
+                    // Fallback notification
+                    alert(message);
+                }
+            } catch (error) {
+                console.error('Error showing notification:', error);
+            }
+        }
+        
+        escapeHtml(text) {
+            try {
+                const div = document.createElement('div');
+                div.textContent = text;
+                return div.innerHTML;
+            } catch (error) {
+                console.error('Error escaping HTML:', error);
+                return String(text).replace(/[&<>"']/g, '');
+            }
+        }
+    }
+
+    // Initialize shopping cart
+    const cart = new ShoppingCart();
+
+    // Global function to add items to cart (can be called from template cards)
+    window.addToCart = function(templateData) {
+        try {
+            cart.addItem(templateData);
         } catch (error) {
-            console.error('Error clearing cart:', error);
-            // Xóa thông báo lỗi - chỉ log console
+            console.error('Error in global addToCart function:', error);
         }
-    }
-    
-    updateCartUI() {
-        const cartBadge = document.getElementById('cartBadge');
-        const cartItems = document.getElementById('cartItems');
-        const cartFooter = document.getElementById('cartFooter');
-        const cartTotal = document.getElementById('cartTotal');
-        
-        // Update badge
-        if (cartBadge) {
-            if (this.items.length > 0) {
-                cartBadge.textContent = this.items.length;
-                cartBadge.style.transform = 'scale(1)';
-            } else {
-                cartBadge.style.transform = 'scale(0)';
-            }
-        }
-        
-        // Update cart content
-        if (cartItems && cartFooter && cartTotal) {
-            if (this.items.length === 0) {
-                cartFooter.style.display = 'none';
-                cartItems.innerHTML = `
-                    <div class="text-center py-8">
-                        <i class="ri-shopping-cart-line text-4xl text-gray-300 mb-3"></i>
-                        <p class="text-gray-500">Your cart is empty</p>
-                        <p class="text-sm text-gray-400 mt-1">Add some templates to get started!</p>
-                    </div>
-                `;
-            } else {
-                cartFooter.style.display = 'block';
-                
-                // Calculate total
-                const total = this.items.reduce((sum, item) => sum + parseFloat(item.price), 0);
-                cartTotal.textContent = `$${total.toFixed(2)}`;
-                
-                // Render cart items
-                cartItems.innerHTML = this.items.map(item => `
-                    <div class="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
-                        <img src="${this.escapeHtml(item.image)}" alt="${this.escapeHtml(item.title)}" class="w-12 h-12 rounded-lg object-cover">
-                        <div class="flex-1 min-w-0">
-                            <h4 class="font-medium text-sm text-gray-900 truncate">${this.escapeHtml(item.title)}</h4>
-                            <p class="text-xs text-gray-500">by ${this.escapeHtml(item.seller)}</p>
-                            <p class="text-sm font-semibold text-primary">$${parseFloat(item.price).toFixed(2)}</p>
-                        </div>
-                        <button onclick="cart.removeItem('${item.id}')" class="w-8 h-8 flex items-center justify-center text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-full transition-colors">
-                            <i class="ri-close-line text-sm"></i>
-                        </button>
-                    </div>
-                `).join('');
-            }
-        }
-    }
-    
-    toggleCartDropdown() {
-        const cartDropdown = document.getElementById('cartDropdown');
-        if (cartDropdown) {
-            const isVisible = cartDropdown.style.opacity === '1';
-            if (isVisible) {
-                this.closeCartDropdown();
-            } else {
-                this.openCartDropdown();
-            }
-        }
-    }
-    
-    openCartDropdown() {
-        const cartDropdown = document.getElementById('cartDropdown');
-        if (cartDropdown) {
-            cartDropdown.style.opacity = '1';
-            cartDropdown.style.visibility = 'visible';
-            cartDropdown.style.transform = 'translateY(0)';
-        }
-    }
-    
-    closeCartDropdown() {
-        const cartDropdown = document.getElementById('cartDropdown');
-        if (cartDropdown) {
-            cartDropdown.style.opacity = '0';
-            cartDropdown.style.visibility = 'hidden';
-            cartDropdown.style.transform = 'translateY(10px)';
-        }
-    }
-    
-    highlightCartButton() {
-        const cartButton = document.getElementById('cartButton');
-        if (cartButton) {
-            cartButton.style.transform = 'scale(1.1)';
-            cartButton.style.background = 'rgba(255, 95, 31, 0.1)';
+    };
+
+    // Global functions for cart buttons
+    window.viewCart = function() {
+        try {
+            // Close the cart dropdown first
+            cart.closeCartDropdown();
             
-            setTimeout(() => {
-                cartButton.style.transform = 'scale(1)';
-                cartButton.style.background = '';
-            }, 300);
+            // Navigate to cart page - we'll create this page
+            window.location.href = 'cart.php';
+        } catch (error) {
+            console.error('Error in viewCart function:', error);
         }
-    }
-    
-    showNotification(message, type = 'info') {
-        // Use existing toast system if available
-        if (window.toast) {
-            window.toast[type](message, {
-                duration: 3000,
-                position: 'top-right'
-            });
-        } else {
-            // Fallback notification
-            alert(message);
+    };
+
+    window.proceedToCheckout = function() {
+        try {
+            // Check if cart has items
+            if (cart.items.length === 0) {
+                if (window.toast) {
+                    window.toast.warning('Your cart is empty. Add some templates first!', {
+                        duration: 3000,
+                        position: 'top-right'
+                    });
+                } else {
+                    alert('Your cart is empty. Add some templates first!');
+                }
+                return;
+            }
+            
+            // Close the cart dropdown first
+            cart.closeCartDropdown();
+            
+            // Navigate to checkout page - we'll create this page
+            window.location.href = 'checkout.php';
+        } catch (error) {
+            console.error('Error in proceedToCheckout function:', error);
         }
-    }
-    
-    escapeHtml(text) {
-        const div = document.createElement('div');
-        div.textContent = text;
-        return div.innerHTML;
-    }
+    };
+} catch (error) {
+    console.error('Error initializing cart system:', error);
 }
-
-// Initialize shopping cart
-const cart = new ShoppingCart();
-
-// Global function to add items to cart (can be called from template cards)
-window.addToCart = function(templateData) {
-    cart.addItem(templateData);
-};
-
-// Global functions for cart buttons
-window.viewCart = function() {
-    // Close the cart dropdown first
-    cart.closeCartDropdown();
-    
-    // Navigate to cart page - we'll create this page
-    window.location.href = 'cart.php';
-};
-
-window.proceedToCheckout = function() {
-    // Check if cart has items
-    if (cart.items.length === 0) {
-        if (window.toast) {
-            window.toast.warning('Your cart is empty. Add some templates first!', {
-                duration: 3000,
-                position: 'top-right'
-            });
-        } else {
-            alert('Your cart is empty. Add some templates first!');
-        }
-        return;
-    }
-    
-    // Close the cart dropdown first
-    cart.closeCartDropdown();
-    
-    // Navigate to checkout page - we'll create this page
-    window.location.href = 'checkout.php';
-};
 <?php endif; ?>
 </script>

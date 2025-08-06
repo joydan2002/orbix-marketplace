@@ -461,5 +461,85 @@ class SellerManager {
             return false;
         }
     }
+
+    /**
+     * Update a product (template or service) if owned by seller
+     */
+    public function updateProduct($sellerId, $type, $productId, $data) {
+        try {
+            error_log("🔄 Updating product - Seller: $sellerId, Type: $type, Product ID: $productId");
+            
+            // Validate inputs
+            if (!$sellerId || !$type || !$productId || !$data) {
+                error_log("❌ Invalid parameters for update");
+                return false;
+            }
+            
+            $table = $type === 'service' ? 'services' : 'templates';
+            
+            // First check if product exists and belongs to seller
+            $checkStmt = $this->pdo->prepare("SELECT id, title FROM {$table} WHERE id = ? AND seller_id = ?");
+            $checkStmt->execute([$productId, $sellerId]);
+            $product = $checkStmt->fetch(PDO::FETCH_ASSOC);
+            
+            if (!$product) {
+                error_log("❌ Product not found or doesn't belong to seller");
+                return false;
+            }
+            
+            // Build update query dynamically
+            $fields = [];
+            $values = [];
+            
+            // Common fields that can be updated
+            $allowedFields = ['title', 'description', 'price', 'category', 'preview_image', 'demo_url'];
+            
+            // Type-specific fields
+            if ($type === 'template') {
+                $allowedFields[] = 'technology';
+            } else {
+                $allowedFields[] = 'delivery_time';
+            }
+            
+            foreach ($allowedFields as $field) {
+                if (isset($data[$field]) && $data[$field] !== '') {
+                    $fields[] = "$field = ?";
+                    $values[] = $data[$field];
+                }
+            }
+            
+            // Always update the updated_at timestamp
+            $fields[] = "updated_at = ?";
+            $values[] = date('Y-m-d H:i:s');
+            
+            if (empty($fields)) {
+                error_log("❌ No valid fields to update");
+                return false;
+            }
+            
+            // Add WHERE clause parameters
+            $values[] = $productId;
+            $values[] = $sellerId;
+            
+            $sql = "UPDATE {$table} SET " . implode(', ', $fields) . " WHERE id = ? AND seller_id = ?";
+            
+            $stmt = $this->pdo->prepare($sql);
+            $result = $stmt->execute($values);
+            
+            if ($result) {
+                $rowsAffected = $stmt->rowCount();
+                error_log("✅ Update executed - Rows affected: $rowsAffected");
+                return $rowsAffected > 0;
+            } else {
+                error_log("❌ Update execution failed");
+                $errorInfo = $stmt->errorInfo();
+                error_log("SQL Error: " . print_r($errorInfo, true));
+                return false;
+            }
+        } catch (Exception $e) {
+            error_log("❌ Update product exception: " . $e->getMessage());
+            throw $e;
+        }
+    }
 }
 ?>

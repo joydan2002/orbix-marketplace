@@ -255,93 +255,6 @@
                                 </div>
                             </div>
                         </div>
-                        
-                        <!-- Right Column -->
-                        <div class="space-y-6">
-                            <!-- Description & Details -->
-                            <div>
-                                <h4 class="font-semibold text-secondary mb-4">Description & Details</h4>
-                                
-                                <div class="mb-4">
-                                    <label class="block text-sm font-medium text-gray-700 mb-2">Description *</label>
-                                    <textarea name="description" id="edit-description" required rows="6"
-                                              class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors resize-none"
-                                              placeholder="Describe your product in detail..."></textarea>
-                                </div>
-                                
-                                <div class="mb-4">
-                                    <label class="block text-sm font-medium text-gray-700 mb-2">Tags</label>
-                                    <input type="text" name="tags" id="edit-tags"
-                                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors"
-                                           placeholder="web, design, template, responsive (comma separated)">
-                                    <p class="text-xs text-gray-500 mt-1">Add relevant tags to help customers find your product</p>
-                                </div>
-                                
-                                <!-- Features List -->
-                                <div class="mb-4">
-                                    <label class="block text-sm font-medium text-gray-700 mb-2">Key Features</label>
-                                    <div id="edit-features-list" class="space-y-2 mb-2">
-                                        <!-- Features will be loaded here -->
-                                    </div>
-                                    <button type="button" onclick="addEditFeature()" class="text-primary hover:text-primary/80 text-sm flex items-center">
-                                        <i class="ri-add-line mr-1"></i>Add Feature
-                                    </button>
-                                </div>
-                                
-                                <!-- Service Packages (Service only) -->
-                                <div class="edit-service-only hidden">
-                                    <label class="block text-sm font-medium text-gray-700 mb-2">Service Packages</label>
-                                    <div class="space-y-4" id="edit-service-packages">
-                                        <!-- Packages will be loaded here -->
-                                    </div>
-                                    <button type="button" onclick="addEditServicePackage()" class="text-primary hover:text-primary/80 text-sm flex items-center mt-2">
-                                        <i class="ri-add-line mr-1"></i>Add Package
-                                    </button>
-                                </div>
-                            </div>
-                            
-                            <!-- SEO & Marketing -->
-                            <div>
-                                <h4 class="font-semibold text-secondary mb-4">SEO & Marketing</h4>
-                                
-                                <div class="mb-4">
-                                    <label class="block text-sm font-medium text-gray-700 mb-2">SEO Title</label>
-                                    <input type="text" name="seo_title" id="edit-seo-title"
-                                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors"
-                                           placeholder="SEO optimized title">
-                                </div>
-                                
-                                <div class="mb-4">
-                                    <label class="block text-sm font-medium text-gray-700 mb-2">Meta Description</label>
-                                    <textarea name="meta_description" id="edit-meta-description" rows="3"
-                                              class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors resize-none"
-                                              placeholder="Brief description for search engines..."></textarea>
-                                </div>
-                            </div>
-                            
-                            <!-- Product Statistics -->
-                            <div>
-                                <h4 class="font-semibold text-secondary mb-4">Product Statistics</h4>
-                                <div class="grid grid-cols-2 gap-4">
-                                    <div class="bg-gray-50 p-4 rounded-lg">
-                                        <div class="text-2xl font-bold text-primary" id="edit-views">0</div>
-                                        <div class="text-sm text-gray-600">Views</div>
-                                    </div>
-                                    <div class="bg-gray-50 p-4 rounded-lg">
-                                        <div class="text-2xl font-bold text-green-600" id="edit-sales">0</div>
-                                        <div class="text-sm text-gray-600">Sales</div>
-                                    </div>
-                                    <div class="bg-gray-50 p-4 rounded-lg">
-                                        <div class="text-2xl font-bold text-yellow-600" id="edit-rating">0.0</div>
-                                        <div class="text-sm text-gray-600">Rating</div>
-                                    </div>
-                                    <div class="bg-gray-50 p-4 rounded-lg">
-                                        <div class="text-2xl font-bold text-blue-600" id="edit-revenue">$0</div>
-                                        <div class="text-sm text-gray-600">Revenue</div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
                     </div>
                     
                     <!-- Form Actions -->
@@ -372,196 +285,6 @@
                         </div>
                     </div>
                 </form>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- View Product Modal -->
-<div id="viewProductModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 hidden">
-    <div class="flex items-center justify-center min-h-screen p-4">
-        <div class="bg-white rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
-            <div class="sticky top-0 bg-white border-b border-gray-100 p-6 rounded-t-2xl">
-                <div class="flex items-center justify-between">
-                    <h2 class="text-2xl font-bold text-secondary flex items-center">
-                        <i class="ri-eye-line mr-3 text-primary"></i>
-                        Product Details
-                    </h2>
-                    <button onclick="hideModal('viewProductModal')" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-gray-100 transition-colors">
-                        <i class="ri-close-line text-xl text-gray-600"></i>
-                    </button>
-                </div>
-            </div>
-            
-            <div class="p-8">
-                <!-- Product Type Display -->
-                <div class="mb-8">
-                    <h3 class="text-lg font-semibold text-secondary mb-4">Product Type</h3>
-                    <div id="viewCurrentProductType" class="p-6 border-2 border-primary bg-primary/5 rounded-xl">
-                        <div class="flex items-center">
-                            <div id="viewTypeIcon" class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mr-4">
-                                <i class="ri-layout-grid-line text-2xl text-blue-500"></i>
-                            </div>
-                            <div>
-                                <h4 id="viewTypeName" class="font-bold text-secondary">Template</h4>
-                                <p id="viewTypeDescription" class="text-sm text-gray-600">Digital template product</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="grid md:grid-cols-2 gap-6">
-                    <!-- Left Column -->
-                    <div class="space-y-6">
-                        <!-- Basic Information -->
-                        <div>
-                            <h4 class="font-semibold text-secondary mb-4">Basic Information</h4>
-                            
-                            <div class="mb-4">
-                                <label class="block text-sm font-medium text-gray-700 mb-2">Product Title</label>
-                                <div class="w-full px-4 py-3 border border-gray-200 rounded-lg bg-gray-50" id="viewTitle">-</div>
-                            </div>
-                            
-                            <div class="mb-4">
-                                <label class="block text-sm font-medium text-gray-700 mb-2">Category</label>
-                                <div class="w-full px-4 py-3 border border-gray-200 rounded-lg bg-gray-50" id="viewCategory">-</div>
-                            </div>
-                            
-                            <div class="mb-4 view-template-only">
-                                <label class="block text-sm font-medium text-gray-700 mb-2">Technology</label>
-                                <div class="w-full px-4 py-3 border border-gray-200 rounded-lg bg-gray-50" id="viewTechnology">-</div>
-                            </div>
-                            
-                            <div class="view-service-only hidden">
-                                <label class="block text-sm font-medium text-gray-700 mb-2">Delivery Time</label>
-                                <div class="w-full px-4 py-3 border border-gray-200 rounded-lg bg-gray-50" id="viewDeliveryTime">-</div>
-                            </div>
-                            
-                            <div class="mb-4">
-                                <label class="block text-sm font-medium text-gray-700 mb-2">Price (USD)</label>
-                                <div class="w-full px-4 py-3 border border-gray-200 rounded-lg bg-gray-50 text-2xl font-bold text-primary" id="viewPrice">$0.00</div>
-                            </div>
-                            
-                            <div class="mb-4">
-                                <label class="block text-sm font-medium text-gray-700 mb-2">Status</label>
-                                <div class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium" id="viewStatusBadge">
-                                    <span id="viewStatus">Draft</span>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <!-- Preview Image -->
-                        <div>
-                            <h4 class="font-semibold text-secondary mb-4">Preview Image</h4>
-                            <div id="viewPreviewContainer" class="border border-gray-200 rounded-lg p-4">
-                                <img id="viewPreviewImg" src="" alt="Product preview" class="w-full h-48 object-cover rounded-lg">
-                            </div>
-                            <div id="viewNoPreview" class="border border-gray-200 rounded-lg p-8 text-center text-gray-500 hidden">
-                                <i class="ri-image-line text-3xl mb-2"></i>
-                                <p>No preview image available</p>
-                            </div>
-                        </div>
-                        
-                        <!-- Demo URL -->
-                        <div class="mb-4">
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Demo URL</label>
-                            <div class="w-full px-4 py-3 border border-gray-200 rounded-lg bg-gray-50" id="viewDemoUrl">-</div>
-                        </div>
-                    </div>
-                    
-                    <!-- Right Column -->
-                    <div class="space-y-6">
-                        <!-- Description & Details -->
-                        <div>
-                            <h4 class="font-semibold text-secondary mb-4">Description & Details</h4>
-                            
-                            <div class="mb-4">
-                                <label class="block text-sm font-medium text-gray-700 mb-2">Description</label>
-                                <div class="w-full px-4 py-3 border border-gray-200 rounded-lg bg-gray-50 min-h-[120px]" id="viewDescription">-</div>
-                            </div>
-                            
-                            <div class="mb-4">
-                                <label class="block text-sm font-medium text-gray-700 mb-2">Tags</label>
-                                <div class="flex flex-wrap gap-2" id="viewTagsContainer">
-                                    <!-- Tags will be displayed here -->
-                                </div>
-                            </div>
-                            
-                            <!-- Features List -->
-                            <div class="mb-4">
-                                <label class="block text-sm font-medium text-gray-700 mb-2">Key Features</label>
-                                <div id="viewFeaturesList" class="space-y-2">
-                                    <!-- Features will be displayed here -->
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <!-- Product Statistics -->
-                        <div>
-                            <h4 class="font-semibold text-secondary mb-4">Product Statistics</h4>
-                            <div class="grid grid-cols-2 gap-4">
-                                <div class="bg-gray-50 p-4 rounded-lg">
-                                    <div class="text-2xl font-bold text-primary" id="viewViews">0</div>
-                                    <div class="text-sm text-gray-600">Views</div>
-                                </div>
-                                <div class="bg-gray-50 p-4 rounded-lg">
-                                    <div class="text-2xl font-bold text-green-600" id="viewSales">0</div>
-                                    <div class="text-sm text-gray-600">Sales</div>
-                                </div>
-                                <div class="bg-gray-50 p-4 rounded-lg">
-                                    <div class="text-2xl font-bold text-yellow-600" id="viewRating">0.0</div>
-                                    <div class="text-sm text-gray-600">Rating</div>
-                                </div>
-                                <div class="bg-gray-50 p-4 rounded-lg">
-                                    <div class="text-2xl font-bold text-blue-600" id="viewRevenue">$0</div>
-                                    <div class="text-sm text-gray-600">Revenue</div>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <!-- Creation Info -->
-                        <div>
-                            <h4 class="font-semibold text-secondary mb-4">Creation Info</h4>
-                            <div class="space-y-3">
-                                <div class="flex justify-between">
-                                    <span class="text-sm text-gray-600">Created:</span>
-                                    <span class="text-sm font-medium" id="viewCreatedAt">-</span>
-                                </div>
-                                <div class="flex justify-between">
-                                    <span class="text-sm text-gray-600">Last Updated:</span>
-                                    <span class="text-sm font-medium" id="viewUpdatedAt">-</span>
-                                </div>
-                                <div class="flex justify-between">
-                                    <span class="text-sm text-gray-600">Product ID:</span>
-                                    <span class="text-sm font-medium font-mono" id="viewProductId">-</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Modal Actions -->
-                <div class="flex items-center justify-between mt-8 pt-8 border-t border-gray-200">
-                    <div class="flex items-center space-x-4">
-                        <button type="button" onclick="editProductFromView()" 
-                                class="bg-primary text-white px-6 py-3 rounded-lg font-semibold hover:bg-primary/90 transition-colors flex items-center">
-                            <i class="ri-edit-line mr-2"></i>
-                            Edit Product
-                        </button>
-                        <button type="button" onclick="duplicateProductFromView()" 
-                                class="bg-gray-500 text-white px-6 py-3 rounded-lg font-semibold hover:bg-gray-600 transition-colors flex items-center">
-                            <i class="ri-file-copy-line mr-2"></i>
-                            Duplicate
-                        </button>
-                    </div>
-                    
-                    <div class="flex items-center space-x-4">
-                        <button type="button" onclick="hideModal('viewProductModal')" 
-                                class="px-6 py-3 text-gray-600 hover:text-gray-800 font-medium">
-                            Close
-                        </button>
-                    </div>
-                </div>
             </div>
         </div>
     </div>
@@ -683,9 +406,39 @@ function editProduct(id, type = 'template') {
                 
                 // Update preview image
                 if (product.preview_image) {
-                    document.getElementById('current-preview-img').src = '/' + product.preview_image;
-                    document.getElementById('current-preview-container').style.display = 'block';
+                    console.log('🖼️ Loading preview image:', product.preview_image);
+                    
+                    // Check if it's already a full URL (Cloudinary)
+                    if (product.preview_image.startsWith('http')) {
+                        document.getElementById('current-preview-img').src = product.preview_image;
+                        document.getElementById('current-preview-container').style.display = 'block';
+                    } else {
+                        // Use AJAX to get the proper Cloudinary URL
+                        fetch(`seller-api.php?action=get_image_url&image=${encodeURIComponent(product.preview_image)}&size=medium`)
+                            .then(response => response.json())
+                            .then(urlData => {
+                                console.log('🔗 Image URL response:', urlData);
+                                if (urlData.success && urlData.url) {
+                                    document.getElementById('current-preview-img').src = urlData.url;
+                                    document.getElementById('current-preview-container').style.display = 'block';
+                                } else {
+                                    console.warn('⚠️ Failed to get image URL, using fallback');
+                                    // Try direct Cloudinary URL construction as fallback
+                                    const cloudinaryUrl = `https://res.cloudinary.com/dxvpvmr6g/image/upload/c_fill,h_800,w_1200/${product.preview_image}`;
+                                    document.getElementById('current-preview-img').src = cloudinaryUrl;
+                                    document.getElementById('current-preview-container').style.display = 'block';
+                                }
+                            })
+                            .catch(error => {
+                                console.error('❌ Error loading image URL:', error);
+                                // Try direct Cloudinary URL construction as fallback
+                                const cloudinaryUrl = `https://res.cloudinary.com/dxvpvmr6g/image/upload/c_fill,h_800,w_1200/${product.preview_image}`;
+                                document.getElementById('current-preview-img').src = cloudinaryUrl;
+                                document.getElementById('current-preview-container').style.display = 'block';
+                            });
+                    }
                 } else {
+                    console.log('📭 No preview image found');
                     document.getElementById('current-preview-container').style.display = 'none';
                 }
                 
@@ -1063,253 +816,4 @@ document.getElementById('edit-preview-upload').addEventListener('change', functi
         reader.readAsDataURL(file);
     }
 });
-
-let currentViewingProductId = null;
-let currentViewingProductType = null;
-
-// Enhanced viewProduct function
-function viewProduct(id, type = 'template') {
-    currentViewingProductId = id;
-    currentViewingProductType = type;
-    
-    console.log('👁️ viewProduct called with:', { id, type });
-    
-    // Fetch product data first
-    fetch(`seller-api.php?action=get_product&id=${id}&type=${type}`)
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                const product = data.product;
-                console.log('✅ Product data loaded:', product);
-                
-                // Update product type display
-                updateViewProductTypeDisplay(type);
-                
-                // Fill basic information
-                document.getElementById('viewTitle').textContent = product.title || '-';
-                document.getElementById('viewCategory').textContent = getCategoryName(product.category_id) || '-';
-                document.getElementById('viewPrice').textContent = `$${parseFloat(product.price || 0).toFixed(2)}`;
-                document.getElementById('viewDescription').textContent = product.description || '-';
-                document.getElementById('viewDemoUrl').textContent = product.demo_url || 'No demo URL';
-                document.getElementById('viewProductId').textContent = product.id;
-                
-                // Handle creation dates
-                document.getElementById('viewCreatedAt').textContent = formatDate(product.created_at);
-                document.getElementById('viewUpdatedAt').textContent = formatDate(product.updated_at || product.created_at);
-                
-                // Update status badge
-                updateViewStatusBadge(product.status);
-                
-                // Type-specific fields
-                if (type === 'template') {
-                    document.querySelectorAll('.view-template-only').forEach(el => el.classList.remove('hidden'));
-                    document.querySelectorAll('.view-service-only').forEach(el => el.classList.add('hidden'));
-                    
-                    document.getElementById('viewTechnology').textContent = product.technology || '-';
-                } else {
-                    document.querySelectorAll('.view-template-only').forEach(el => el.classList.add('hidden'));
-                    document.querySelectorAll('.view-service-only').forEach(el => el.classList.remove('hidden'));
-                    
-                    const deliveryTime = product.delivery_time ? `${product.delivery_time} days` : '-';
-                    document.getElementById('viewDeliveryTime').textContent = deliveryTime;
-                }
-                
-                // Update preview image
-                if (product.preview_image) {
-                    document.getElementById('viewPreviewImg').src = '/' + product.preview_image;
-                    document.getElementById('viewPreviewContainer').style.display = 'block';
-                    document.getElementById('viewNoPreview').style.display = 'none';
-                } else {
-                    document.getElementById('viewPreviewContainer').style.display = 'none';
-                    document.getElementById('viewNoPreview').style.display = 'block';
-                }
-                
-                // Display tags
-                displayViewTags(product.tags);
-                
-                // Display features
-                displayViewFeatures(product.features);
-                
-                // Update statistics
-                document.getElementById('viewViews').textContent = product.views || 0;
-                document.getElementById('viewSales').textContent = product.sales || 0;
-                document.getElementById('viewRating').textContent = (product.rating || 0).toFixed(1);
-                document.getElementById('viewRevenue').textContent = `$${((product.price || 0) * (product.sales || 0)).toFixed(2)}`;
-                
-                // Show modal
-                showModal('viewProductModal');
-            } else {
-                console.error('❌ Failed to load product:', data.error);
-                showErrorToast(data.error || 'Failed to load product data');
-            }
-        })
-        .catch(error => {
-            console.error('💥 Error loading product:', error);
-            showErrorToast('Error loading product data');
-        });
-}
-
-function updateViewProductTypeDisplay(type) {
-    const typeIcon = document.getElementById('viewTypeIcon');
-    const typeName = document.getElementById('viewTypeName');
-    const typeDescription = document.getElementById('viewTypeDescription');
-    
-    if (type === 'service') {
-        typeIcon.innerHTML = '<i class="ri-tools-line text-2xl text-green-500"></i>';
-        typeIcon.className = 'w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mr-4';
-        typeName.textContent = 'Service';
-        typeDescription.textContent = 'Custom service offering';
-    } else {
-        typeIcon.innerHTML = '<i class="ri-layout-grid-line text-2xl text-blue-500"></i>';
-        typeIcon.className = 'w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mr-4';
-        typeName.textContent = 'Template';
-        typeDescription.textContent = 'Digital template product';
-    }
-}
-
-function updateViewStatusBadge(status) {
-    const statusBadge = document.getElementById('viewStatusBadge');
-    const statusText = document.getElementById('viewStatus');
-    
-    statusText.textContent = status ? status.charAt(0).toUpperCase() + status.slice(1) : 'Unknown';
-    
-    // Remove existing classes
-    statusBadge.className = 'inline-flex items-center px-3 py-1 rounded-full text-sm font-medium';
-    
-    // Add status-specific classes
-    switch(status) {
-        case 'approved':
-        case 'active':
-            statusBadge.className += ' bg-green-100 text-green-800';
-            break;
-        case 'pending':
-            statusBadge.className += ' bg-yellow-100 text-yellow-800';
-            break;
-        case 'draft':
-            statusBadge.className += ' bg-gray-100 text-gray-800';
-            break;
-        default:
-            statusBadge.className += ' bg-red-100 text-red-800';
-    }
-}
-
-function displayViewTags(tags) {
-    const tagsContainer = document.getElementById('viewTagsContainer');
-    tagsContainer.innerHTML = '';
-    
-    if (tags) {
-        try {
-            let tagsArray = [];
-            if (typeof tags === 'string') {
-                // Try to parse as JSON first
-                try {
-                    tagsArray = JSON.parse(tags);
-                } catch (e) {
-                    // If not JSON, split by comma
-                    tagsArray = tags.split(',').map(tag => tag.trim()).filter(tag => tag);
-                }
-            } else if (Array.isArray(tags)) {
-                tagsArray = tags;
-            }
-            
-            if (tagsArray.length > 0) {
-                tagsArray.forEach(tag => {
-                    const tagElement = document.createElement('span');
-                    tagElement.className = 'inline-block bg-primary/10 text-primary px-3 py-1 rounded-full text-sm';
-                    tagElement.textContent = tag;
-                    tagsContainer.appendChild(tagElement);
-                });
-            } else {
-                tagsContainer.innerHTML = '<span class="text-gray-500 text-sm">No tags</span>';
-            }
-        } catch (e) {
-            tagsContainer.innerHTML = '<span class="text-gray-500 text-sm">No tags</span>';
-        }
-    } else {
-        tagsContainer.innerHTML = '<span class="text-gray-500 text-sm">No tags</span>';
-    }
-}
-
-function displayViewFeatures(features) {
-    const featuresList = document.getElementById('viewFeaturesList');
-    featuresList.innerHTML = '';
-    
-    if (features) {
-        const featuresArray = features.split(',').map(f => f.trim()).filter(f => f);
-        if (featuresArray.length > 0) {
-            featuresArray.forEach(feature => {
-                const featureElement = document.createElement('div');
-                featureElement.className = 'flex items-center text-sm';
-                featureElement.innerHTML = `
-                    <i class="ri-check-line text-green-500 mr-2"></i>
-                    <span>${feature}</span>
-                `;
-                featuresList.appendChild(featureElement);
-            });
-        } else {
-            featuresList.innerHTML = '<span class="text-gray-500 text-sm">No features listed</span>';
-        }
-    } else {
-        featuresList.innerHTML = '<span class="text-gray-500 text-sm">No features listed</span>';
-    }
-}
-
-function getCategoryName(categoryId) {
-    const categoryMap = {
-        1: 'Business',
-        2: 'Mobile App',
-        3: 'UI/UX Design',
-        4: 'Graphics',
-        5: 'Development',
-        9: 'Marketing',
-        12: 'Web Design',
-        13: 'Other'
-    };
-    return categoryMap[categoryId] || 'Unknown Category';
-}
-
-function formatDate(dateString) {
-    if (!dateString) return '-';
-    
-    try {
-        const date = new Date(dateString);
-        return date.toLocaleDateString('en-US', {
-            year: 'numeric',
-            month: 'short',
-            day: 'numeric',
-            hour: '2-digit',
-            minute: '2-digit'
-        });
-    } catch (e) {
-        return dateString;
-    }
-}
-
-// Actions from view modal
-function editProductFromView() {
-    hideModal('viewProductModal');
-    setTimeout(() => {
-        if (typeof window.editProduct === 'function') {
-            window.editProduct(currentViewingProductId, currentViewingProductType);
-        } else if (typeof window.editProductFromList === 'function') {
-            window.editProductFromList(currentViewingProductId);
-        } else {
-            showErrorToast('Edit function not available');
-        }
-    }, 100);
-}
-
-function duplicateProductFromView() {
-    if (confirm('Are you sure you want to duplicate this product?')) {
-        if (typeof window.duplicateProduct === 'function') {
-            window.duplicateProduct(currentViewingProductType, currentViewingProductId);
-            hideModal('viewProductModal');
-        } else {
-            showErrorToast('Duplicate function not available');
-        }
-    }
-}
-
-// Make viewProduct globally available
-window.viewProduct = viewProduct;
 </script>

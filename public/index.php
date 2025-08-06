@@ -7,19 +7,24 @@
 
 // Include configuration and database connection
 require_once '../config/database.php';
+require_once '../config/cloudinary-config.php'; // Add Cloudinary support
 
 // Get database connection for server-side rendering
 try {
     $pdo = DatabaseConfig::getConnection();
     
     // Get initial data for page load
-    $stmt = $pdo->query("SELECT COUNT(*) as count FROM templates WHERE status = 'approved'");
+    $stmt = $pdo->query("SELECT COUNT(*) as count FROM templates t 
+                         LEFT JOIN users u ON t.seller_id = u.id 
+                         WHERE t.status = 'approved' AND u.user_type = 'seller'");
     $templateCount = $stmt->fetch(PDO::FETCH_ASSOC)['count'];
     
     $stmt = $pdo->query("SELECT COUNT(*) as count FROM users WHERE user_type = 'seller' AND is_verified = 1");
     $sellerCount = $stmt->fetch(PDO::FETCH_ASSOC)['count'];
     
-    $stmt = $pdo->query("SELECT SUM(downloads_count) as total FROM templates WHERE status = 'approved'");
+    $stmt = $pdo->query("SELECT SUM(t.downloads_count) as total FROM templates t 
+                         LEFT JOIN users u ON t.seller_id = u.id 
+                         WHERE t.status = 'approved' AND u.user_type = 'seller'");
     $totalDownloads = $stmt->fetch(PDO::FETCH_ASSOC)['total'] ?? 0;
     
     // Get categories for filters
@@ -319,7 +324,7 @@ function renderHeroTemplates(templates) {
         <div class="space-y-4">
             ${leftColumn.map(template => `
                 <div class="bg-white/90 backdrop-blur-sm rounded-xl p-4 shadow-lg hover:shadow-xl transition-all hover:scale-105">
-                    <img src="${template.preview_image}" alt="${template.title}" class="w-full h-24 object-cover rounded-lg">
+                    <img src="${getOptimizedImageUrlJS(template.preview_image, 'thumb')}" alt="${template.title}" class="w-full h-24 object-cover rounded-lg" onerror="this.src='../assets/images/default-template.jpg'">
                     <div class="mt-2">
                         <h4 class="font-semibold text-sm text-secondary">${template.title}</h4>
                         <p class="text-xs text-primary font-medium">$${template.price}</p>
@@ -330,7 +335,7 @@ function renderHeroTemplates(templates) {
         <div class="space-y-4 mt-8">
             ${rightColumn.map(template => `
                 <div class="bg-white/90 backdrop-blur-sm rounded-xl p-4 shadow-lg hover:shadow-xl transition-all hover:scale-105">
-                    <img src="${template.preview_image}" alt="${template.title}" class="w-full h-24 object-cover rounded-lg">
+                    <img src="${getOptimizedImageUrlJS(template.preview_image, 'thumb')}" alt="${template.title}" class="w-full h-24 object-cover rounded-lg" onerror="this.src='../assets/images/default-template.jpg'">
                     <div class="mt-2">
                         <h4 class="font-semibold text-sm text-secondary">${template.title}</h4>
                         <p class="text-xs text-primary font-medium">$${template.price}</p>
@@ -370,7 +375,7 @@ function createMainTemplateCard(template) {
     return `
         <div class="bg-white rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-all hover:-translate-y-2">
             <div class="relative">
-                <img src="${template.preview_image}" alt="${template.title}" class="w-full h-64 object-cover">
+                <img src="${getOptimizedImageUrlJS(template.preview_image, 'card')}" alt="${template.title}" class="w-full h-64 object-cover" onerror="this.src='../assets/images/default-template.jpg'">
                 ${badges}
             </div>
             <div class="p-6">
@@ -395,7 +400,7 @@ function createMainTemplateCard(template) {
                         <button onclick="addToFavorites(${template.id}, 'template')" class="w-10 h-10 flex items-center justify-center bg-gray-100 rounded-full hover:bg-gray-200 transition-colors">
                             <i class="ri-heart-line text-gray-600"></i>
                         </button>
-                        <button onclick="addToCart(${template.id}, '${escapeHtml(template.title)}', ${template.price}, '${escapeHtml(template.preview_image)}', '${escapeHtml(template.seller_name || 'Unknown')}', 'template')" class="w-10 h-10 flex items-center justify-center bg-primary rounded-full hover:bg-primary/90 transition-colors">
+                        <button onclick="addToCart(${template.id}, '${escapeHtml(template.title)}', ${template.price}, '${escapeHtml(getOptimizedImageUrlJS(template.preview_image, 'thumb'))}', '${escapeHtml(template.seller_name || 'Unknown')}', 'template')" class="w-10 h-10 flex items-center justify-center bg-primary rounded-full hover:bg-primary/90 transition-colors">
                             <i class="ri-shopping-cart-line text-white"></i>
                         </button>
                     </div>
@@ -445,7 +450,7 @@ function createFeaturedTemplateCard(template) {
     return `
         <div class="flex-1 bg-white rounded-lg overflow-hidden shadow-xl hover:shadow-2xl transition-all hover:-translate-y-1">
             <div class="relative">
-                <img src="${template.preview_image}" alt="${template.title}" class="w-full h-64 object-cover">
+                <img src="${getOptimizedImageUrlJS(template.preview_image, 'card')}" alt="${template.title}" class="w-full h-64 object-cover" onerror="this.src='../assets/images/default-template.jpg'">
                 <div class="absolute inset-0 bg-black bg-opacity-20 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity">
                     <button onclick="viewTemplateDetails(${template.id})" class="bg-white text-gray-800 px-6 py-2 rounded-button font-medium hover:bg-gray-100 transition-colors">
                         View Details
@@ -462,7 +467,7 @@ function createFeaturedTemplateCard(template) {
                         <span class="text-gray-400 line-through text-sm">$${originalPrice}</span>
                         <span class="text-primary font-bold text-xl ml-2">$${template.price}</span>
                     </div>
-                    <button onclick="addToCart(${template.id}, '${escapeHtml(template.title)}', ${template.price}, '${escapeHtml(template.preview_image)}', '${escapeHtml(template.seller_name || 'Unknown')}', 'template')" class="bg-gradient-to-r from-primary to-primary/80 text-white px-4 py-2 rounded-button font-medium hover:shadow-lg transition-all">
+                    <button onclick="addToCart(${template.id}, '${escapeHtml(template.title)}', ${template.price}, '${escapeHtml(getOptimizedImageUrlJS(template.preview_image, 'thumb'))}', '${escapeHtml(template.seller_name || 'Unknown')}', 'template')" class="bg-gradient-to-r from-primary to-primary/80 text-white px-4 py-2 rounded-button font-medium hover:shadow-lg transition-all">
                         <i class="ri-shopping-cart-line mr-1"></i> Buy Now
                     </button>
                 </div>
@@ -606,6 +611,32 @@ function escapeHtml(text) {
         .replace(/>/g, '&gt;')
         .replace(/"/g, '&quot;')
         .replace(/'/g, '&#039;');
+}
+
+// Add Cloudinary optimization function for JavaScript
+function getOptimizedImageUrlJS(imageUrl, transformType = 'thumb') {
+    if (!imageUrl) return '../assets/images/default-template.jpg';
+    
+    // If already a Cloudinary URL, return as is
+    if (imageUrl.includes('cloudinary.com')) {
+        return imageUrl;
+    }
+    
+    // If it's a relative or full path, check if it exists in Cloudinary
+    const filename = imageUrl.split('/').pop();
+    if (!filename) return '../assets/images/default-template.jpg';
+    
+    // Define transformations based on type
+    const transformations = {
+        'thumb': 'w_300,h_200,c_fill,f_auto,q_auto',
+        'card': 'w_400,h_300,c_fill,f_auto,q_auto',
+        'hero': 'w_200,h_150,c_fill,f_auto,q_auto'
+    };
+    
+    const transformation = transformations[transformType] || transformations['thumb'];
+    
+    // Return Cloudinary URL
+    return `https://res.cloudinary.com/<?= CLOUDINARY_CLOUD_NAME ?>/image/upload/${transformation}/templates/${filename}`;
 }
 </script>
 

@@ -6,6 +6,7 @@
  */
 
 require_once '../config/database.php';
+require_once '../config/cloudinary-config.php'; // Add Cloudinary support
 
 // Cache configuration
 $cache_file = '../cache/template-cards.json';
@@ -64,7 +65,7 @@ if ($templates):
             <!-- Template Image -->
             <div class="relative overflow-hidden h-48 bg-gradient-to-br from-gray-100 to-gray-200">
                 <?php if ($template['preview_image']): ?>
-                    <img src="../assets/images/templates/<?php echo htmlspecialchars($template['preview_image']); ?>" 
+                    <img src="<?= getOptimizedImageUrl($template['preview_image'], 'thumb') ?>" 
                          alt="<?php echo htmlspecialchars($template['title']); ?>" 
                          class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                          loading="lazy"

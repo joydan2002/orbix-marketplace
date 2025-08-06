@@ -5,6 +5,7 @@
  */
 
 require_once '../../config/database.php';
+require_once '../../config/cloudinary-config.php'; // Add Cloudinary support
 
 // Check if user is logged in as seller
 session_start();

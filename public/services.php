@@ -11,6 +11,7 @@ if (session_status() === PHP_SESSION_NONE) {
 
 require_once __DIR__ . '/../config/database.php';
 require_once __DIR__ . '/../config/service-manager.php';
+require_once __DIR__ . '/../config/cloudinary-config.php'; // Add Cloudinary support
 
 // Get database connection
 try {
@@ -563,7 +564,11 @@ $deliveryTimes = $serviceManager->getDeliveryTimeFilters();
                         <?php foreach ($services as $service): ?>
                         <div class="service-card rounded-2xl overflow-hidden">
                             <div class="relative">
-                                <img src="<?= htmlspecialchars($service['preview_image']) ?>" alt="<?= htmlspecialchars($service['title']) ?>" class="service-image">
+                                <img src="<?= getOptimizedImageUrl($service['preview_image'], 'thumb') ?>" 
+                                     alt="<?= htmlspecialchars($service['title']) ?>" 
+                                     class="service-image"
+                                     loading="lazy"
+                                     onerror="this.src='../assets/images/default-service.jpg'">
                                 <div class="absolute top-3 right-3">
                                     <button class="w-8 h-8 bg-white/80 rounded-full flex items-center justify-center hover:bg-white transition-colors">
                                         <i class="ri-heart-line text-gray-600"></i>
@@ -582,7 +587,10 @@ $deliveryTimes = $serviceManager->getDeliveryTimeFilters();
                                 <div class="service-header">
                                     <div class="flex-1">
                                         <div class="flex items-center space-x-2 mb-2">
-                                            <img src="<?= htmlspecialchars($service['profile_image']) ?>" alt="<?= htmlspecialchars($service['seller_name']) ?>" class="w-6 h-6 rounded-full object-cover">
+                                            <img src="<?= getOptimizedImageUrl($service['profile_image'], 'avatar_small') ?>" 
+                                                 alt="<?= htmlspecialchars($service['seller_name']) ?>" 
+                                                 class="w-6 h-6 rounded-full object-cover"
+                                                 onerror="this.src='../assets/images/default-avatar.png'">
                                             <span class="text-sm text-gray-600"><?= htmlspecialchars($service['seller_name']) ?></span>
                                         </div>
                                     </div>
@@ -605,7 +613,7 @@ $deliveryTimes = $serviceManager->getDeliveryTimeFilters();
                                     </div>
                                 </div>
                                 <div class="service-actions">
-                                    <button onclick="handleOrderService(<?= $service['id'] ?>, '<?= addslashes($service['title']) ?>', <?= $service['price'] ?>, '<?= addslashes($service['preview_image']) ?>', '<?= addslashes($service['seller_name']) ?>')" 
+                                    <button onclick="handleOrderService(<?= $service['id'] ?>, '<?= addslashes($service['title']) ?>', <?= $service['price'] ?>, '<?= addslashes(getOptimizedImageUrl($service['preview_image'], 'thumb')) ?>', '<?= addslashes($service['seller_name']) ?>')" 
                                             class="flex-1 bg-primary text-white py-2 px-4 rounded-button text-sm font-medium hover:bg-primary/90 transition-colors whitespace-nowrap">
                                         <i class="ri-shopping-cart-line mr-1"></i>Order Now
                                     </button>
@@ -754,7 +762,11 @@ $deliveryTimes = $serviceManager->getDeliveryTimeFilters();
             grid.innerHTML = services.map(service => `
                 <div class="service-card rounded-2xl overflow-hidden">
                     <div class="relative">
-                        <img src="${escapeHtml(service.preview_image)}" alt="${escapeHtml(service.title)}" class="service-image">
+                        <img src="${getOptimizedImageUrlJS(service.preview_image, 'thumb')}" 
+                             alt="${escapeHtml(service.title)}" 
+                             class="service-image"
+                             loading="lazy"
+                             onerror="this.src='../assets/images/default-service.jpg'">
                         <div class="absolute top-3 right-3">
                             <button class="w-8 h-8 bg-white/80 rounded-full flex items-center justify-center hover:bg-white transition-colors">
                                 <i class="ri-heart-line text-gray-600"></i>
@@ -769,7 +781,10 @@ $deliveryTimes = $serviceManager->getDeliveryTimeFilters();
                         <div class="service-header">
                             <div class="flex-1">
                                 <div class="flex items-center space-x-2 mb-2">
-                                    <img src="${escapeHtml(service.profile_image)}" alt="${escapeHtml(service.seller_name)}" class="w-6 h-6 rounded-full object-cover">
+                                    <img src="${getOptimizedImageUrlJS(service.profile_image, 'avatar_small')}" 
+                                         alt="${escapeHtml(service.seller_name)}" 
+                                         class="w-6 h-6 rounded-full object-cover"
+                                         onerror="this.src='../assets/images/default-avatar.png'">
                                     <span class="text-sm text-gray-600">${escapeHtml(service.seller_name)}</span>
                                 </div>
                             </div>
@@ -792,7 +807,7 @@ $deliveryTimes = $serviceManager->getDeliveryTimeFilters();
                             </div>
                         </div>
                         <div class="service-actions">
-                            <button onclick="handleOrderService(${service.id}, '${addslashes(service.title)}', ${service.price}, '${addslashes(service.preview_image)}', '${addslashes(service.seller_name)}')" 
+                            <button onclick="handleOrderService(${service.id}, '${addslashes(service.title)}', ${service.price}, '${addslashes(getOptimizedImageUrlJS(service.preview_image, 'thumb'))}', '${addslashes(service.seller_name)}')" 
                                     class="flex-1 bg-primary text-white py-2 px-4 rounded-button text-sm font-medium hover:bg-primary/90 transition-colors whitespace-nowrap">
                                 <i class="ri-shopping-cart-line mr-1"></i>Order Now
                             </button>
@@ -818,7 +833,11 @@ $deliveryTimes = $serviceManager->getDeliveryTimeFilters();
             grid.innerHTML = services.map(service => `
                 <div class="service-card-list">
                     <div class="relative">
-                        <img src="${escapeHtml(service.preview_image)}" alt="${escapeHtml(service.title)}" class="service-image">
+                        <img src="${getOptimizedImageUrlJS(service.preview_image, 'thumb')}" 
+                             alt="${escapeHtml(service.title)}" 
+                             class="service-image"
+                             loading="lazy"
+                             onerror="this.src='../assets/images/default-service.jpg'">
                         <div class="absolute top-3 right-3">
                             <button class="w-8 h-8 bg-white/80 rounded-full flex items-center justify-center hover:bg-white transition-colors">
                                 <i class="ri-heart-line text-gray-600"></i>
@@ -834,7 +853,10 @@ $deliveryTimes = $serviceManager->getDeliveryTimeFilters();
                             <div class="flex-1">
                                 <h3 class="service-title">${escapeHtml(service.title)}</h3>
                                 <div class="flex items-center space-x-2 mb-3">
-                                    <img src="${escapeHtml(service.profile_image)}" alt="${escapeHtml(service.seller_name)}" class="w-6 h-6 rounded-full object-cover">
+                                    <img src="${getOptimizedImageUrlJS(service.profile_image, 'avatar_small')}" 
+                                         alt="${escapeHtml(service.seller_name)}" 
+                                         class="w-6 h-6 rounded-full object-cover"
+                                         onerror="this.src='../assets/images/default-avatar.png'">
                                     <span class="text-sm text-gray-600">${escapeHtml(service.seller_name)}</span>
                                 </div>
                             </div>
@@ -854,7 +876,7 @@ $deliveryTimes = $serviceManager->getDeliveryTimeFilters();
                             <p class="service-description">${escapeHtml(service.description)}</p>
                         </div>
                         <div class="service-actions">
-                            <button onclick="handleOrderService(${service.id}, '${addslashes(service.title)}', ${service.price}, '${addslashes(service.preview_image)}', '${addslashes(service.seller_name)}')" 
+                            <button onclick="handleOrderService(${service.id}, '${addslashes(service.title)}', ${service.price}, '${addslashes(getOptimizedImageUrlJS(service.preview_image, 'thumb'))}', '${addslashes(service.seller_name)}')" 
                                     class="bg-primary text-white py-2 px-6 rounded-button text-sm font-medium hover:bg-primary/90 transition-colors whitespace-nowrap">
                                 <i class="ri-shopping-cart-line mr-2"></i>Order Now
                             </button>
@@ -1306,6 +1328,45 @@ $deliveryTimes = $serviceManager->getDeliveryTimeFilters();
             // Reset to page 1 and apply filters
             currentPage = 1;
             applyFilters();
+        }
+
+        // JavaScript function to generate optimized image URLs (equivalent to PHP function)
+        function getOptimizedImageUrlJS(publicId, size = 'thumb') {
+            if (!publicId) {
+                // Return default image based on size
+                const defaults = {
+                    'thumb': '../assets/images/default-service.jpg',
+                    'medium': '../assets/images/default-service.jpg', 
+                    'avatar_small': '../assets/images/default-avatar.png',
+                    'avatar_medium': '../assets/images/default-avatar.png',
+                    'avatar_large': '../assets/images/default-avatar.png'
+                };
+                return defaults[size] || '../assets/images/default-service.jpg';
+            }
+            
+            // If it's already a full URL, return as is
+            if (publicId.startsWith('http')) {
+                return publicId;
+            }
+            
+            const cloudName = 'dpmwj7f9j';
+            
+            // Handle Cloudinary public IDs - add orbix/products/ prefix if needed
+            let processedPublicId = publicId;
+            if (!processedPublicId.includes('orbix/') && processedPublicId.startsWith('orbix_')) {
+                processedPublicId = 'orbix/products/' + processedPublicId;
+            }
+            
+            const transformations = {
+                'thumb': 'w_300,h_200,c_fill,f_auto,q_auto',
+                'medium': 'w_800,h_600,c_fill,f_auto,q_auto',
+                'avatar_small': 'w_50,h_50,c_fill,f_auto,q_auto,r_max',
+                'avatar_medium': 'w_100,h_100,c_fill,f_auto,q_auto,r_max',
+                'avatar_large': 'w_200,h_200,c_fill,f_auto,q_auto,r_max'
+            };
+            
+            const transformation = transformations[size] || transformations['thumb'];
+            return `https://res.cloudinary.com/${cloudName}/image/upload/${transformation}/${processedPublicId}`;
         }
     </script>
 </body>

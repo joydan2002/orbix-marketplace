@@ -6,6 +6,7 @@
 
 require_once '../config/database.php';
 require_once '../config/seller-manager.php';
+require_once '../config/cloudinary-service.php'; // Add Cloudinary support
 
 // Start session if not already started
 if (session_status() === PHP_SESSION_NONE) {
@@ -21,6 +22,9 @@ $action = $input['action'] ?? $_POST['action'] ?? $_GET['action'] ?? '';
 try {
     $pdo = DatabaseConfig::getConnection();
     $sellerManager = new SellerManager($pdo);
+    
+    // Initialize Cloudinary service
+    $cloudinary = new CloudinaryService();
     
     switch ($action) {
         case 'upgrade_to_seller':
@@ -164,7 +168,7 @@ try {
                 throw new Exception('Not authenticated');
             }
             
-            $productType = $_POST['product_type'] ?? 'template';
+            $productType = $_POST['type'] ?? 'template'; // Fix: get type from form
             
             // Validate required fields
             $requiredFields = ['title', 'description', 'price', 'category'];
@@ -189,44 +193,45 @@ try {
             $categorySlug = $_POST['category'];
             $categoryId = $categoryMap[$categorySlug] ?? 1; // Default to Business
             
-            // Handle file uploads
-            $previewImagePath = null;
-            $productFilePath = null;
+            // Handle file uploads with Cloudinary
+            $previewImageUrl = null;
+            $productFileUrl = null;
             
-            // Upload preview image
-            if (isset($_FILES['preview_image']) && $_FILES['preview_image']['error'] === 0) {
-                $uploadDir = '../uploads/products/';
-                if (!is_dir($uploadDir)) {
-                    mkdir($uploadDir, 0755, true);
-                }
-                
-                $file = $_FILES['preview_image'];
-                $allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
-                
-                if (in_array($file['type'], $allowedTypes) && $file['size'] <= 5 * 1024 * 1024) {
-                    $extension = pathinfo($file['name'], PATHINFO_EXTENSION);
-                    $filename = 'preview_' . $_SESSION['user_id'] . '_' . time() . '.' . $extension;
-                    $filepath = $uploadDir . $filename;
+            // Upload preview image to Cloudinary
+            if (isset($_FILES['preview_image']) && $_FILES['preview_image']['error'] === UPLOAD_ERR_OK) {
+                try {
+                    $folder = $productType === 'template' ? 'templates' : 'services';
+                    $uploadResult = $cloudinary->uploadImage($_FILES['preview_image'], $folder);
                     
-                    if (move_uploaded_file($file['tmp_name'], $filepath)) {
-                        $previewImagePath = 'uploads/products/' . $filename;
+                    if ($uploadResult['success']) {
+                        $previewImageUrl = $uploadResult['public_id'];
+                        error_log("✅ Preview image uploaded to Cloudinary: " . $previewImageUrl);
+                    } else {
+                        error_log("❌ Preview image upload failed: " . $uploadResult['error']);
+                        throw new Exception('Failed to upload preview image: ' . $uploadResult['error']);
                     }
+                } catch (Exception $e) {
+                    error_log("❌ Cloudinary upload exception: " . $e->getMessage());
+                    throw new Exception('Failed to upload preview image: ' . $e->getMessage());
                 }
             }
             
-            // Upload product files (for templates)
-            if ($productType === 'template' && isset($_FILES['product_files']) && $_FILES['product_files']['error'] === 0) {
-                $file = $_FILES['product_files'];
-                $allowedTypes = ['application/zip', 'application/x-zip-compressed', 'application/x-rar-compressed'];
-                
-                if (in_array($file['type'], $allowedTypes) && $file['size'] <= 100 * 1024 * 1024) {
-                    $extension = pathinfo($file['name'], PATHINFO_EXTENSION);
-                    $filename = 'product_' . $_SESSION['user_id'] . '_' . time() . '.' . $extension;
-                    $filepath = $uploadDir . $filename;
+            // Upload product files to Cloudinary (for templates)
+            if ($productType === 'template' && isset($_FILES['product_files']) && $_FILES['product_files']['error'] === UPLOAD_ERR_OK) {
+                try {
+                    // For ZIP files, we'll upload as raw files using uploadImage method
+                    $uploadResult = $cloudinary->uploadImage($_FILES['product_files'], null, 'templates/files');
                     
-                    if (move_uploaded_file($file['tmp_name'], $filepath)) {
-                        $productFilePath = 'uploads/products/' . $filename;
+                    if ($uploadResult['success']) {
+                        $productFileUrl = $uploadResult['public_id'];
+                        error_log("✅ Product file uploaded to Cloudinary: " . $productFileUrl);
+                    } else {
+                        error_log("❌ Product file upload failed: " . $uploadResult['error']);
+                        throw new Exception('Failed to upload product files: ' . $uploadResult['error']);
                     }
+                } catch (Exception $e) {
+                    error_log("❌ Cloudinary file upload exception: " . $e->getMessage());
+                    throw new Exception('Failed to upload product files: ' . $e->getMessage());
                 }
             }
             
@@ -252,7 +257,7 @@ try {
                 // Create slug from title
                 $slug = strtolower(trim(preg_replace('/[^A-Za-z0-9-]+/', '-', $_POST['title'])));
                 
-                // Insert into templates table
+                // Insert into templates table with Cloudinary URLs
                 $stmt = $pdo->prepare("
                     INSERT INTO templates (seller_id, title, slug, description, price, category_id, technology, 
                                          preview_image, download_file, demo_url, tags, status, created_at) 
@@ -267,8 +272,8 @@ try {
                     floatval($_POST['price']),
                     $categoryId,
                     $_POST['technology'] ?? '',
-                    $previewImagePath,
-                    $productFilePath,
+                    $previewImageUrl, // Cloudinary public_id
+                    $productFileUrl,  // Cloudinary public_id
                     $_POST['demo_url'] ?? null,
                     $tags,
                     'pending'
@@ -296,7 +301,7 @@ try {
                 // Create slug from title  
                 $slug = strtolower(trim(preg_replace('/[^A-Za-z0-9-]+/', '-', $_POST['title'])));
                 
-                // Insert into services table
+                // Insert into services table with Cloudinary URLs
                 $stmt = $pdo->prepare("
                     INSERT INTO services (seller_id, title, slug, description, price, category_id, 
                                         delivery_time, preview_image, demo_url, tags, 
@@ -312,7 +317,7 @@ try {
                     floatval($_POST['price']),
                     $categoryId,
                     $deliveryTime,
-                    $previewImagePath,
+                    $previewImageUrl, // Cloudinary public_id
                     $_POST['demo_url'] ?? null,
                     $tags,
                     $features,
@@ -468,223 +473,96 @@ try {
             
             if (!$product) {
                 // Let's see what products actually exist for this user
-                $debugStmt = $pdo->prepare("SELECT id, title FROM {$table} WHERE seller_id = ? LIMIT 5");
-                $debugStmt->execute([$_SESSION['user_id']]);
+                $debugStmt = $pdo->prepare("SELECT id, title, 'template' as type FROM templates WHERE seller_id = ? 
+                                          UNION ALL 
+                                          SELECT id, title, 'service' as type FROM services WHERE seller_id = ?");
+                $debugStmt->execute([$_SESSION['user_id'], $_SESSION['user_id']]);
                 $userProducts = $debugStmt->fetchAll(PDO::FETCH_ASSOC);
-                error_log("Available products for user {$_SESSION['user_id']} in $table: " . json_encode($userProducts));
+                error_log("User's products: " . json_encode($userProducts));
                 
-                throw new Exception('Product not found or you do not have permission to delete it');
+                throw new Exception("Product not found or you don't have permission to delete it");
             }
             
-            error_log("Product found: ID {$product['id']}, Title: {$product['title']}");
+            // Delete the product
+            $deleteStmt = $pdo->prepare("DELETE FROM {$table} WHERE id = ? AND seller_id = ?");
+            $result = $deleteStmt->execute([$id, $_SESSION['user_id']]);
             
-            // Call deleteProduct function
-            error_log("Calling deleteProduct({$_SESSION['user_id']}, '$type', $id)");
-            $result = $sellerManager->deleteProduct($_SESSION['user_id'], $type, $id);
-            error_log("deleteProduct returned: " . ($result ? 'TRUE' : 'FALSE'));
+            error_log("Delete result: " . ($result ? 'SUCCESS' : 'FAILED'));
             
             if (!$result) {
-                error_log("❌ deleteProduct returned FALSE");
-                throw new Exception('Failed to delete product - Database operation failed');
+                throw new Exception('Failed to delete product');
             }
             
-            error_log("✅ Delete successful - ID: $id, Title: {$product['title']}");
-            error_log("🗑️ DELETE REQUEST END ====================");
-            echo json_encode(['success' => true, 'message' => 'Product deleted successfully']);
+            echo json_encode([
+                'success' => true,
+                'message' => ucfirst($type) . ' "' . $product['title'] . '" deleted successfully'
+            ]);
             break;
-
-        case 'duplicate_product':
-            // Duplicate a seller's product
-            if (!isset($_SESSION['user_id'])) {
-                throw new Exception('Not authenticated');
+            
+        case 'get_image_url':
+            // Get Cloudinary URL for an image
+            $imagePublicId = $_GET['image'] ?? '';
+            $size = $_GET['size'] ?? 'medium';
+            
+            if (!$imagePublicId) {
+                throw new Exception('Image public ID is required');
             }
-            $type = $input['type'] ?? '';
-            $id = intval($input['id'] ?? 0);
-            $result = $sellerManager->duplicateProduct($_SESSION['user_id'], $type, $id);
-            if (!$result) {
-                throw new Exception('Failed to duplicate product');
+            
+            try {
+                // Define size transformations
+                $transformations = [
+                    'small' => 'c_fill,w_150,h_150,q_auto',
+                    'medium' => 'c_fill,w_300,h_200,q_auto',
+                    'large' => 'c_fill,w_600,h_400,q_auto',
+                    'full' => 'q_auto'
+                ];
+                
+                $transformation = $transformations[$size] ?? $transformations['medium'];
+                
+                // Get optimized image URL from Cloudinary
+                $imageUrl = $cloudinary->getOptimizedUrl($imagePublicId, $transformation);
+                
+                if (empty($imageUrl)) {
+                    throw new Exception('Failed to generate image URL');
+                }
+                
+                echo json_encode([
+                    'success' => true,
+                    'url' => $imageUrl,
+                    'public_id' => $imagePublicId
+                ]);
+            } catch (Exception $e) {
+                // If Cloudinary fails, try to fallback to default image
+                $fallbackUrl = $size === 'small' ? '/assets/images/default-template.jpg' : 
+                              ($size === 'large' ? '/assets/images/default-template.jpg' : 
+                               '/assets/images/default-template.jpg');
+                
+                echo json_encode([
+                    'success' => false,
+                    'error' => $e->getMessage(),
+                    'fallback_url' => $fallbackUrl
+                ]);
             }
-            echo json_encode(['success' => true, 'message' => 'Product duplicated successfully']);
             break;
-
+            
         case 'update_product':
-            // Update an existing product
+            // Update product
             if (!isset($_SESSION['user_id'])) {
                 throw new Exception('Not authenticated');
             }
             
-            $productId = intval($_POST['product_id'] ?? 0);
-            $productType = $_POST['product_type'] ?? 'template';
+            $productType = $input['type'] ?? 'template';
+            $productId = intval($input['id'] ?? 0);
+            $productData = $input['product_data'] ?? [];
             
             if (!$productId) {
                 throw new Exception('Product ID is required');
             }
             
-            // Validate required fields
-            $requiredFields = ['title', 'description', 'price', 'category'];
-            foreach ($requiredFields as $field) {
-                if (empty($_POST[$field])) {
-                    throw new Exception("Field '$field' is required");
-                }
-            }
-            
-            // Map category slug to category_id
-            $categoryMap = [
-                'web-design' => 1,      // Business
-                'mobile-app' => 2,      // Mobile Apps
-                'ui-ux' => 3,           // Portfolio
-                'graphics' => 4,        // Landing Page
-                'development' => 5,     // Admin Dashboard
-                'marketing' => 9,       // E-commerce
-                'business' => 12,       // Blog
-                'other' => 13           // SaaS
-            ];
-            
-            $categorySlug = $_POST['category'];
-            $categoryId = $categoryMap[$categorySlug] ?? 1;
-            
-            // Handle file uploads
-            $previewImagePath = null;
-            $productFilePath = null;
-            
-            // Upload new preview image if provided
-            if (isset($_FILES['preview_image']) && $_FILES['preview_image']['error'] === 0) {
-                $uploadDir = '../uploads/products/';
-                if (!is_dir($uploadDir)) {
-                    mkdir($uploadDir, 0755, true);
-                }
-                
-                $file = $_FILES['preview_image'];
-                $allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
-                
-                if (in_array($file['type'], $allowedTypes) && $file['size'] <= 5 * 1024 * 1024) {
-                    $extension = pathinfo($file['name'], PATHINFO_EXTENSION);
-                    $filename = 'preview_' . $_SESSION['user_id'] . '_' . time() . '.' . $extension;
-                    $filepath = $uploadDir . $filename;
-                    
-                    if (move_uploaded_file($file['tmp_name'], $filepath)) {
-                        $previewImagePath = 'uploads/products/' . $filename;
-                    }
-                }
-            }
-            
-            // Upload new product files if provided (for templates)
-            if ($productType === 'template' && isset($_FILES['product_files']) && $_FILES['product_files']['error'] === 0) {
-                $uploadDir = '../uploads/products/';
-                $file = $_FILES['product_files'];
-                $allowedTypes = ['application/zip', 'application/x-zip-compressed', 'application/x-rar-compressed'];
-                
-                if (in_array($file['type'], $allowedTypes) && $file['size'] <= 100 * 1024 * 1024) {
-                    $extension = pathinfo($file['name'], PATHINFO_EXTENSION);
-                    $filename = 'product_' . $_SESSION['user_id'] . '_' . time() . '.' . $extension;
-                    $filepath = $uploadDir . $filename;
-                    
-                    if (move_uploaded_file($file['tmp_name'], $filepath)) {
-                        $productFilePath = 'uploads/products/' . $filename;
-                    }
-                }
-            }
-            
-            // Convert tags to JSON format
-            $tags = null; // Default to NULL for JSON column
-            if (!empty($_POST['tags'])) {
-                $tagArray = array_map('trim', explode(',', $_POST['tags']));
-                $tagArray = array_filter($tagArray); // Remove empty tags
-                if (!empty($tagArray)) {
-                    $tags = json_encode($tagArray);
-                }
-            }
-            
-            // Validate and sanitize status
-            $allowedStatuses = ['draft', 'pending', 'approved', 'rejected'];
-            $status = $_POST['status'] ?? 'draft';
-            if (!in_array($status, $allowedStatuses)) {
-                $status = 'draft';
-            }
-            
-            // Update based on product type
-            if ($productType === 'template') {
-                $features = isset($_POST['features']) ? implode(',', array_filter($_POST['features'])) : '';
-                
-                // Build update query for templates
-                $updateFields = [
-                    'title = ?', 'description = ?', 'price = ?', 'category_id = ?',
-                    'technology = ?', 'demo_url = ?', 'tags = ?', 'status = ?', 'updated_at = NOW()'
-                ];
-                $updateValues = [
-                    $_POST['title'],
-                    $_POST['description'],
-                    floatval($_POST['price']),
-                    $categoryId,
-                    $_POST['technology'] ?? '',
-                    $_POST['demo_url'] ?? null,
-                    $tags,
-                    $status
-                ];
-                
-                // Add preview image if uploaded
-                if ($previewImagePath) {
-                    $updateFields[] = 'preview_image = ?';
-                    $updateValues[] = $previewImagePath;
-                }
-                
-                // Add product files if uploaded
-                if ($productFilePath) {
-                    $updateFields[] = 'download_file = ?';
-                    $updateValues[] = $productFilePath;
-                }
-                
-                $updateValues[] = $productId;
-                $updateValues[] = $_SESSION['user_id'];
-                
-                $query = "UPDATE templates SET " . implode(', ', $updateFields) . " WHERE id = ? AND seller_id = ?";
-                $stmt = $pdo->prepare($query);
-                
-            } else { // service
-                $features = isset($_POST['features']) ? implode(',', array_filter($_POST['features'])) : '';
-                $deliveryTime = intval($_POST['delivery_time'] ?? 7);
-                
-                // Build update query for services
-                $updateFields = [
-                    'title = ?', 'description = ?', 'price = ?', 'category_id = ?',
-                    'delivery_time = ?', 'demo_url = ?', 'tags = ?', 'features = ?', 
-                    'status = ?', 'updated_at = NOW()'
-                ];
-                $updateValues = [
-                    $_POST['title'],
-                    $_POST['description'],
-                    floatval($_POST['price']),
-                    $categoryId,
-                    $deliveryTime,
-                    $_POST['demo_url'] ?? null,
-                    $tags,
-                    $features,
-                    $status
-                ];
-                
-                // Add preview image if uploaded
-                if ($previewImagePath) {
-                    $updateFields[] = 'preview_image = ?';
-                    $updateValues[] = $previewImagePath;
-                }
-                
-                $updateValues[] = $productId;
-                $updateValues[] = $_SESSION['user_id'];
-                
-                $query = "UPDATE services SET " . implode(', ', $updateFields) . " WHERE id = ? AND seller_id = ?";
-                $stmt = $pdo->prepare($query);
-            }
-            
-            $result = $stmt->execute($updateValues);
+            $result = $sellerManager->updateProduct($_SESSION['user_id'], $productId, $productData, $productType);
             
             if (!$result) {
-                $errorInfo = $stmt->errorInfo();
-                throw new Exception('Failed to update product - Database error: ' . $errorInfo[2]);
-            }
-            
-            $rowsAffected = $stmt->rowCount();
-            if ($rowsAffected === 0) {
-                throw new Exception('Product not found or you do not have permission to update it');
+                throw new Exception('Failed to update product');
             }
             
             echo json_encode([
@@ -696,10 +574,12 @@ try {
         default:
             throw new Exception('Invalid action');
     }
+    
 } catch (Exception $e) {
-    // Handle exceptions and return error response
+    error_log("Seller API Error: " . $e->getMessage());
     echo json_encode([
         'success' => false,
         'error' => $e->getMessage()
     ]);
 }
+?>

@@ -11,6 +11,7 @@ if (session_status() === PHP_SESSION_NONE) {
 
 require_once __DIR__ . '/../config/database.php';
 require_once __DIR__ . '/../config/service-manager.php';
+require_once __DIR__ . '/../config/cloudinary-config.php'; // Add Cloudinary support
 
 // Get service ID from URL
 $serviceId = isset($_GET['id']) ? intval($_GET['id']) : 0;
@@ -43,13 +44,33 @@ $relatedServices = array_filter($relatedServices, function($s) use ($serviceId) 
 });
 $relatedServices = array_slice($relatedServices, 0, 3);
 
-// Get service images
+// Get service images with Cloudinary optimization
 $images = [];
 if (!empty($service['gallery_images'])) {
-    $images = json_decode($service['gallery_images'], true) ?: [];
+    // Check if gallery_images is already an array or a JSON string
+    if (is_array($service['gallery_images'])) {
+        $galleryImages = $service['gallery_images'];
+    } else {
+        $galleryImages = json_decode($service['gallery_images'], true) ?: [];
+    }
+    
+    // Convert each gallery image to optimized URL
+    foreach ($galleryImages as $image) {
+        $images[] = getOptimizedImageUrl($image, 'large');
+    }
 }
+
+// Add preview image as first image if not already in gallery
 if (!empty($service['preview_image'])) {
-    array_unshift($images, $service['preview_image']);
+    $previewUrl = getOptimizedImageUrl($service['preview_image'], 'large');
+    if (!in_array($previewUrl, $images)) {
+        array_unshift($images, $previewUrl);
+    }
+}
+
+// Ensure we have at least one image
+if (empty($images)) {
+    $images[] = getOptimizedImageUrl('/orbix/assets/images/default-service.jpg', 'large');
 }
 
 // Get service tags
@@ -63,6 +84,10 @@ $features = [];
 if (!empty($service['features'])) {
     $features = json_decode($service['features'], true) ?: [];
 }
+
+// Optimize profile image
+$service['profile_image'] = getOptimizedImageUrl($service['profile_image'] ?? '/assets/images/default-avatar.png', 'avatar');
+$service['preview_image_optimized'] = getOptimizedImageUrl($service['preview_image'], 'large');
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -315,7 +340,7 @@ if (!empty($service['features'])) {
                         <!-- Service Images -->
                         <div class="mb-8">
                             <div class="zoom-container mb-6">
-                                <img id="mainImage" src="<?= htmlspecialchars($images[0] ?? $service['preview_image']) ?>" alt="<?= htmlspecialchars($service['title']) ?>" class="service-image zoom-image">
+                                <img id="mainImage" src="<?= htmlspecialchars($images[0]) ?>" alt="<?= htmlspecialchars($service['title']) ?>" class="service-image zoom-image">
                             </div>
                             
                             <?php if (count($images) > 1): ?>
@@ -430,7 +455,7 @@ if (!empty($service['features'])) {
                             </div>
 
                             <div class="space-y-4 mb-8">
-                                <button onclick="handleOrderService(<?= $service['id'] ?>, '<?= addslashes($service['title']) ?>', <?= $service['price'] ?>, '<?= addslashes($service['preview_image']) ?>', '<?= addslashes($service['seller_name']) ?>')" 
+                                <button onclick="handleOrderService(<?= $service['id'] ?>, '<?= addslashes($service['title']) ?>', <?= $service['price'] ?>, '<?= addslashes($service['preview_image_optimized']) ?>', '<?= addslashes($service['seller_name']) ?>')" 
                                         class="w-full btn-primary">
                                     <i class="ri-shopping-cart-line mr-2"></i>Order Service
                                 </button>
@@ -507,7 +532,7 @@ if (!empty($service['features'])) {
                 <?php foreach ($relatedServices as $related): ?>
                 <div class="service-card overflow-hidden">
                     <div class="relative">
-                        <img src="<?= htmlspecialchars($related['preview_image']) ?>" alt="<?= htmlspecialchars($related['title']) ?>" class="w-full h-64 object-cover">
+                        <img src="<?= htmlspecialchars(getOptimizedImageUrl($related['preview_image'], 'medium')) ?>" alt="<?= htmlspecialchars($related['title']) ?>" class="w-full h-64 object-cover">
                         <div class="absolute top-4 right-4">
                             <button class="w-10 h-10 bg-white/90 rounded-full flex items-center justify-center hover:bg-white transition-colors shadow-lg">
                                 <i class="ri-heart-line text-gray-600"></i>
@@ -524,7 +549,7 @@ if (!empty($service['features'])) {
                     </div>
                     <div class="p-6">
                         <div class="flex items-center space-x-2 mb-3">
-                            <img src="<?= htmlspecialchars($related['profile_image']) ?>" alt="<?= htmlspecialchars($related['seller_name']) ?>" class="w-6 h-6 rounded-full object-cover">
+                            <img src="<?= htmlspecialchars(getOptimizedImageUrl($related['profile_image'] ?? '/assets/images/default-avatar.png', 'avatar')) ?>" alt="<?= htmlspecialchars($related['seller_name']) ?>" class="w-6 h-6 rounded-full object-cover">
                             <span class="text-sm text-gray-600 font-medium"><?= htmlspecialchars($related['seller_name']) ?></span>
                         </div>
                         <h4 class="text-xl font-bold text-secondary mb-2"><?= htmlspecialchars($related['title']) ?></h4>
@@ -545,7 +570,7 @@ if (!empty($service['features'])) {
                                 <button onclick="window.location.href='service-detail.php?id=<?= $related['id'] ?>'" class="w-10 h-10 flex items-center justify-center border-2 border-gray-200 rounded-lg hover:border-primary hover:text-primary transition-colors">
                                     <i class="ri-eye-line"></i>
                                 </button>
-                                <button onclick="handleOrderService(<?= $related['id'] ?>, '<?= addslashes($related['title']) ?>', <?= $related['price'] ?>, '<?= addslashes($related['preview_image']) ?>', '<?= addslashes($related['seller_name']) ?>')" 
+                                <button onclick="handleOrderService(<?= $related['id'] ?>, '<?= addslashes($related['title']) ?>', <?= $related['price'] ?>, '<?= addslashes(getOptimizedImageUrl($related['preview_image'], 'medium')) ?>', '<?= addslashes($related['seller_name']) ?>')" 
                                         class="w-10 h-10 flex items-center justify-center bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors">
                                     <i class="ri-shopping-cart-line"></i>
                                 </button>

@@ -4,6 +4,8 @@
  * Handles all template-related database operations
  */
 
+require_once __DIR__ . '/cloudinary-config.php'; // Import để sử dụng getOptimizedImageUrl function
+
 class TemplateManager {
     private $db;
     
@@ -15,7 +17,7 @@ class TemplateManager {
      * Get all templates with optional filtering and sorting
      */
     public function getTemplates($filters = [], $sort = 'popular', $limit = null, $offset = 0) {
-        $whereConditions = ["t.status = 'approved'"];
+        $whereConditions = ["t.status = 'approved'", "u.user_type = 'seller'"]; // Only show templates from sellers
         $params = [];
         
         // Apply filters
@@ -101,9 +103,20 @@ class TemplateManager {
             $template['tags'] = json_decode($template['tags'], true) ?: [];
             $template['avg_rating'] = round((float)$template['avg_rating'], 1);
             
-            // Generate fallback image if needed
-            if (empty($template['preview_image']) || !$this->imageExists($template['preview_image'])) {
-                $template['preview_image'] = $this->generateFallbackImage($template['category_slug']);
+            // Generate optimized image URLs for JavaScript
+            if (!empty($template['preview_image'])) {
+                $template['preview_image_url'] = getOptimizedImageUrl($template['preview_image'], 'thumb');
+            } else {
+                // Use fallback image
+                $fallbackImage = $this->generateFallbackImage($template['category_slug']);
+                $template['preview_image'] = $fallbackImage;
+                $template['preview_image_url'] = $fallbackImage;
+            }
+            
+            if (!empty($template['profile_image'])) {
+                $template['seller_avatar_url'] = getOptimizedImageUrl($template['profile_image'], 'avatar_small');
+            } else {
+                $template['seller_avatar_url'] = '../assets/images/default-avatar.png';
             }
         }
         
@@ -117,6 +130,7 @@ class TemplateManager {
         $sql = "SELECT c.*, COUNT(t.id) as template_count
                 FROM categories c
                 LEFT JOIN templates t ON c.id = t.category_id AND t.status = 'approved'
+                LEFT JOIN users u ON t.seller_id = u.id AND u.user_type = 'seller'
                 WHERE c.is_active = 1
                 GROUP BY c.id
                 ORDER BY c.name";
@@ -193,10 +207,11 @@ class TemplateManager {
      * Get technology filter options with counts
      */
     public function getTechnologyFilters() {
-        $sql = "SELECT technology, COUNT(*) as count
-                FROM templates 
-                WHERE status = 'approved' AND technology IS NOT NULL
-                GROUP BY technology
+        $sql = "SELECT t.technology, COUNT(*) as count
+                FROM templates t
+                LEFT JOIN users u ON t.seller_id = u.id
+                WHERE t.status = 'approved' AND t.technology IS NOT NULL AND u.user_type = 'seller'
+                GROUP BY t.technology
                 ORDER BY count DESC";
         
         $stmt = $this->db->query($sql);
@@ -224,6 +239,11 @@ class TemplateManager {
      * Check if image exists
      */
     private function imageExists($imageUrl) {
+        // If it's a Cloudinary image ID (starts with 'orbix_'), consider it valid
+        if (strpos($imageUrl, 'orbix_') === 0) {
+            return true;
+        }
+        
         if (filter_var($imageUrl, FILTER_VALIDATE_URL)) {
             return true; // Assume external URLs are valid
         }
@@ -234,22 +254,26 @@ class TemplateManager {
      * Generate fallback image URL
      */
     private function generateFallbackImage($category) {
+        // Use the actual default images that exist
         $fallbackImages = [
-            'business' => '/orbix/assets/images/fallbacks/business-fallback.svg',
-            'e-commerce' => '/orbix/assets/images/fallbacks/ecommerce-fallback.svg',
-            'portfolio' => '/orbix/assets/images/fallbacks/portfolio-fallback.svg',
-            'landing' => '/orbix/assets/images/fallbacks/landing-fallback.svg',
-            'admin' => '/orbix/assets/images/fallbacks/admin-fallback.svg'
+            'business' => '/orbix/assets/images/default-template.jpg',
+            'ecommerce' => '/orbix/assets/images/default-template.jpg',
+            'e-commerce' => '/orbix/assets/images/default-template.jpg',
+            'portfolio' => '/orbix/assets/images/default-template.jpg',
+            'landing' => '/orbix/assets/images/default-template.jpg',
+            'admin' => '/orbix/assets/images/default-template.jpg',
+            'blog' => '/orbix/assets/images/default-template.jpg',
+            'education' => '/orbix/assets/images/default-template.jpg'
         ];
         
-        return $fallbackImages[$category] ?? '/orbix/assets/images/fallbacks/default-fallback.svg';
+        return $fallbackImages[$category] ?? '/orbix/assets/images/default-template.jpg';
     }
     
     /**
      * Get total template count with filters
      */
     public function getTotalCount($filters = []) {
-        $whereConditions = ["t.status = 'approved'"];
+        $whereConditions = ["t.status = 'approved'", "u.user_type = 'seller'"]; // Only count templates from sellers
         $params = [];
         
         // Apply same filters as getTemplates
@@ -299,6 +323,7 @@ class TemplateManager {
         $sql = "SELECT COUNT(DISTINCT t.id) as total
                 FROM templates t
                 LEFT JOIN categories c ON t.category_id = c.id
+                LEFT JOIN users u ON t.seller_id = u.id
                 {$whereClause}";
         
         $stmt = $this->db->prepare($sql);

@@ -83,7 +83,7 @@
                                     </select>
                                 </div>
                                 
-                                <div class="mb-4 template-only">
+                                <div class="mb-4">
                                     <label class="block text-sm font-medium text-gray-700 mb-2">Technology</label>
                                     <select name="technology"
                                             class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors">
@@ -363,7 +363,7 @@ document.getElementById('addProductForm').addEventListener('submit', function(e)
     
     const formData = new FormData(this);
     formData.append('action', 'add_product');
-    formData.append('product_type', selectedProductType);
+    formData.append('type', selectedProductType); // Thêm field type
     
     // Show loading state
     const submitBtn = this.querySelector('button[type="submit"]');
