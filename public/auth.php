@@ -229,7 +229,7 @@ if (isset($_GET['action']) && $_GET['action'] === 'verify') {
     <link href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css" rel="stylesheet">
     <script src="https://accounts.google.com/gsi/client" async defer></script>
     <link rel="stylesheet" href="<?php echo AssetConfig::getCssPath('auth.css'); ?>">
-    <link rel="stylesheet" href="<?php echo AssetConfig::getCssPath('universal-fix.css'); ?>">
+    <!-- <link rel="stylesheet" href="<?php echo AssetConfig::getCssPath('universal-fix.css'); ?>"> -->
     <script>
         tailwind.config = {
             theme: {
