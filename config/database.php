@@ -2,21 +2,45 @@
 /**
  * Database Configuration
  * Handles database connections and app configuration
+ * Now supports both local development and production deployment
  */
 
+// Load production config if available
+if (file_exists(__DIR__ . '/production-config.php')) {
+    require_once __DIR__ . '/production-config.php';
+}
+
 class DatabaseConfig {
-    // Database Configuration
-    const DB_HOST = 'localhost';
-    const DB_NAME = 'orbix_market';
-    const DB_USER = 'root';
-    const DB_PASS = '';
-    const DB_CHARSET = 'utf8mb4';
-    const DB_SOCKET = '/Applications/XAMPP/xamppfiles/var/mysql/mysql.sock';
+    /**
+     * Get database configuration based on environment
+     */
+    private static function getDbConfig() {
+        // Check if we're in production
+        if (class_exists('ProductionConfig') && ProductionConfig::isProduction()) {
+            return ProductionConfig::getDatabaseConfig();
+        }
+        
+        // Local development configuration
+        return [
+            'host' => 'localhost',
+            'dbname' => 'orbix_market',
+            'username' => 'root',
+            'password' => '',
+            'charset' => 'utf8mb4',
+            'socket' => '/Applications/XAMPP/xamppfiles/var/mysql/mysql.sock'
+        ];
+    }
     
     // App Configuration
     const APP_NAME = 'Orbix Market';
-    const APP_URL = 'http://localhost/orbix';
     const APP_VERSION = '2.0.0';
+    
+    public static function getAppUrl() {
+        if (class_exists('ProductionConfig') && ProductionConfig::isProduction()) {
+            return $_ENV['APP_URL'] ?? getenv('APP_URL') ?? 'https://your-app.railway.app';
+        }
+        return 'http://localhost/orbix';
+    }
     
     private static $connection = null;
     
@@ -26,8 +50,18 @@ class DatabaseConfig {
     public static function getConnection() {
         if (self::$connection === null) {
             try {
-                $dsn = "mysql:unix_socket=" . self::DB_SOCKET . ";dbname=" . self::DB_NAME . ";charset=" . self::DB_CHARSET;
-                self::$connection = new PDO($dsn, self::DB_USER, self::DB_PASS, [
+                $config = self::getDbConfig();
+                
+                // Build DSN based on environment
+                if (isset($config['socket']) && file_exists($config['socket'])) {
+                    // Local development with socket
+                    $dsn = "mysql:unix_socket={$config['socket']};dbname={$config['dbname']};charset={$config['charset']}";
+                } else {
+                    // Production or standard connection
+                    $dsn = "mysql:host={$config['host']};dbname={$config['dbname']};charset={$config['charset']}";
+                }
+                
+                self::$connection = new PDO($dsn, $config['username'], $config['password'], [
                     PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
                     PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
                     PDO::ATTR_EMULATE_PREPARES => false,
@@ -46,7 +80,7 @@ class DatabaseConfig {
     public static function getAppConfig() {
         return [
             'name' => self::APP_NAME,
-            'url' => self::APP_URL,
+            'url' => self::getAppUrl(),
             'version' => self::APP_VERSION
         ];
     }

@@ -72,18 +72,30 @@ class ServiceManager {
         $whereClause = count($whereConditions) > 0 ? "WHERE " . implode(" AND ", $whereConditions) : "";
         
         // Build ORDER BY clause
-        $orderBy = match($sort) {
-            "newest" => "ORDER BY s.created_at DESC",
-            "price-low" => "ORDER BY s.price ASC",
-            "price-high" => "ORDER BY s.price DESC", 
-            "rating" => "ORDER BY s.rating DESC, s.reviews_count DESC",
-            "delivery" => "ORDER BY CASE 
-                WHEN s.delivery_time LIKE '%hour%' THEN 1
-                WHEN s.delivery_time LIKE '%day%' THEN CAST(SUBSTRING_INDEX(s.delivery_time, ' ', 1) AS UNSIGNED) + 1
-                ELSE 999
-            END ASC",
-            default => "ORDER BY s.is_featured DESC, s.orders_count DESC, s.rating DESC"
-        };
+        switch ($sort) {
+            case "newest":
+                $orderBy = "ORDER BY s.created_at DESC";
+                break;
+            case "price-low":
+                $orderBy = "ORDER BY s.price ASC";
+                break;
+            case "price-high":
+                $orderBy = "ORDER BY s.price DESC";
+                break;
+            case "rating":
+                $orderBy = "ORDER BY s.rating DESC, s.reviews_count DESC";
+                break;
+            case "delivery":
+                $orderBy = "ORDER BY CASE 
+                    WHEN s.delivery_time LIKE '%hour%' THEN 1
+                    WHEN s.delivery_time LIKE '%day%' THEN CAST(SUBSTRING_INDEX(s.delivery_time, ' ', 1) AS UNSIGNED) + 1
+                    ELSE 999
+                END ASC";
+                break;
+            default:
+                $orderBy = "ORDER BY s.is_featured DESC, s.orders_count DESC, s.rating DESC";
+                break;
+        }
         
         $sql = "
             SELECT 

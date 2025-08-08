@@ -66,13 +66,23 @@ class TemplateManager {
         $whereClause = count($whereConditions) > 0 ? "WHERE " . implode(" AND ", $whereConditions) : "";
         
         // Build ORDER BY clause
-        $orderBy = match($sort) {
-            'price-low' => "ORDER BY t.price ASC",
-            'price-high' => "ORDER BY t.price DESC",
-            'rating' => "ORDER BY avg_rating DESC, review_count DESC", 
-            'newest' => "ORDER BY t.created_at DESC",
-            default => "ORDER BY t.downloads_count DESC, t.views_count DESC"
-        };
+        switch ($sort) {
+            case 'price-low':
+                $orderBy = "ORDER BY t.price ASC";
+                break;
+            case 'price-high':
+                $orderBy = "ORDER BY t.price DESC";
+                break;
+            case 'rating':
+                $orderBy = "ORDER BY avg_rating DESC, review_count DESC";
+                break;
+            case 'newest':
+                $orderBy = "ORDER BY t.created_at DESC";
+                break;
+            default:
+                $orderBy = "ORDER BY t.downloads_count DESC, t.views_count DESC";
+                break;
+        }
         
         $sql = "SELECT t.*, c.name as category_name, c.slug as category_slug,
                        COALESCE(CONCAT(u.first_name, ' ', u.last_name), 'Anonymous Seller') as seller_name,
