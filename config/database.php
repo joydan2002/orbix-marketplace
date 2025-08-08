@@ -15,7 +15,26 @@ class DatabaseConfig {
      * Get database configuration based on environment
      */
     private static function getDbConfig() {
-        // Check if we're in production
+        // Check environment variables first (Railway/Production)
+        $envHost = $_ENV['DB_HOST'] ?? getenv('DB_HOST');
+        $envName = $_ENV['DB_NAME'] ?? getenv('DB_NAME');
+        $envUser = $_ENV['DB_USER'] ?? getenv('DB_USER');
+        $envPass = $_ENV['DB_PASSWORD'] ?? getenv('DB_PASSWORD');
+        $envPort = $_ENV['DB_PORT'] ?? getenv('DB_PORT');
+        
+        if ($envHost && $envName && $envUser && isset($envPass)) {
+            // Production environment (Railway)
+            return [
+                'host' => $envHost,
+                'dbname' => $envName,
+                'username' => $envUser,
+                'password' => $envPass,
+                'port' => $envPort ?? '3306',
+                'charset' => 'utf8mb4'
+            ];
+        }
+        
+        // Check if we're in production using legacy config
         if (class_exists('ProductionConfig') && ProductionConfig::isProduction()) {
             return ProductionConfig::getDatabaseConfig();
         }
@@ -58,7 +77,8 @@ class DatabaseConfig {
                     $dsn = "mysql:unix_socket={$config['socket']};dbname={$config['dbname']};charset={$config['charset']}";
                 } else {
                     // Production or standard connection
-                    $dsn = "mysql:host={$config['host']};dbname={$config['dbname']};charset={$config['charset']}";
+                    $port = isset($config['port']) ? ";port={$config['port']}" : '';
+                    $dsn = "mysql:host={$config['host']}{$port};dbname={$config['dbname']};charset={$config['charset']}";
                 }
                 
                 self::$connection = new PDO($dsn, $config['username'], $config['password'], [
