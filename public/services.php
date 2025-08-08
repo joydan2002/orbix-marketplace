@@ -13,6 +13,39 @@ require_once __DIR__ . '/../config/database.php';
 require_once __DIR__ . '/../config/service-manager.php';
 require_once __DIR__ . '/../config/cloudinary-config.php'; // Add Cloudinary support
 
+// Format delivery time with proper unit
+function formatDeliveryTime($deliveryTime) {
+    if (empty($deliveryTime) || !is_numeric($deliveryTime)) {
+        return '7 days';
+    }
+    
+    $days = intval($deliveryTime);
+    
+    if ($days == 1) {
+        return '1 day';
+    } elseif ($days <= 7) {
+        return $days . ' days';
+    } elseif ($days <= 14) {
+        $weeks = round($days / 7, 1);
+        if ($weeks == 1) {
+            return '1 week';
+        } elseif ($weeks == 2) {
+            return '2 weeks';
+        } else {
+            return $weeks . ' weeks';
+        }
+    } elseif ($days <= 30) {
+        return round($days / 7) . ' weeks';
+    } else {
+        $months = round($days / 30, 1);
+        if ($months == 1) {
+            return '1 month';
+        } else {
+            return $months . ' months';
+        }
+    }
+}
+
 // Get database connection
 try {
     $db = DatabaseConfig::getConnection();
@@ -95,265 +128,7 @@ $deliveryTimes = $serviceManager->getDeliveryTimeFilters();
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css" rel="stylesheet">
-    <style>
-        :where([class^="ri-"])::before {
-            content: "\f3c2";
-        }
-        
-        .glass-effect {
-            backdrop-filter: blur(20px);
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-        }
-        
-        .gradient-bg {
-            background: linear-gradient(135deg, #ffffff 0%, #f8fafc 50%, #ffffff 100%);
-        }
-        
-        .service-card {
-            transition: all 0.3s ease;
-            background: rgba(255, 255, 255, 0.9);
-            backdrop-filter: blur(10px);
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-        }
-        
-        .service-card:hover {
-            transform: translateY(-8px);
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-        }
-        
-        .service-image {
-            width: 100%;
-            height: 200px;
-            object-fit: cover;
-            object-position: center;
-        }
-        
-        .service-content {
-            padding: 1.5rem;
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-        }
-        
-        .service-header {
-            display: flex;
-            align-items: flex-start;
-            justify-content: space-between;
-            margin-bottom: 0.75rem;
-            min-height: 3rem;
-        }
-        
-        .service-title {
-            font-weight: 600;
-            color: #1f2937;
-            line-height: 1.25;
-            flex: 1;
-            margin-right: 0.75rem;
-            display: -webkit-box;
-            -webkit-line-clamp: 2;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
-        }
-        
-        .service-price {
-            font-size: 1.25rem;
-            font-weight: 700;
-            color: #FF5F1F;
-            white-space: nowrap;
-        }
-        
-        .service-description {
-            font-size: 0.875rem;
-            color: #6b7280;
-            margin-bottom: 1rem;
-            flex: 1;
-            display: -webkit-box;
-            -webkit-line-clamp: 3;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
-            line-height: 1.4;
-            min-height: 4.2rem;
-        }
-        
-        .service-meta {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 1rem;
-            min-height: 1.5rem;
-        }
-        
-        .service-actions {
-            display: flex;
-            gap: 0.5rem;
-            margin-top: auto;
-        }
-        
-        .filter-sidebar {
-            max-height: calc(100vh - 8rem);
-            overflow-y: auto;
-        }
-        
-        .custom-checkbox {
-            appearance: none;
-            width: 1rem;
-            height: 1rem;
-            border: 2px solid #d1d5db;
-            border-radius: 0.25rem;
-            background: white;
-            cursor: pointer;
-            position: relative;
-        }
-        
-        .custom-checkbox:checked {
-            background: #FF5F1F;
-            border-color: #FF5F1F;
-        }
-        
-        .custom-checkbox:checked::after {
-            content: '✓';
-            position: absolute;
-            top: -2px;
-            left: 1px;
-            color: white;
-            font-size: 0.75rem;
-            font-weight: bold;
-        }
-        
-        .price-range-slider {
-            -webkit-appearance: none;
-            appearance: none;
-            height: 4px;
-            background: #e5e7eb;
-            border-radius: 2px;
-            outline: none;
-        }
-        
-        .price-range-slider::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            appearance: none;
-            width: 20px;
-            height: 20px;
-            background: #FF5F1F;
-            border-radius: 50%;
-            cursor: pointer;
-        }
-        
-        .price-range-slider::-moz-range-thumb {
-            width: 20px;
-            height: 20px;
-            background: #FF5F1F;
-            border-radius: 50%;
-            cursor: pointer;
-            border: none;
-        }
-        
-        /* List View Styles */
-        .services-list {
-            display: flex;
-            flex-direction: column;
-            gap: 1.5rem;
-        }
-        
-        .service-card-list {
-            display: flex;
-            flex-direction: row;
-            background: rgba(255, 255, 255, 0.9);
-            backdrop-filter: blur(10px);
-            border-radius: 1rem;
-            overflow: hidden;
-            transition: all 0.3s ease;
-            height: auto;
-        }
-        
-        .service-card-list:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-        }
-        
-        .service-card-list .service-image {
-            width: 280px;
-            height: 180px;
-            object-fit: cover;
-            object-position: center;
-            flex-shrink: 0;
-        }
-        
-        .service-card-list .service-content {
-            flex: 1;
-            padding: 1.5rem;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-        }
-        
-        .service-card-list .service-header {
-            display: flex;
-            align-items: flex-start;
-            justify-content: space-between;
-            margin-bottom: 1rem;
-        }
-        
-        .service-card-list .service-title {
-            font-size: 1.25rem;
-            font-weight: 700;
-            color: #1f2937;
-            margin-bottom: 0.5rem;
-            display: block;
-            -webkit-line-clamp: 2;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
-        }
-        
-        .service-card-list .service-description {
-            font-size: 0.95rem;
-            color: #6b7280;
-            line-height: 1.5;
-            margin-bottom: 1rem;
-            display: -webkit-box;
-            -webkit-line-clamp: 3;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
-        }
-        
-        .service-card-list .service-price {
-            font-size: 1.5rem;
-            font-weight: 800;
-            color: #FF5F1F;
-        }
-        
-        .service-card-list .service-actions {
-            display: flex;
-            gap: 0.75rem;
-            align-items: center;
-            margin-top: 1rem;
-        }
-        
-        .service-card-list .service-meta {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 1rem;
-        }
-        
-        /* View Toggle Button States */
-        .view-btn-active {
-            background: #FF5F1F !important;
-            color: white !important;
-        }
-        
-        .view-btn-inactive {
-            background: rgba(255, 255, 255, 0.8) !important;
-            color: #6b7280 !important;
-        }
-        
-        .view-btn-inactive:hover {
-            background: rgba(229, 231, 235, 1) !important;
-        }
-    </style>
+    <link href="../assets/css/services.css" rel="stylesheet">
     <script>
         tailwind.config = {
             theme: {
@@ -393,30 +168,141 @@ $deliveryTimes = $serviceManager->getDeliveryTimeFilters();
 
     <!-- Page Header -->
     <section class="pb-8">
-        <div class="max-w-7xl mx-auto px-6">
-            <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6">
+            <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 sm:gap-6">
                 <div>
-                    <h1 class="text-4xl font-bold text-secondary mb-4">Website Services</h1>
-                    <p class="text-lg text-gray-600">Professional web services from expert freelancers and agencies</p>
+                    <h1 class="text-3xl sm:text-4xl font-bold text-secondary mb-4">Website Services</h1>
+                    <p class="text-base sm:text-lg text-gray-600">Professional web services from expert freelancers and agencies</p>
                 </div>
-                <div class="flex items-center space-x-4">
-                    <div class="flex items-center bg-white/50 rounded-full px-4 py-2 backdrop-blur-sm">
+                <div class="flex items-center space-x-3 sm:space-x-4">
+                    <!-- Mobile Filter Button (positioned next to search) -->
+                    <button id="mobileFilterDropdownToggle" class="lg:hidden flex items-center justify-center w-10 h-10 bg-white/50 rounded-full backdrop-blur-sm border border-gray-200 hover:bg-white/70 transition-colors">
+                        <i class="ri-equalizer-line text-gray-600"></i>
+                    </button>
+                    
+                    <div class="flex items-center bg-white/50 rounded-full px-3 sm:px-4 py-2 backdrop-blur-sm search-container">
                         <div class="w-5 h-5 flex items-center justify-center">
                             <i class="ri-search-line text-gray-500"></i>
                         </div>
-                        <input type="text" id="searchInput" placeholder="Search website services..." class="ml-2 bg-transparent border-none outline-none text-sm w-64">
+                        <input type="text" id="searchInput" placeholder="Search website services..." class="ml-2 bg-transparent border-none outline-none text-sm w-32 sm:w-48 lg:w-64">
                     </div>
                 </div>
             </div>
         </div>
     </section>
 
+    <!-- Mobile Filter Dropdown -->
+    <div id="mobileFilterDropdown" class="lg:hidden hidden fixed top-0 left-0 right-0 z-50 bg-white shadow-lg border-b border-gray-200 max-h-[80vh] overflow-y-auto">
+        <div class="p-4">
+            <!-- Filter Header -->
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-lg font-semibold text-secondary">Filters</h3>
+                <div class="flex items-center space-x-3">
+                    <button onclick="clearAllFilters()" class="text-primary text-sm font-medium hover:underline">Clear All</button>
+                    <button id="closeMobileFilterDropdown" class="w-8 h-8 flex items-center justify-center bg-gray-100 rounded-full hover:bg-gray-200 transition-colors">
+                        <i class="ri-close-line text-lg"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Mobile Filter Content -->
+            <div class="space-y-4">
+                <!-- Categories -->
+                <div>
+                    <h4 class="font-medium text-secondary mb-3 text-sm">Service Categories</h4>
+                    <div class="grid grid-cols-2 gap-2">
+                        <?php foreach ($categories as $category): ?>
+                        <label class="flex items-center space-x-2 cursor-pointer p-2 rounded-lg hover:bg-gray-50">
+                            <input type="radio" name="mobile_category" value="<?= htmlspecialchars($category['slug']) ?>" class="custom-checkbox text-primary" <?= $category['slug'] === 'all' ? 'checked' : '' ?>>
+                            <span class="text-sm text-gray-600"><?= htmlspecialchars($category['name']) ?></span>
+                        </label>
+                        <?php endforeach; ?>
+                    </div>
+                </div>
+
+                <!-- Price Range -->
+                <div>
+                    <h4 class="font-medium text-secondary mb-3 text-sm">Price Range</h4>
+                    <div class="flex items-center space-x-3">
+                        <div class="flex-1">
+                            <input type="number" id="mobileminPrice" placeholder="Min" class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm">
+                        </div>
+                        <span class="text-gray-400">-</span>
+                        <div class="flex-1">
+                            <input type="number" id="mobilemaxPrice" placeholder="Max" class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Delivery Time -->
+                <div>
+                    <h4 class="font-medium text-secondary mb-3 text-sm">Delivery Time</h4>
+                    <div class="grid grid-cols-2 gap-2">
+                        <label class="flex items-center space-x-2 cursor-pointer p-2 rounded-lg hover:bg-gray-50">
+                            <input type="checkbox" name="mobile_delivery_time" value="1-3-days" class="custom-checkbox text-primary">
+                            <span class="text-sm text-gray-600">1-3 Days</span>
+                        </label>
+                        <label class="flex items-center space-x-2 cursor-pointer p-2 rounded-lg hover:bg-gray-50">
+                            <input type="checkbox" name="mobile_delivery_time" value="1-week" class="custom-checkbox text-primary">
+                            <span class="text-sm text-gray-600">1 Week</span>
+                        </label>
+                        <label class="flex items-center space-x-2 cursor-pointer p-2 rounded-lg hover:bg-gray-50">
+                            <input type="checkbox" name="mobile_delivery_time" value="2-weeks" class="custom-checkbox text-primary">
+                            <span class="text-sm text-gray-600">2 Weeks</span>
+                        </label>
+                        <label class="flex items-center space-x-2 cursor-pointer p-2 rounded-lg hover:bg-gray-50">
+                            <input type="checkbox" name="mobile_delivery_time" value="1-month" class="custom-checkbox text-primary">
+                            <span class="text-sm text-gray-600">1+ Month</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Rating -->
+                <div>
+                    <h4 class="font-medium text-secondary mb-3 text-sm">Minimum Rating</h4>
+                    <div class="space-y-2">
+                        <label class="flex items-center space-x-2 cursor-pointer p-2 rounded-lg hover:bg-gray-50">
+                            <input type="radio" name="mobile_rating" value="4" class="custom-checkbox text-primary">
+                            <div class="flex items-center space-x-1">
+                                <?php for($i = 0; $i < 4; $i++): ?>
+                                <i class="ri-star-fill text-yellow-400 text-sm"></i>
+                                <?php endfor; ?>
+                                <i class="ri-star-line text-gray-300 text-sm"></i>
+                                <span class="text-sm text-gray-600 ml-1">(4.0+)</span>
+                            </div>
+                        </label>
+                        <label class="flex items-center space-x-2 cursor-pointer p-2 rounded-lg hover:bg-gray-50">
+                            <input type="radio" name="mobile_rating" value="3" class="custom-checkbox text-primary">
+                            <div class="flex items-center space-x-1">
+                                <?php for($i = 0; $i < 3; $i++): ?>
+                                <i class="ri-star-fill text-yellow-400 text-sm"></i>
+                                <?php endfor; ?>
+                                <?php for($i = 0; $i < 2; $i++): ?>
+                                <i class="ri-star-line text-gray-300 text-sm"></i>
+                                <?php endfor; ?>
+                                <span class="text-sm text-gray-600 ml-1">(3.0+)</span>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Apply Filters Button -->
+                <div class="pt-4 border-t border-gray-200">
+                    <button id="applyMobileFilters" class="w-full bg-primary text-white py-3 rounded-lg font-medium hover:bg-primary/90 transition-colors">
+                        Apply Filters
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Category Pills -->
-    <section class="pb-8">
-        <div class="max-w-7xl mx-auto px-6">
-            <div class="flex flex-wrap items-center gap-3" id="categoryPills">
+    <!-- Hidden on mobile, visible on desktop -->
+    <section class="pb-8 hidden lg:block">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6">
+            <div class="flex items-center gap-2 sm:gap-3 overflow-x-auto scrollbar-hide whitespace-nowrap py-2" id="categoryPills">
                 <?php foreach ($categories as $index => $category): ?>
-                <button class="px-6 py-2 <?= $index === 0 ? 'bg-primary text-white' : 'bg-white/80 text-secondary hover:bg-primary hover:text-white' ?> rounded-button text-sm font-medium transition-colors" 
+                <button class="px-4 sm:px-6 py-2 <?= $index === 0 ? 'bg-primary text-white' : 'bg-white/80 text-secondary hover:bg-primary hover:text-white' ?> rounded-button text-sm font-medium transition-colors" 
                         data-category="<?= htmlspecialchars($category['slug']) ?>">
                     <?= htmlspecialchars($category['name']) ?>
                 </button>
@@ -427,11 +313,11 @@ $deliveryTimes = $serviceManager->getDeliveryTimeFilters();
 
     <!-- Main Content -->
     <section class="pb-16">
-        <div class="max-w-7xl mx-auto px-6">
-            <div class="grid lg:grid-cols-4 gap-8">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6">
+            <div class="grid lg:grid-cols-4 gap-6 sm:gap-8">
                 <!-- Sidebar Filters -->
-                <div class="lg:col-span-1">
-                    <div class="glass-effect rounded-2xl p-6 sticky top-32 filter-sidebar">
+                <div class="lg:col-span-1 order-2 lg:order-1">
+                    <div class="glass-effect rounded-2xl p-4 sm:p-6 sticky top-32 filter-sidebar hidden lg:block">
                         <div class="flex items-center justify-between mb-6">
                             <h3 class="font-semibold text-secondary">Filters</h3>
                             <button class="text-primary text-sm font-medium hover:underline" onclick="clearAllFilters()">Clear All</button>
@@ -529,38 +415,66 @@ $deliveryTimes = $serviceManager->getDeliveryTimeFilters();
                 </div>
                 
                 <!-- Services Grid -->
-                <div class="lg:col-span-3">
+                <div class="lg:col-span-3 order-1 lg:order-2">
                     <!-- Top Bar -->
-                    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
-                        <div class="flex items-center space-x-4">
+                    <div class="flex flex-col gap-4 mb-6 sm:mb-8">
+                        <!-- Results count (mobile: full width, desktop: left side) -->
+                        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                             <span class="text-sm text-gray-600" id="resultsCount">Showing <?= count($services) ?> services</span>
-                            <div class="flex items-center space-x-2">
-                                <button id="gridViewBtn" class="w-8 h-8 flex items-center justify-center bg-primary text-white rounded-button">
-                                    <i class="ri-grid-line text-sm"></i>
-                                </button>
-                                <button id="listViewBtn" class="w-8 h-8 flex items-center justify-center bg-white/80 text-gray-600 rounded-button hover:bg-gray-100 transition-colors">
-                                    <i class="ri-list-unordered text-sm"></i>
-                                </button>
+                            
+                            <!-- Desktop: View buttons and sort in original layout -->
+                            <div class="hidden sm:flex items-center space-x-4">
+                                <div class="flex items-center space-x-2">
+                                    <button id="gridViewBtn" class="w-8 h-8 flex items-center justify-center bg-primary text-white rounded-button">
+                                        <i class="ri-grid-line text-sm"></i>
+                                    </button>
+                                    <button id="listViewBtn" class="w-8 h-8 flex items-center justify-center bg-white/80 text-gray-600 rounded-button hover:bg-gray-100 transition-colors">
+                                        <i class="ri-list-unordered text-sm"></i>
+                                    </button>
+                                </div>
+                                <span class="text-sm font-medium text-secondary">Sort by:</span>
+                                <div class="relative">
+                                    <select id="sortSelect" class="px-4 py-2 bg-white/80 rounded-button text-sm font-medium hover:bg-white transition-colors border-none outline-none cursor-pointer">
+                                        <option value="popular">Most Popular</option>
+                                        <option value="newest">Newest First</option>
+                                        <option value="price-low">Price: Low to High</option>
+                                        <option value="price-high">Price: High to Low</option>
+                                        <option value="rating">Highest Rated</option>
+                                        <option value="delivery">Fastest Delivery</option>
+                                    </select>
+                                </div>
                             </div>
                         </div>
                         
-                        <div class="flex items-center space-x-4">
-                            <span class="text-sm font-medium text-secondary">Sort by:</span>
-                            <div class="relative">
-                                <select id="sortSelect" class="px-4 py-2 bg-white/80 rounded-button text-sm font-medium hover:bg-white transition-colors border-none outline-none cursor-pointer">
-                                    <option value="popular">Most Popular</option>
-                                    <option value="newest">Newest First</option>
-                                    <option value="price-low">Price: Low to High</option>
-                                    <option value="price-high">Price: High to Low</option>
-                                    <option value="rating">Highest Rated</option>
-                                    <option value="delivery">Fastest Delivery</option>
-                                </select>
+                        <!-- Mobile: View buttons and sort on same row -->
+                        <div class="flex sm:hidden items-center justify-between">
+                            <div class="flex items-center space-x-2">
+                                <button id="gridViewBtnMobile" class="w-8 h-8 flex items-center justify-center bg-primary text-white rounded-button">
+                                    <i class="ri-grid-line text-sm"></i>
+                                </button>
+                                <button id="listViewBtnMobile" class="w-8 h-8 flex items-center justify-center bg-white/80 text-gray-600 rounded-button hover:bg-gray-100 transition-colors">
+                                    <i class="ri-list-unordered text-sm"></i>
+                                </button>
+                            </div>
+                            
+                            <div class="flex items-center space-x-2">
+                                <span class="text-sm font-medium text-secondary">Sort by:</span>
+                                <div class="relative">
+                                    <select id="sortSelectMobile" class="px-3 py-1.5 bg-white/80 rounded-button text-sm font-medium hover:bg-white transition-colors border-none outline-none cursor-pointer">
+                                        <option value="popular">Most Popular</option>
+                                        <option value="newest">Newest First</option>
+                                        <option value="price-low">Price: Low to High</option>
+                                        <option value="price-high">Price: High to Low</option>
+                                        <option value="rating">Highest Rated</option>
+                                        <option value="delivery">Fastest Delivery</option>
+                                    </select>
+                                </div>
                             </div>
                         </div>
                     </div>
                     
                     <!-- Services Grid -->
-                    <div class="grid md:grid-cols-2 xl:grid-cols-3 gap-6" id="servicesGrid">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6" id="servicesGrid">
                         <?php foreach ($services as $service): ?>
                         <div class="service-card rounded-2xl overflow-hidden">
                             <div class="relative">
@@ -580,7 +494,7 @@ $deliveryTimes = $serviceManager->getDeliveryTimeFilters();
                                 </div>
                                 <?php endif; ?>
                                 <div class="absolute bottom-3 left-3 flex space-x-2">
-                                    <span class="px-2 py-1 bg-green-500 text-white text-xs rounded-button font-medium"><?= htmlspecialchars($service['delivery_time']) ?></span>
+                                    <span class="px-2 py-1 bg-green-500 text-white text-xs rounded-button font-medium"><?= htmlspecialchars(formatDeliveryTime($service['delivery_time'])) ?></span>
                                 </div>
                             </div>
                             <div class="service-content">
@@ -627,7 +541,7 @@ $deliveryTimes = $serviceManager->getDeliveryTimeFilters();
                     </div>
                     
                     <!-- Pagination -->
-                    <div class="flex items-center justify-center space-x-2 mt-12" id="paginationContainer">
+                    <div class="flex items-center justify-center space-x-1 sm:space-x-2 mt-8 sm:mt-12" id="paginationContainer">
                         <!-- Pagination will be dynamically updated by JavaScript -->
                     </div>
                 </div>
@@ -651,6 +565,7 @@ $deliveryTimes = $serviceManager->getDeliveryTimeFilters();
             initializeSearch();
             initializeCategoryPills();
             initializeViewToggle();
+            initializeMobileFilters();
             
             // Initialize pagination with current data
             const totalCount = <?= isset($totalCount) ? $totalCount : count($services) ?>;
@@ -665,17 +580,44 @@ $deliveryTimes = $serviceManager->getDeliveryTimeFilters();
 
         // Initialize view toggle functionality
         function initializeViewToggle() {
+            // Desktop view buttons
             const gridViewBtn = document.getElementById('gridViewBtn');
             const listViewBtn = document.getElementById('listViewBtn');
             
-            if (gridViewBtn && listViewBtn) {
+            // Mobile view buttons
+            const gridViewBtnMobile = document.getElementById('gridViewBtnMobile');
+            const listViewBtnMobile = document.getElementById('listViewBtnMobile');
+            
+            // Desktop grid view
+            if (gridViewBtn) {
                 gridViewBtn.addEventListener('click', function() {
                     if (currentView !== 'grid') {
                         switchToGridView();
                     }
                 });
-                
+            }
+            
+            // Desktop list view
+            if (listViewBtn) {
                 listViewBtn.addEventListener('click', function() {
+                    if (currentView !== 'list') {
+                        switchToListView();
+                    }
+                });
+            }
+            
+            // Mobile grid view
+            if (gridViewBtnMobile) {
+                gridViewBtnMobile.addEventListener('click', function() {
+                    if (currentView !== 'grid') {
+                        switchToGridView();
+                    }
+                });
+            }
+            
+            // Mobile list view
+            if (listViewBtnMobile) {
+                listViewBtnMobile.addEventListener('click', function() {
                     if (currentView !== 'list') {
                         switchToListView();
                     }
@@ -687,15 +629,29 @@ $deliveryTimes = $serviceManager->getDeliveryTimeFilters();
         function switchToGridView() {
             currentView = 'grid';
             
-            // Update button states
+            // Update desktop button states
             const gridViewBtn = document.getElementById('gridViewBtn');
             const listViewBtn = document.getElementById('listViewBtn');
             
-            gridViewBtn.classList.remove('view-btn-inactive');
-            gridViewBtn.classList.add('view-btn-active');
+            if (gridViewBtn && listViewBtn) {
+                gridViewBtn.classList.remove('bg-white/80', 'text-gray-600');
+                gridViewBtn.classList.add('bg-primary', 'text-white');
+                
+                listViewBtn.classList.remove('bg-primary', 'text-white');
+                listViewBtn.classList.add('bg-white/80', 'text-gray-600');
+            }
             
-            listViewBtn.classList.remove('view-btn-active');
-            listViewBtn.classList.add('view-btn-inactive');
+            // Update mobile button states
+            const gridViewBtnMobile = document.getElementById('gridViewBtnMobile');
+            const listViewBtnMobile = document.getElementById('listViewBtnMobile');
+            
+            if (gridViewBtnMobile && listViewBtnMobile) {
+                gridViewBtnMobile.classList.remove('bg-white/80', 'text-gray-600');
+                gridViewBtnMobile.classList.add('bg-primary', 'text-white');
+                
+                listViewBtnMobile.classList.remove('bg-primary', 'text-white');
+                listViewBtnMobile.classList.add('bg-white/80', 'text-gray-600');
+            }
             
             // Update grid container classes
             const grid = document.getElementById('servicesGrid');
@@ -714,15 +670,29 @@ $deliveryTimes = $serviceManager->getDeliveryTimeFilters();
         function switchToListView() {
             currentView = 'list';
             
-            // Update button states
+            // Update desktop button states
             const gridViewBtn = document.getElementById('gridViewBtn');
             const listViewBtn = document.getElementById('listViewBtn');
             
-            gridViewBtn.classList.remove('view-btn-active');
-            gridViewBtn.classList.add('view-btn-inactive');
+            if (gridViewBtn && listViewBtn) {
+                gridViewBtn.classList.remove('bg-primary', 'text-white');
+                gridViewBtn.classList.add('bg-white/80', 'text-gray-600');
+                
+                listViewBtn.classList.remove('bg-white/80', 'text-gray-600');
+                listViewBtn.classList.add('bg-primary', 'text-white');
+            }
             
-            listViewBtn.classList.remove('view-btn-inactive');
-            listViewBtn.classList.add('view-btn-active');
+            // Update mobile button states
+            const gridViewBtnMobile = document.getElementById('gridViewBtnMobile');
+            const listViewBtnMobile = document.getElementById('listViewBtnMobile');
+            
+            if (gridViewBtnMobile && listViewBtnMobile) {
+                gridViewBtnMobile.classList.remove('bg-primary', 'text-white');
+                gridViewBtnMobile.classList.add('bg-white/80', 'text-gray-600');
+                
+                listViewBtnMobile.classList.remove('bg-white/80', 'text-gray-600');
+                listViewBtnMobile.classList.add('bg-primary', 'text-white');
+            }
             
             // Update grid container classes
             const grid = document.getElementById('servicesGrid');
@@ -733,6 +703,39 @@ $deliveryTimes = $serviceManager->getDeliveryTimeFilters();
                 const services = getCurrentServices();
                 if (services.length > 0) {
                     updateServicesListView(services);
+                }
+            }
+        }
+
+        // Format delivery time with proper unit
+        function formatDeliveryTimeJS(deliveryTime) {
+            if (!deliveryTime || isNaN(deliveryTime)) {
+                return '7 days';
+            }
+            
+            const days = parseInt(deliveryTime);
+            
+            if (days == 1) {
+                return '1 day';
+            } else if (days <= 7) {
+                return days + ' days';
+            } else if (days <= 14) {
+                const weeks = Math.round(days / 7 * 10) / 10;
+                if (weeks == 1) {
+                    return '1 week';
+                } else if (weeks == 2) {
+                    return '2 weeks';
+                } else {
+                    return weeks + ' weeks';
+                }
+            } else if (days <= 30) {
+                return Math.round(days / 7) + ' weeks';
+            } else {
+                const months = Math.round(days / 30 * 10) / 10;
+                if (months == 1) {
+                    return '1 month';
+                } else {
+                    return months + ' months';
                 }
             }
         }
@@ -774,7 +777,7 @@ $deliveryTimes = $serviceManager->getDeliveryTimeFilters();
                         </div>
                         ${service.is_featured ? '<div class="absolute top-3 left-3"><span class="px-2 py-1 bg-red-500 text-white text-xs rounded-button font-medium">Featured</span></div>' : ''}
                         <div class="absolute bottom-3 left-3 flex space-x-2">
-                            <span class="px-2 py-1 bg-green-500 text-white text-xs rounded-button font-medium">${escapeHtml(service.delivery_time)}</span>
+                            <span class="px-2 py-1 bg-green-500 text-white text-xs rounded-button font-medium">${formatDeliveryTimeJS(service.delivery_time)}</span>
                         </div>
                     </div>
                     <div class="service-content">
@@ -845,7 +848,7 @@ $deliveryTimes = $serviceManager->getDeliveryTimeFilters();
                         </div>
                         ${service.is_featured ? '<div class="absolute top-3 left-3"><span class="px-2 py-1 bg-red-500 text-white text-xs rounded-button font-medium">Featured</span></div>' : ''}
                         <div class="absolute bottom-3 left-3 flex space-x-2">
-                            <span class="px-2 py-1 bg-green-500 text-white text-xs rounded-button font-medium">${escapeHtml(service.delivery_time)}</span>
+                            <span class="px-2 py-1 bg-green-500 text-white text-xs rounded-button font-medium">${formatDeliveryTimeJS(service.delivery_time)}</span>
                         </div>
                     </div>
                     <div class="service-content">
@@ -1010,10 +1013,28 @@ $deliveryTimes = $serviceManager->getDeliveryTimeFilters();
                 maxPrice.addEventListener('change', handlePriceChange);
             }
 
-            // Sort dropdown
+            // Sort dropdown (desktop)
             const sortSelect = document.getElementById('sortSelect');
             if (sortSelect) {
                 sortSelect.addEventListener('change', function() {
+                    // Sync with mobile dropdown
+                    const sortSelectMobile = document.getElementById('sortSelectMobile');
+                    if (sortSelectMobile) {
+                        sortSelectMobile.value = this.value;
+                    }
+                    // Don't reset page for sort changes, just re-sort current results
+                    applyFilters();
+                });
+            }
+
+            // Sort dropdown (mobile)
+            const sortSelectMobile = document.getElementById('sortSelectMobile');
+            if (sortSelectMobile) {
+                sortSelectMobile.addEventListener('change', function() {
+                    // Sync with desktop dropdown
+                    if (sortSelect) {
+                        sortSelect.value = this.value;
+                    }
                     // Don't reset page for sort changes, just re-sort current results
                     applyFilters();
                 });
@@ -1118,8 +1139,11 @@ $deliveryTimes = $serviceManager->getDeliveryTimeFilters();
             
             // Sort
             const sortSelect = document.getElementById('sortSelect');
+            const sortSelectMobile = document.getElementById('sortSelectMobile');
             if (sortSelect) {
                 filters.sort = sortSelect.value;
+            } else if (sortSelectMobile) {
+                filters.sort = sortSelectMobile.value;
             }
             
             // Page
@@ -1237,25 +1261,58 @@ $deliveryTimes = $serviceManager->getDeliveryTimeFilters();
 
         // Handle Order Service function
         function handleOrderService(id, title, price, image, seller) {
-            // Check if user is logged in
-            if (typeof cart === 'undefined') {
-                // If cart is not defined, user is not logged in
+            // Check if user is logged in using PHP session
+            const isLoggedIn = <?php echo $isLoggedIn ? 'true' : 'false'; ?>;
+            
+            if (!isLoggedIn) {
+                // If user is not logged in, redirect to login
                 window.location.href = 'auth.php?redirect=' + encodeURIComponent(window.location.href);
                 return;
             }
             
-            // Create service data object
-            const serviceData = {
+            console.log('Adding service to cart:', {
                 id: id,
                 title: title,
                 price: price,
-                image: image,
-                seller: seller,
-                type: 'service' // Distinguish from templates
-            };
+                type: 'service'
+            });
             
-            // Add to cart using the global cart system
-            cart.addItem(serviceData);
+            // Send to cart API directly
+            fetch('cart-api.php?action=add', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: new URLSearchParams({
+                    service_id: id
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Update cart badge if element exists
+                    const cartBadge = document.getElementById('cartBadge');
+                    if (cartBadge && data.cart_count) {
+                        cartBadge.textContent = data.cart_count;
+                        cartBadge.style.transform = 'scale(1)';
+                    }
+                    
+                    // Refresh cart dropdown if cart object exists
+                    if (typeof cart !== 'undefined' && cart.loadCartFromServer) {
+                        cart.loadCartFromServer();
+                    }
+                } else {
+                    if (data.redirect) {
+                        window.location.href = data.redirect + '?redirect=' + encodeURIComponent(window.location.href);
+                    } else {
+                        showError('Failed to add service to cart: ' + (data.error || 'Unknown error'));
+                    }
+                }
+            })
+            .catch(error => {
+                console.error('Error adding service to cart:', error);
+                showError('Error adding service to cart. Please try again.');
+            });
         }
         
         // Helper function for JavaScript addslashes equivalent
@@ -1289,29 +1346,32 @@ $deliveryTimes = $serviceManager->getDeliveryTimeFilters();
                 searchInput.value = '';
             }
             
-            // Reset all checkboxes and radios
+            // Reset all checkboxes and radios (desktop)
             const checkboxes = document.querySelectorAll('input[type="checkbox"]');
             checkboxes.forEach(input => {
                 input.checked = false;
             });
             
-            // Reset category to "all"
+            // Reset category to "all" (desktop)
             const allCategoryRadio = document.querySelector('input[name="category"][value="all"]');
             if (allCategoryRadio) {
                 allCategoryRadio.checked = true;
             }
             
-            // Reset rating radio buttons
+            // Reset rating radio buttons (desktop)
             const ratingRadios = document.querySelectorAll('input[name="rating"]');
             ratingRadios.forEach(input => {
                 input.checked = false;
             });
             
-            // Clear price inputs
+            // Clear price inputs (desktop)
             const minPrice = document.getElementById('minPrice');
             const maxPrice = document.getElementById('maxPrice');
             if (minPrice) minPrice.value = '';
             if (maxPrice) maxPrice.value = '';
+            
+            // Clear mobile filters
+            clearMobileFilters();
             
             // Reset price slider
             const priceSlider = document.querySelector('.price-range-slider');
@@ -1319,15 +1379,47 @@ $deliveryTimes = $serviceManager->getDeliveryTimeFilters();
                 priceSlider.value = 1000;
             }
             
-            // Reset sort to popular
+            // Reset sort to popular (both desktop and mobile)
             const sortSelect = document.getElementById('sortSelect');
             if (sortSelect) {
                 sortSelect.value = 'popular';
             }
             
+            const sortSelectMobile = document.getElementById('sortSelectMobile');
+            if (sortSelectMobile) {
+                sortSelectMobile.value = 'popular';
+            }
+            
             // Reset to page 1 and apply filters
             currentPage = 1;
             applyFilters();
+        }
+
+        // Clear mobile filters
+        function clearMobileFilters() {
+            // Reset mobile category to "all"
+            const allMobileCategoryRadio = document.querySelector('input[name="mobile_category"][value="all"]');
+            if (allMobileCategoryRadio) {
+                allMobileCategoryRadio.checked = true;
+            }
+            
+            // Reset mobile delivery time checkboxes
+            const mobileDeliveryCheckboxes = document.querySelectorAll('input[name="mobile_delivery_time"]');
+            mobileDeliveryCheckboxes.forEach(input => {
+                input.checked = false;
+            });
+            
+            // Reset mobile rating radio buttons
+            const mobileRatingRadios = document.querySelectorAll('input[name="mobile_rating"]');
+            mobileRatingRadios.forEach(input => {
+                input.checked = false;
+            });
+            
+            // Clear mobile price inputs
+            const mobileminPrice = document.getElementById('mobileminPrice');
+            const mobilemaxPrice = document.getElementById('mobilemaxPrice');
+            if (mobileminPrice) mobileminPrice.value = '';
+            if (mobilemaxPrice) mobilemaxPrice.value = '';
         }
 
         // JavaScript function to generate optimized image URLs (equivalent to PHP function)
@@ -1367,6 +1459,177 @@ $deliveryTimes = $serviceManager->getDeliveryTimeFilters();
             
             const transformation = transformations[size] || transformations['thumb'];
             return `https://res.cloudinary.com/${cloudName}/image/upload/${transformation}/${processedPublicId}`;
+        }
+
+        // Initialize mobile filters
+        function initializeMobileFilters() {
+            const mobileFilterDropdownToggle = document.getElementById('mobileFilterDropdownToggle');
+            const mobileFilterDropdown = document.getElementById('mobileFilterDropdown');
+            const closeMobileFilterDropdown = document.getElementById('closeMobileFilterDropdown');
+            const applyMobileFilters = document.getElementById('applyMobileFilters');
+            
+            // Toggle dropdown
+            if (mobileFilterDropdownToggle) {
+                mobileFilterDropdownToggle.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    toggleMobileFilterDropdown();
+                });
+            }
+            
+            // Close dropdown
+            if (closeMobileFilterDropdown) {
+                closeMobileFilterDropdown.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    closeMobileFilterDropdownFunc();
+                });
+            }
+            
+            // Apply filters
+            if (applyMobileFilters) {
+                applyMobileFilters.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    applyMobileFiltersFunc();
+                });
+            }
+            
+            // Close dropdown when clicking outside
+            document.addEventListener('click', function(e) {
+                if (mobileFilterDropdown && !mobileFilterDropdown.contains(e.target) && !mobileFilterDropdownToggle.contains(e.target)) {
+                    closeMobileFilterDropdownFunc();
+                }
+            });
+            
+            // Sync mobile filters with desktop filters
+            initializeMobileFilterSync();
+        }
+
+        // Toggle mobile filter dropdown
+        function toggleMobileFilterDropdown() {
+            const dropdown = document.getElementById('mobileFilterDropdown');
+            if (dropdown) {
+                if (dropdown.classList.contains('hidden')) {
+                    openMobileFilterDropdown();
+                } else {
+                    closeMobileFilterDropdownFunc();
+                }
+            }
+        }
+
+        // Open mobile filter dropdown
+        function openMobileFilterDropdown() {
+            const dropdown = document.getElementById('mobileFilterDropdown');
+            if (dropdown) {
+                dropdown.classList.remove('hidden');
+                // Animate slide down
+                dropdown.style.transform = 'translateY(-10px)';
+                dropdown.style.opacity = '0';
+                setTimeout(() => {
+                    dropdown.style.transform = 'translateY(0)';
+                    dropdown.style.opacity = '1';
+                    dropdown.style.transition = 'all 0.2s ease-out';
+                }, 10);
+            }
+        }
+
+        // Close mobile filter dropdown
+        function closeMobileFilterDropdownFunc() {
+            const dropdown = document.getElementById('mobileFilterDropdown');
+            if (dropdown && !dropdown.classList.contains('hidden')) {
+                dropdown.style.transform = 'translateY(-10px)';
+                dropdown.style.opacity = '0';
+                setTimeout(() => {
+                    dropdown.classList.add('hidden');
+                    dropdown.style.transform = '';
+                    dropdown.style.opacity = '';
+                    dropdown.style.transition = '';
+                }, 200);
+            }
+        }
+
+        // Apply mobile filters
+        function applyMobileFiltersFunc() {
+            // Sync mobile filter values to desktop filters
+            syncMobileToDesktopFilters();
+            
+            // Close dropdown
+            closeMobileFilterDropdownFunc();
+            
+            // Apply filters
+            applyFilters();
+        }
+
+        // Initialize mobile filter synchronization
+        function initializeMobileFilterSync() {
+            // Sync category changes
+            const mobileCategoryRadios = document.querySelectorAll('input[name="mobile_category"]');
+            mobileCategoryRadios.forEach(radio => {
+                radio.addEventListener('change', function() {
+                    // Sync to desktop
+                    const desktopRadio = document.querySelector(`input[name="category"][value="${this.value}"]`);
+                    if (desktopRadio) {
+                        desktopRadio.checked = true;
+                    }
+                    // Sync category pills
+                    syncCategoryPills(this.value);
+                });
+            });
+
+            // Sync delivery time changes
+            const mobileDeliveryCheckboxes = document.querySelectorAll('input[name="mobile_delivery_time"]');
+            mobileDeliveryCheckboxes.forEach(checkbox => {
+                checkbox.addEventListener('change', function() {
+                    const desktopCheckbox = document.querySelector(`input[name="delivery_time"][value="${this.value}"]`);
+                    if (desktopCheckbox) {
+                        desktopCheckbox.checked = this.checked;
+                    }
+                });
+            });
+
+            // Sync rating changes
+            const mobileRatingRadios = document.querySelectorAll('input[name="mobile_rating"]');
+            mobileRatingRadios.forEach(radio => {
+                radio.addEventListener('change', function() {
+                    const desktopRadio = document.querySelector(`input[name="rating"][value="${this.value}"]`);
+                    if (desktopRadio) {
+                        desktopRadio.checked = true;
+                    }
+                });
+            });
+
+            // Sync price inputs
+            const mobileminPrice = document.getElementById('mobileminPrice');
+            const mobilemaxPrice = document.getElementById('mobilemaxPrice');
+            const desktopMinPrice = document.getElementById('minPrice');
+            const desktopMaxPrice = document.getElementById('maxPrice');
+
+            if (mobileminPrice && desktopMinPrice) {
+                mobileminPrice.addEventListener('input', function() {
+                    desktopMinPrice.value = this.value;
+                });
+            }
+
+            if (mobilemaxPrice && desktopMaxPrice) {
+                mobilemaxPrice.addEventListener('input', function() {
+                    desktopMaxPrice.value = this.value;
+                });
+            }
+        }
+
+        // Sync mobile filter values to desktop filters
+        function syncMobileToDesktopFilters() {
+            // Sync price inputs
+            const mobileminPrice = document.getElementById('mobileminPrice');
+            const mobilemaxPrice = document.getElementById('mobilemaxPrice');
+            const desktopMinPrice = document.getElementById('minPrice');
+            const desktopMaxPrice = document.getElementById('maxPrice');
+
+            if (mobileminPrice && desktopMinPrice) {
+                desktopMinPrice.value = mobileminPrice.value;
+            }
+
+            if (mobilemaxPrice && desktopMaxPrice) {
+                desktopMaxPrice.value = mobilemaxPrice.value;
+            }
         }
     </script>
 </body>

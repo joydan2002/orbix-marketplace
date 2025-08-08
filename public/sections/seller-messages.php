@@ -381,7 +381,7 @@ function markAsRead(messageId) {
 }
 
 function archiveMessage(messageId) {
-    if (confirm('Are you sure you want to archive this message?')) {
+    showConfirm('Are you sure you want to archive this message?', () => {
         fetch('seller-api.php', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -399,7 +399,7 @@ function archiveMessage(messageId) {
                 showToast(data.message, 'error');
             }
         });
-    }
+    });
 }
 
 function composeMessage() {

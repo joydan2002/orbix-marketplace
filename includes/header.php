@@ -76,268 +76,10 @@ try {
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css" rel="stylesheet">
-    <style>
-        :where([class^="ri-"])::before {
-            content: "\f3c2";
-        }
-        .glass-effect {
-            backdrop-filter: blur(20px);
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-        }
-        .neon-glow {
-            box-shadow: 0 0 20px rgba(255, 95, 31, 0.3);
-        }
-        .gradient-bg {
-            background: linear-gradient(135deg, #ffffff 0%, #f8fafc 50%, #ffffff 100%);
-        }
-        .floating-animation {
-            animation: float 6s ease-in-out infinite;
-        }
-        @keyframes float {
-            0%, 100% { transform: translateY(0px); }
-            50% { transform: translateY(-20px); }
-        }
-        .hover-scale {
-            transition: transform 0.3s ease;
-        }
-        .hover-scale:hover {
-            transform: scale(1.05);
-        }
-        .template-card {
-            transition: all 0.3s ease;
-            background: rgba(255, 255, 255, 0.9);
-            backdrop-filter: blur(10px);
-        }
-        .template-card:hover {
-            transform: translateY(-8px);
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-        }
-        .ai-mascot {
-            position: fixed;
-            bottom: 2rem;
-            right: 2rem;
-            z-index: 1000;
-            animation: bounce 2s infinite;
-        }
-        @keyframes bounce {
-            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
-            40% { transform: translateY(-10px); }
-            60% { transform: translateY(-5px); }
-        }
-        
-        /* User Dropdown Styles - Thay đổi về background trắng */
-        .user-dropdown {
-            opacity: 0;
-            visibility: hidden;
-            transform: translateY(10px) scale(0.95);
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            /* Background trắng như các dropdown khác */
-            background: #ffffff;
-            border: 1px solid rgba(0, 0, 0, 0.1);
-            box-shadow: 
-                0 20px 40px -12px rgba(0, 0, 0, 0.15),
-                0 4px 16px -4px rgba(0, 0, 0, 0.1);
-        }
-        
-        .user-dropdown.show {
-            opacity: 1;
-            visibility: visible;
-            transform: translateY(0) scale(1);
-        }
-        
-        /* Templates Dropdown Styles - Tương tự User Dropdown */
-        .templates-dropdown-menu {
-            opacity: 0;
-            visibility: hidden;
-            transform: translateY(10px) translateX(-50%) scale(0.95);
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            background: #ffffff;
-            border: 1px solid rgba(0, 0, 0, 0.1);
-            box-shadow: 
-                0 20px 40px -12px rgba(0, 0, 0, 0.15),
-                0 4px 16px -4px rgba(0, 0, 0, 0.1);
-        }
-        
-        .templates-dropdown-menu.show {
-            opacity: 1;
-            visibility: visible;
-            transform: translateY(0) translateX(-50%) scale(1);
-        }
-        
-        /* Template dropdown hover effects */
-        .templates-dropdown-container:hover .templates-dropdown-menu {
-            opacity: 1;
-            visibility: visible;
-            transform: translateY(0) translateX(-50%) scale(1);
-        }
-        
-        .dropdown-header {
-            background: rgba(248, 250, 252, 0.8);
-            border-radius: 16px 16px 0 0;
-            border-bottom: 1px solid rgba(0, 0, 0, 0.08);
-            position: relative;
-        }
-        
-        .menu-item {
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            border-radius: 14px;
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .menu-item:hover {
-            background: rgba(255, 95, 31, 0.15);
-            backdrop-filter: blur(20px);
-            transform: translateX(6px) translateY(-2px);
-            box-shadow: 
-                0 8px 20px -8px rgba(255, 95, 31, 0.3),
-                0 0 0 1px rgba(255, 95, 31, 0.2);
-        }
-        
-        /* Fixed Avatar Container */
-        .dropdown-avatar {
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            flex-shrink: 0;
-            position: relative;
-            overflow: hidden;
-            border: 3px solid rgba(255, 95, 31, 0.4);
-            box-shadow: 0 4px 15px rgba(255, 95, 31, 0.2);
-        }
-        
-        .dropdown-avatar img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-        
-        .dropdown-avatar-fallback {
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(135deg, #FF5F1F 0%, #FF8C42 50%, #FFB366 100%);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-weight: bold;
-            font-size: 1.5rem;
-            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-        }
-        
-        /* User Info Container - Màu text phù hợp với brand */
-        .user-info-container {
-            flex: 1;
-            min-width: 0;
-            margin-left: 16px;
-        }
-        
-        .user-name {
-            font-size: 1.1rem;
-            font-weight: 800;
-            color: #1f2937;
-            margin-bottom: 4px;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            max-width: 180px;
-            text-shadow: 0 2px 4px rgba(255, 255, 255, 0.8);
-        }
-        
-        .user-email {
-            font-size: 0.85rem;
-            color: #4b5563;
-            font-weight: 600;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            margin-bottom: 8px;
-            max-width: 180px;
-            text-shadow: 0 1px 2px rgba(255, 255, 255, 0.6);
-        }
-        
-        .glass-badge {
-            background: rgba(255, 95, 31, 0.2);
-            backdrop-filter: blur(15px);
-            border: 1px solid rgba(255, 95, 31, 0.4);
-            border-radius: 20px;
-            padding: 6px 12px;
-            font-size: 0.75rem;
-            font-weight: 700;
-            white-space: nowrap;
-            color: #1f2937;
-            text-shadow: 0 1px 2px rgba(255, 255, 255, 0.8);
-            box-shadow: 0 2px 8px rgba(255, 95, 31, 0.2);
-        }
-        
-        .glass-badge.badge-success {
-            background: rgba(34, 197, 94, 0.2);
-            border-color: rgba(34, 197, 94, 0.4);
-            color: #1f2937;
-            box-shadow: 0 2px 8px rgba(34, 197, 94, 0.2);
-        }
-        
-        /* Menu item text với màu brand phù hợp */
-        .menu-title {
-            font-weight: 700;
-            color: #1f2937;
-            font-size: 0.95rem;
-            text-shadow: 0 1px 3px rgba(255, 255, 255, 0.8);
-        }
-        
-        .menu-subtitle {
-            color: #6b7280;
-            font-weight: 500;
-            text-shadow: 0 1px 2px rgba(255, 255, 255, 0.6);
-        }
-        
-        .menu-item:hover .menu-title {
-            color: #FF5F1F;
-            text-shadow: 0 2px 4px rgba(255, 255, 255, 0.9);
-        }
-        
-        .menu-item:hover .menu-subtitle {
-            color: #1f2937;
-            text-shadow: 0 1px 2px rgba(255, 255, 255, 0.7);
-        }
-        
-        /* Icon containers với màu brand */
-        .icon-container {
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-        }
-        
-        /* Red text cho Sign Out với contrast tốt */
-        .text-red-600 {
-            color: #dc2626 !important;
-            font-weight: 700 !important;
-            text-shadow: 0 1px 3px rgba(255, 255, 255, 0.8) !important;
-        }
-        
-        .text-red-400 {
-            color: #f87171 !important;
-            font-weight: 500 !important;
-            text-shadow: 0 1px 2px rgba(255, 255, 255, 0.6) !important;
-        }
-        
-        /* Arrow icons với màu primary khi hover */
-        .menu-item:hover .ri-arrow-right-s-line {
-            color: #FF5F1F !important;
-        }
-        
-        /* Divider với gradient subtle */
-        .dropdown-divider {
-            background: linear-gradient(to right, 
-                transparent, 
-                rgba(255, 95, 31, 0.2) 20%, 
-                rgba(255, 95, 31, 0.3) 50%, 
-                rgba(255, 95, 31, 0.2) 80%, 
-                transparent
-            );
-            height: 1px;
-        }
-    </style>
+    
+    <!-- Toast Notification System -->
+    <script src="../assets/js/toast.js"></script>
+    <link rel="stylesheet" href="../assets/css/header.css">
     <script>
         tailwind.config = {
             theme: {
@@ -371,17 +113,36 @@ try {
 
 <!-- Header -->
 <header class="fixed top-0 left-0 right-0 z-50 backdrop-blur-md" style="background: rgba(255, 255, 255, 0.1);">
-    <div class="max-w-7xl mx-auto px-6">
-        <div class="flex items-center justify-between h-20">
-            <!-- Logo -->
-            <div class="flex items-center space-x-3">
-                <div class="w-10 h-10 bg-primary rounded-lg flex items-center justify-center">
-                    <span class="text-white font-bold text-xl">O</span>
+    <div class="max-w-7xl mx-auto px-4 sm:px-6">
+        <div class="flex items-center justify-between h-16 sm:h-20">
+            <!-- Logo Section -->
+            <div class="flex items-center space-x-2 sm:space-x-3">
+                <!-- Animated Hamburger Logo (Mobile Only) -->
+                <div id="logoHamburger" class="logo-hamburger">
+                    <!-- Logo Text -->
+                    <span class="logo-text">O</span>
+                    
+                    <!-- Hamburger Lines -->
+                    <div class="hamburger-lines">
+                        <div class="hamburger-line"></div>
+                        <div class="hamburger-line"></div>
+                        <div class="hamburger-line"></div>
+                    </div>
                 </div>
-                <span class="font-pacifico text-3xl text-secondary">Orbix Market</span>
+                
+                <!-- Mobile Site Name (Mobile Only) -->
+                <span class="mobile-site-name" style="display: none;">Orbix Market</span>
+                
+                <!-- Original Logo (Desktop Only) -->
+                <div class="original-logo flex items-center space-x-2 sm:space-x-3">
+                    <div class="w-8 h-8 sm:w-10 sm:h-10 bg-primary rounded-lg flex items-center justify-center">
+                        <span class="text-white font-bold text-lg sm:text-xl">O</span>
+                    </div>
+                    <span class="font-pacifico text-xl sm:text-2xl lg:text-3xl text-secondary">Orbix Market</span>
+                </div>
             </div>
             
-            <!-- Navigation -->
+            <!-- Desktop Navigation -->
             <nav class="hidden lg:flex items-center space-x-8">
                 <a href="index.php" class="text-secondary hover:text-primary transition-colors font-medium">Home</a>
                 
@@ -458,13 +219,17 @@ try {
             </nav>
             
             <!-- Actions -->
-            <div class="flex items-center space-x-4">
+            <div class="flex items-center space-x-2 sm:space-x-4">
                 <?php if ($isLoggedIn): ?>
                     <!-- Shopping Cart -->
                     <div class="relative">
                         <button id="cartButton" class="relative p-2 rounded-xl hover:bg-white/10 transition-colors group">
-                            <i class="ri-shopping-cart-line text-xl text-secondary group-hover:text-primary transition-colors"></i>
+                            <i class="ri-shopping-cart-line text-lg sm:text-xl text-secondary group-hover:text-primary transition-colors"></i>
                             <!-- Cart Badge -->
+                            <span id="cartBadge" class="absolute -top-1 -right-1 w-4 h-4 sm:w-5 sm:h-5 bg-primary text-white text-xs font-bold rounded-full flex items-center justify-center transform scale-0 transition-transform duration-200">
+                                0
+                            </span>
+                        </button>
                             <span id="cartBadge" class="absolute -top-1 -right-1 w-5 h-5 bg-primary text-white text-xs font-bold rounded-full flex items-center justify-center transform scale-0 transition-transform duration-200">
                                 0
                             </span>
@@ -513,26 +278,24 @@ try {
                     <!-- User Menu Dropdown -->
                     <div id="userDropdownContainer" class="relative group">
                         <!-- User Avatar Button -->
-                        <button id="userDropdownButton" class="flex items-center space-x-3 p-2 rounded-xl hover:bg-white/10 transition-colors">
+                        <button id="userDropdownButton" class="flex items-center space-x-2 sm:space-x-3 p-1 sm:p-2 rounded-xl hover:bg-white/10 transition-colors">
                             <!-- Avatar -->
                             <div class="relative avatar-ring">
                                 <?php if (!empty($userData['profile_image'])): ?>
                                     <img src="<?= htmlspecialchars($userData['profile_image']) ?>" 
                                          alt="<?= htmlspecialchars($userData['first_name']) ?>" 
-                                         class="w-10 h-10 rounded-full object-cover border-2 border-white/20">
+                                         class="w-8 h-8 sm:w-10 sm:h-10 rounded-full object-cover border-2 border-white/20">
                                 <?php else: ?>
-                                    <div class="w-10 h-10 bg-gradient-to-br from-primary to-primary/80 rounded-full flex items-center justify-center border-2 border-white/20">
-                                        <span class="text-white font-semibold text-sm">
+                                    <div class="w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-br from-primary to-primary/80 rounded-full flex items-center justify-center border-2 border-white/20">
+                                        <span class="text-white font-semibold text-xs sm:text-sm">
                                             <?= strtoupper(substr($userData['first_name'], 0, 1) . substr($userData['last_name'], 0, 1)) ?>
                                         </span>
                                     </div>
                                 <?php endif; ?>
-                                
-
                             </div>
                             
-                            <!-- User Info (Hidden on mobile) -->
-                            <div class="hidden md:block text-left">
+                            <!-- User Info (Hidden on small mobile) -->
+                            <div class="hidden sm:block text-left">
                                 <div class="text-sm font-semibold text-secondary">
                                     <?= htmlspecialchars($userData['first_name'] . ' ' . $userData['last_name']) ?>
                                 </div>
@@ -682,15 +445,99 @@ try {
                     <a href="auth.php" class="hidden md:block text-secondary hover:text-primary transition-colors font-medium">Sign In</a>
                     <a href="auth.php?mode=signup" class="bg-primary text-white px-6 py-2 rounded-button font-medium hover:bg-primary/90 transition-colors whitespace-nowrap">Get Started</a>
                 <?php endif; ?>
-                
-                <!-- Mobile Menu Toggle -->
-                <button class="lg:hidden w-8 h-8 flex items-center justify-center">
-                    <i class="ri-menu-line text-secondary text-xl"></i>
-                </button>
             </div>
         </div>
     </div>
 </header>
+
+<!-- Mobile Menu -->
+<div id="mobileMenu" class="mobile-menu">
+    <div class="mobile-menu-content">
+        <!-- Navigation Links -->
+        <nav class="mobile-nav">
+            <a href="/orbix/public/" class="mobile-menu-item">
+                <i class="ri-home-line"></i>
+                <span>Home</span>
+            </a>
+            <a href="/orbix/public/services.php" class="mobile-menu-item">
+                <i class="ri-service-line"></i>
+                <span>Services</span>
+            </a>
+            <a href="/orbix/public/templates.php" class="mobile-menu-item">
+                <i class="ri-layout-line"></i>
+                <span>Templates</span>
+            </a>
+            <a href="/orbix/public/support.php" class="mobile-menu-item">
+                <i class="ri-customer-service-line"></i>
+                <span>Support</span>
+            </a>
+        </nav>
+
+        <!-- User Section -->
+        <div class="mobile-user-section">
+            <?php if ($isLoggedIn && $userData): ?>
+                <div class="mobile-user-info">
+                    <img src="<?php echo htmlspecialchars($userData['profile_image'] ?? '/orbix/assets/images/default-avatar.png'); ?>" 
+                         alt="Avatar" class="mobile-avatar" onerror="this.src='/orbix/assets/images/default-avatar.png'">
+                    <div class="mobile-user-details">
+                        <span class="mobile-username"><?php echo htmlspecialchars($userData['username'] ?? $userData['first_name'] ?? 'User'); ?></span>
+                        <span class="mobile-user-role"><?php echo $userData['user_type'] === 'seller' ? 'Seller' : 'Customer'; ?></span>
+                    </div>
+                </div>
+                <div class="mobile-user-actions">
+                    <a href="/orbix/public/profile.php" class="mobile-menu-item">
+                        <i class="ri-user-line"></i>
+                        <span>Profile</span>
+                    </a>
+                    <?php if ($userData['user_type'] === 'seller'): ?>
+                        <a href="/orbix/public/seller-channel.php" class="mobile-menu-item">
+                            <i class="ri-store-line"></i>
+                            <span>Seller Dashboard</span>
+                        </a>
+                    <?php endif; ?>
+                    <a href="/orbix/public/logout.php" class="mobile-menu-item text-red-500">
+                        <i class="ri-logout-line"></i>
+                        <span>Logout</span>
+                    </a>
+                </div>
+            <?php else: ?>
+                <div class="mobile-auth-actions">
+                    <a href="/orbix/public/auth.php" class="mobile-menu-item">
+                        <i class="ri-login-line"></i>
+                        <span>Login</span>
+                    </a>
+                    <a href="/orbix/public/auth.php?mode=register" class="mobile-menu-item">
+                        <i class="ri-user-add-line"></i>
+                        <span>Register</span>
+                    </a>
+                </div>
+            <?php endif; ?>
+        </div>
+
+        <!-- Cart Section -->
+        <div class="mobile-cart-section">
+            <a href="/orbix/public/cart.php" class="mobile-menu-item">
+                <i class="ri-shopping-cart-line"></i>
+                <span>Cart</span>
+                <?php 
+                // Get cart count if logged in
+                $cartCount = 0;
+                if ($isLoggedIn && $userData) {
+                    try {
+                        $cartStmt = $pdo->prepare("SELECT COUNT(*) FROM cart WHERE user_id = ?");
+                        $cartStmt->execute([$userData['id']]);
+                        $cartCount = $cartStmt->fetchColumn();
+                    } catch (Exception $e) {
+                        $cartCount = 0;
+                    }
+                }
+                if ($cartCount > 0): ?>
+                    <span class="mobile-cart-badge"><?php echo $cartCount; ?></span>
+                <?php endif; ?>
+            </a>
+        </div>
+    </div>
+</div>
 
 <!-- Enhanced JavaScript for Header Interactions -->
 <script>
@@ -770,23 +617,32 @@ function setupDropdowns() {
                 }, 200);
             };
             
-            // Event listeners cho container
-            userDropdownContainer.addEventListener('mouseenter', showDropdown);
-            userDropdownContainer.addEventListener('mouseleave', hideDropdown);
-            
-            // Event listeners cho dropdown menu để không bị đóng khi hover vào menu
-            userMenu.addEventListener('mouseenter', () => {
-                clearTimeout(userHideTimeout);
-            });
-            
-            userMenu.addEventListener('mouseleave', hideDropdown);
+            // Event listeners cho container (chỉ desktop)
+            if (window.innerWidth >= 1024) {
+                userDropdownContainer.addEventListener('mouseenter', showDropdown);
+                userDropdownContainer.addEventListener('mouseleave', hideDropdown);
+                
+                // Event listeners cho dropdown menu để không bị đóng khi hover vào menu
+                userMenu.addEventListener('mouseenter', () => {
+                    clearTimeout(userHideTimeout);
+                });
+                
+                userMenu.addEventListener('mouseleave', hideDropdown);
+            }
             
             // Click để toggle (cho mobile/touch devices)
             userDropdownButton.addEventListener('click', (e) => {
                 e.preventDefault();
                 e.stopPropagation();
                 console.log('User dropdown button clicked');
-                userMenu.classList.toggle('show');
+                
+                const isShown = userMenu.classList.contains('show');
+                
+                if (isShown) {
+                    userMenu.classList.remove('show');
+                } else {
+                    userMenu.classList.add('show');
+                }
             });
             
             // Click bên ngoài để đóng
@@ -809,23 +665,121 @@ function setupDropdowns() {
 
 function setupMobileMenu() {
     try {
-        const mobileToggle = document.querySelector('button.lg\\:hidden');
-        const nav = document.querySelector('nav.hidden.lg\\:flex');
+        const logoHamburger = document.getElementById('logoHamburger');
+        const mobileMenu = document.getElementById('mobileMenu');
         
-        if (mobileToggle && nav) {
-            mobileToggle.addEventListener('click', () => {
-                nav.classList.toggle('hidden');
-                nav.classList.toggle('flex');
+        console.log('Mobile menu elements:', {
+            hamburger: logoHamburger,
+            menu: mobileMenu
+        });
+        
+        if (logoHamburger && mobileMenu) {
+            let currentState = 0; // 0: logo, 1: hamburger
+            let animationInterval;
+            
+            // Auto animation every 3 seconds (switch between logo and hamburger)
+            function startAutoAnimation() {
+                animationInterval = setInterval(() => {
+                    if (!mobileMenu.classList.contains('show')) {
+                        currentState = currentState === 0 ? 1 : 0;
+                        updateHamburgerState();
+                    }
+                }, 3000);
+            }
+            
+            function stopAutoAnimation() {
+                if (animationInterval) {
+                    clearInterval(animationInterval);
+                    animationInterval = null;
+                }
+            }
+            
+            function updateHamburgerState() {
+                // Remove all states
+                logoHamburger.classList.remove('hamburger-mode', 'menu-open');
                 
-                // Animate icon
-                const icon = mobileToggle.querySelector('i');
-                if (icon) {
-                    if (nav.classList.contains('hidden')) {
-                        icon.className = 'ri-menu-line text-secondary text-xl';
-                    } else {
-                        icon.className = 'ri-close-line text-secondary text-xl';
+                if (currentState === 1) {
+                    // Show hamburger lines
+                    logoHamburger.classList.add('hamburger-mode');
+                }
+                // currentState === 0 shows logo by default
+            }
+            
+            // Start auto animation
+            startAutoAnimation();
+            
+            // Toggle mobile menu on click
+            logoHamburger.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                
+                const isShown = mobileMenu.classList.contains('show');
+                
+                if (isShown) {
+                    // Hide menu
+                    mobileMenu.classList.remove('show');
+                    // Reset to logo state and restart animation
+                    currentState = 0;
+                    logoHamburger.classList.remove('hamburger-mode', 'menu-open');
+                    startAutoAnimation();
+                } else {
+                    // Show menu
+                    mobileMenu.classList.add('show');
+                    // Stop animation and set to X state
+                    stopAutoAnimation();
+                    logoHamburger.classList.remove('hamburger-mode');
+                    logoHamburger.classList.add('menu-open');
+                }
+            });
+            
+            // Close menu when clicking outside
+            document.addEventListener('click', (e) => {
+                if (!logoHamburger.contains(e.target) && !mobileMenu.contains(e.target)) {
+                    mobileMenu.classList.remove('show');
+                    // Reset to logo state and restart animation
+                    currentState = 0;
+                    logoHamburger.classList.remove('hamburger-mode', 'menu-open');
+                    startAutoAnimation();
+                }
+            });
+            
+            // Close menu when clicking on menu items
+            const mobileMenuItems = mobileMenu.querySelectorAll('.mobile-menu-item');
+            mobileMenuItems.forEach(item => {
+                item.addEventListener('click', () => {
+                    mobileMenu.classList.remove('show');
+                    // Reset to logo state and restart animation
+                    currentState = 0;
+                    logoHamburger.classList.remove('hamburger-mode', 'menu-open');
+                    startAutoAnimation();
+                });
+            });
+            
+            // Handle window resize
+            window.addEventListener('resize', () => {
+                if (window.innerWidth >= 1024) {
+                    mobileMenu.classList.remove('show');
+                    // Reset to logo state and restart animation
+                    currentState = 0;
+                    logoHamburger.classList.remove('hamburger-mode', 'menu-open');
+                    startAutoAnimation();
+                    
+                    // Hide dropdowns on desktop
+                    const userMenu = document.querySelector('.user-dropdown');
+                    const cartDropdown = document.getElementById('cartDropdown');
+                    
+                    if (userMenu) userMenu.classList.remove('show');
+                    if (cartDropdown) {
+                        cartDropdown.style.opacity = '0';
+                        cartDropdown.style.visibility = 'hidden';
+                        cartDropdown.style.transform = 'translateY(10px)';
                     }
                 }
+            });
+        } else {
+            console.error('Mobile menu elements not found:', {
+                hamburger: !!logoHamburger,
+                menu: !!mobileMenu
             });
         }
     } catch (error) {
@@ -946,12 +900,13 @@ try {
                 
                 if (data.success) {
                     this.items = data.items.map(item => ({
-                        id: item.template_id,
+                        id: item.id, // Now using normalized id field
                         title: item.title,
                         price: parseFloat(item.price),
                         image: item.preview_image,
                         seller: item.seller_name,
-                        addedAt: item.added_at
+                        addedAt: item.added_at,
+                        type: item.type // template or service
                     }));
                     this.updateCartUI();
                 } else {
@@ -1004,10 +959,16 @@ try {
             }
         }
         
-        async removeItem(itemId) {
+        async removeItem(itemId, itemType = 'template') {
             try {
                 const formData = new FormData();
-                formData.append('template_id', itemId);
+                
+                // Send appropriate ID field based on item type
+                if (itemType === 'service') {
+                    formData.append('service_id', itemId);
+                } else {
+                    formData.append('template_id', itemId);
+                }
                 
                 const response = await fetch('cart-api.php?action=remove', {
                     method: 'POST',
@@ -1098,13 +1059,14 @@ try {
                         // Render cart items
                         cartItems.innerHTML = this.items.map(item => `
                             <div class="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
-                                <img src="${this.escapeHtml(item.image)}" alt="${this.escapeHtml(item.title)}" class="w-12 h-12 rounded-lg object-cover">
+                                <img src="${this.getOptimizedImageUrl(item.image, 'thumb')}" alt="${this.escapeHtml(item.title)}" class="w-12 h-12 rounded-lg object-cover" onerror="this.src='../assets/images/default-service.jpg'">
                                 <div class="flex-1 min-w-0">
                                     <h4 class="font-medium text-sm text-gray-900 truncate">${this.escapeHtml(item.title)}</h4>
                                     <p class="text-xs text-gray-500">by ${this.escapeHtml(item.seller)}</p>
                                     <p class="text-sm font-semibold text-primary">$${parseFloat(item.price).toFixed(2)}</p>
+                                    <span class="text-xs text-gray-400 capitalize">${item.type || 'template'}</span>
                                 </div>
-                                <button onclick="cart.removeItem('${item.id}')" class="w-8 h-8 flex items-center justify-center text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-full transition-colors">
+                                <button onclick="cart.removeItem('${item.id}', '${item.type || 'template'}')" class="w-8 h-8 flex items-center justify-center text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-full transition-colors">
                                     <i class="ri-close-line text-sm"></i>
                                 </button>
                             </div>
@@ -1135,10 +1097,12 @@ try {
         openCartDropdown() {
             try {
                 const cartDropdown = document.getElementById('cartDropdown');
+                const isMobile = window.innerWidth < 1024;
+                
                 if (cartDropdown) {
                     cartDropdown.style.opacity = '1';
                     cartDropdown.style.visibility = 'visible';
-                    cartDropdown.style.transform = 'translateY(0)';
+                    cartDropdown.style.transform = isMobile ? 'translateX(-50%) translateY(0)' : 'translateY(0)';
                 }
             } catch (error) {
                 console.error('Error opening cart dropdown:', error);
@@ -1148,10 +1112,12 @@ try {
         closeCartDropdown() {
             try {
                 const cartDropdown = document.getElementById('cartDropdown');
+                const isMobile = window.innerWidth < 1024;
+                
                 if (cartDropdown) {
                     cartDropdown.style.opacity = '0';
                     cartDropdown.style.visibility = 'hidden';
-                    cartDropdown.style.transform = 'translateY(10px)';
+                    cartDropdown.style.transform = isMobile ? 'translateX(-50%) translateY(10px)' : 'translateY(10px)';
                 }
             } catch (error) {
                 console.error('Error closing cart dropdown:', error);
@@ -1184,8 +1150,8 @@ try {
                         position: 'top-right'
                     });
                 } else {
-                    // Fallback notification
-                    alert(message);
+                    // Fallback to toast
+                    showError(message);
                 }
             } catch (error) {
                 console.error('Error showing notification:', error);
@@ -1200,6 +1166,49 @@ try {
             } catch (error) {
                 console.error('Error escaping HTML:', error);
                 return String(text).replace(/[&<>"']/g, '');
+            }
+        }
+        
+        getOptimizedImageUrl(publicId, size = 'thumb') {
+            try {
+                if (!publicId) {
+                    // Return default image based on size
+                    const defaults = {
+                        'thumb': '../assets/images/default-service.jpg',
+                        'medium': '../assets/images/default-service.jpg', 
+                        'avatar_small': '../assets/images/default-avatar.png',
+                        'avatar_medium': '../assets/images/default-avatar.png',
+                        'avatar_large': '../assets/images/default-avatar.png'
+                    };
+                    return defaults[size] || '../assets/images/default-service.jpg';
+                }
+                
+                // If it's already a full URL, return as is
+                if (publicId.startsWith('http')) {
+                    return publicId;
+                }
+                
+                const cloudName = 'dpmwj7f9j';
+                
+                // Handle Cloudinary public IDs - add orbix/products/ prefix if needed
+                let processedPublicId = publicId;
+                if (!processedPublicId.includes('orbix/') && processedPublicId.startsWith('orbix_')) {
+                    processedPublicId = 'orbix/products/' + processedPublicId;
+                }
+                
+                const transformations = {
+                    'thumb': 'w_300,h_200,c_fill,f_auto,q_auto',
+                    'medium': 'w_800,h_600,c_fill,f_auto,q_auto',
+                    'avatar_small': 'w_50,h_50,c_fill,f_auto,q_auto,r_max',
+                    'avatar_medium': 'w_100,h_100,c_fill,f_auto,q_auto,r_max',
+                    'avatar_large': 'w_200,h_200,c_fill,f_auto,q_auto,r_max'
+                };
+                
+                const transformation = transformations[size] || transformations['thumb'];
+                return `https://res.cloudinary.com/${cloudName}/image/upload/${transformation}/${processedPublicId}`;
+            } catch (error) {
+                console.error('Error generating optimized image URL:', error);
+                return '../assets/images/default-service.jpg';
             }
         }
     }
@@ -1239,7 +1248,7 @@ try {
                         position: 'top-right'
                     });
                 } else {
-                    alert('Your cart is empty. Add some templates first!');
+                    showWarning('Your cart is empty. Add some templates first!');
                 }
                 return;
             }

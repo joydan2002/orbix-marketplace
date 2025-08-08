@@ -229,31 +229,35 @@ function displayOrderDetails(order) {
 }
 
 function updateOrderStatus(orderId, newStatus) {
-    if (!confirm(`Are you sure you want to update this order status to "${newStatus}"?`)) {
-        return;
-    }
-    
-    fetch('seller-api.php', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
+    showConfirm(
+        `Are you sure you want to update this order status to "${newStatus}"?`,
+        () => {
+            fetch('seller-api.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: `action=update_order_status&order_id=${orderId}&status=${newStatus}`
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showSuccessToast('Order status updated successfully!');
+                    hideModal('orderModal');
+                    setTimeout(() => window.location.reload(), 1500);
+                } else {
+                    throw new Error(data.error || 'Failed to update order status');
+                }
+            })
+            .catch(error => {
+                console.error('Update status error:', error);
+                showErrorToast(error.message || 'Failed to update order status');
+            });
         },
-        body: `action=update_order_status&order_id=${orderId}&status=${newStatus}`
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            showSuccessToast('Order status updated successfully!');
-            hideModal('orderModal');
-            setTimeout(() => window.location.reload(), 1500);
-        } else {
-            throw new Error(data.error || 'Failed to update order status');
+        () => {
+            // User cancelled
         }
-    })
-    .catch(error => {
-        console.error('Update status error:', error);
-        showErrorToast(error.message || 'Failed to update order status');
-    });
+    );
 }
 
 function contactCustomer(email, name) {

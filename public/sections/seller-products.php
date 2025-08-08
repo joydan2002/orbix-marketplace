@@ -464,7 +464,7 @@ function toggleProductMenu(id) {
 }
 
 function duplicateProduct(type, id) {
-    if (confirm('Are you sure you want to duplicate this product?')) {
+    showConfirm('Are you sure you want to duplicate this product?', () => {
         fetch('seller-api.php', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -483,11 +483,11 @@ function duplicateProduct(type, id) {
                 showToast(data.message, 'error');
             }
         });
-    }
+    });
 }
 
 function deleteProduct(type, id) {
-    if (confirm('Are you sure you want to delete this product? This action cannot be undone.')) {
+    showConfirm('Are you sure you want to delete this product? This action cannot be undone.', () => {
         fetch('seller-api.php', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -506,7 +506,7 @@ function deleteProduct(type, id) {
                 showToast(data.message, 'error');
             }
         });
-    }
+    });
 }
 
 // Close menus when clicking outside

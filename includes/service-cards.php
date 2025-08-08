@@ -4,21 +4,23 @@
  * Uses modern design from backup with orange theme and English translation
  */
 
+// Include Cloudinary service for image handling
+require_once '../config/cloudinary-service.php';
+
 // Get services from database
 try {
     $pdo = DatabaseConfig::getConnection();
-    $stmt = $pdo->query("SELECT * FROM services WHERE is_active = 1 AND is_featured = 1 ORDER BY sort_order ASC, id ASC LIMIT 6");
+    $cloudinary = new CloudinaryService();
+    
+    // Get services, prioritizing featured ones but fallback to any active services
+    $stmt = $pdo->query("SELECT * FROM services WHERE is_active = 1 ORDER BY is_featured DESC, orders_count DESC, rating DESC, created_at DESC LIMIT 6");
     $services = $stmt->fetchAll(PDO::FETCH_ASSOC);
     
-    // If we don't have enough featured services, get the most popular ones
-    if (count($services) < 6) {
-        $stmt = $pdo->query("SELECT * FROM services WHERE is_active = 1 ORDER BY is_featured DESC, orders_count DESC, rating DESC LIMIT 6");
-        $services = $stmt->fetchAll(PDO::FETCH_ASSOC);
-    }
 } catch (Exception $e) {
     // Log error and show empty state
     error_log("Database error in service-cards.php: " . $e->getMessage());
     $services = [];
+    $cloudinary = null;
 }
 ?>
 
@@ -38,40 +40,90 @@ try {
         <?php if (!empty($services)): ?>
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             <?php foreach ($services as $service): ?>
-            <div class="bg-white p-8 rounded-lg shadow-lg hover:shadow-xl transition-all hover:-translate-y-2">
-                <div class="w-16 h-16 flex items-center justify-center bg-primary/10 rounded-lg mb-6">
-                    <i class="<?php echo htmlspecialchars($service['icon']); ?> text-2xl text-primary"></i>
+            <div class="bg-white p-8 rounded-lg shadow-lg hover:shadow-xl transition-all hover:-translate-y-2 flex flex-col h-full">
+                <?php 
+                // Get service preview image
+                $serviceImage = '';
+                if (!empty($service['preview_image']) && $cloudinary) {
+                    try {
+                        $serviceImage = $cloudinary->getOptimizedUrl($service['preview_image'], 'c_fill,w_80,h_80,q_auto');
+                    } catch (Exception $e) {
+                        error_log("Error getting service image for service " . $service['id'] . ": " . $e->getMessage());
+                    }
+                }
+                
+                // Fallback to default image if no preview image or Cloudinary fails
+                if (empty($serviceImage)) {
+                    $serviceImage = '/assets/images/default-service.jpg';
+                }
+                ?>
+                
+                <!-- Image Container - Fixed size and position -->
+                <div class="w-16 h-16 flex items-center justify-center bg-primary/10 rounded-lg mb-6 overflow-hidden flex-shrink-0">
+                    <?php if (!empty($service['preview_image']) && $cloudinary): ?>
+                        <img src="<?php echo htmlspecialchars($serviceImage); ?>" 
+                             alt="<?php echo htmlspecialchars($service['title']); ?>" 
+                             class="w-full h-full object-cover rounded-lg"
+                             onerror="this.onerror=null; this.src='/assets/images/default-service.jpg'; this.parentElement.innerHTML='<i class=\'ri-service-line text-2xl text-primary\'></i>';">
+                    <?php else: ?>
+                        <i class="<?php echo !empty($service['icon']) ? htmlspecialchars($service['icon']) : 'ri-service-line'; ?> text-2xl text-primary"></i>
+                    <?php endif; ?>
                 </div>
                 
-                <h3 class="text-xl font-bold mb-3 text-secondary"><?php echo htmlspecialchars($service['title']); ?></h3>
+                <!-- Title - Fixed height and consistent positioning -->
+                <h3 class="text-xl font-bold mb-3 text-secondary min-h-[3rem] flex items-start">
+                    <?php echo htmlspecialchars($service['title']); ?>
+                </h3>
                 
-                <p class="text-gray-600 mb-4 leading-relaxed">
+                <!-- Description - Fixed height to ensure consistency -->
+                <p class="text-gray-600 mb-6 leading-relaxed flex-grow min-h-[4.5rem]">
                     <?php echo htmlspecialchars($service['description']); ?>
                 </p>
                 
-                <ul class="space-y-2 mb-6">
-                    <?php 
-                    // Handle features from database (JSON format)
-                    $features = [];
-                    if (isset($service['features']) && !empty($service['features'])) {
-                        $features = json_decode($service['features'], true) ?: [];
-                    }
-                    
-                    foreach ($features as $feature): 
-                    ?>
-                    <li class="flex items-start">
-                        <i class="ri-check-line text-green-500 mt-1 mr-2"></i>
-                        <span class="text-gray-600"><?php echo htmlspecialchars($feature); ?></span>
-                    </li>
-                    <?php endforeach; ?>
-                </ul>
+                <!-- Features List - Fixed height container -->
+                <div class="mb-6 flex-grow">
+                    <ul class="space-y-2 min-h-[6rem]">
+                        <?php 
+                        // Handle features from database (could be JSON or comma-separated)
+                        $features = [];
+                        if (isset($service['features']) && !empty($service['features'])) {
+                            // Try to decode as JSON first
+                            $decodedFeatures = json_decode($service['features'], true);
+                            if (json_last_error() === JSON_ERROR_NONE && is_array($decodedFeatures)) {
+                                $features = $decodedFeatures;
+                            } else {
+                                // If not JSON, try comma-separated
+                                $features = array_map('trim', explode(',', $service['features']));
+                                $features = array_filter($features); // Remove empty elements
+                            }
+                        }
+                        
+                        // If no features, show some default ones
+                        if (empty($features)) {
+                            $features = ['Professional service', 'Quick delivery', '24/7 support'];
+                        }
+                        
+                        // Limit to 3 features for better display and consistency
+                        $features = array_slice($features, 0, 3);
+                        
+                        foreach ($features as $feature): 
+                        ?>
+                        <li class="flex items-start">
+                            <i class="ri-check-line text-green-500 mt-1 mr-2 flex-shrink-0"></i>
+                            <span class="text-gray-600 text-sm"><?php echo htmlspecialchars($feature); ?></span>
+                        </li>
+                        <?php endforeach; ?>
+                    </ul>
+                </div>
                 
-                <div class="flex items-center justify-between">
+                <!-- Price and Actions - Always at bottom -->
+                <div class="flex items-center justify-between mt-auto pt-4 border-t border-gray-100">
                     <div class="text-lg font-bold text-primary">
                         Starting at $<?php echo number_format($service['price'], 0); ?>
                     </div>
                     <div class="flex space-x-2">
-                        <button onclick="window.location.href='service-detail.php?id=<?= $service['id'] ?>'" class="w-10 h-10 flex items-center justify-center border-2 border-gray-200 rounded-lg hover:border-primary hover:text-primary transition-colors">
+                        <button onclick="window.location.href='service-detail.php?id=<?= $service['id'] ?>'" 
+                                class="w-10 h-10 flex items-center justify-center border-2 border-gray-200 rounded-lg hover:border-primary hover:text-primary transition-colors">
                             <i class="ri-eye-line"></i>
                         </button>
                         <button onclick="handleOrderService(<?= $service['id'] ?>, '<?= addslashes($service['title']) ?>', <?= $service['price'] ?>, '<?= addslashes($service['preview_image']) ?>', '<?= addslashes($service['seller_name']) ?>')" 
@@ -158,7 +210,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const extension = extensionSelect.value;
         
         if (!domain) {
-            alert('Please enter a domain name');
+            showWarning('Please enter a domain name');
             return;
         }
         
@@ -166,7 +218,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const cleanDomain = domain.replace(/\.(com|net|org|io|co|biz|info|tech|app|dev)$/i, '');
         
         if (!cleanDomain || cleanDomain.length < 2) {
-            alert('Please enter a valid domain name (at least 2 characters)');
+            showWarning('Please enter a valid domain name (at least 2 characters)');
             return;
         }
         
@@ -227,11 +279,11 @@ document.addEventListener('DOMContentLoaded', function() {
             if (data.success) {
                 displaySearchResults(data);
             } else {
-                alert(data.message || 'Error searching domain');
+                showError(data.message || 'Error searching domain');
             }
         } catch (error) {
             console.error('Error searching domain:', error);
-            alert('Error searching domain. Please try again.');
+            showError('Error searching domain. Please try again.');
         } finally {
             setLoading(false);
         }
@@ -379,24 +431,62 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 // Handle Order Service function
+// Pass PHP variables to JavaScript
+const userLoggedIn = <?php echo $isLoggedIn ? 'true' : 'false'; ?>;
+
 function handleOrderService(serviceId, title, price, image, seller) {
     // Check if user is logged in
-    if (typeof cart === 'undefined') {
-        window.location.href = 'public/auth.php?redirect=' + encodeURIComponent(window.location.href);
+    if (!userLoggedIn) {
+        // User not logged in, redirect to login
+        const currentUrl = encodeURIComponent(window.location.href);
+        window.location.href = 'auth.php?redirect=' + currentUrl;
         return;
     }
     
-    // Create service data object
-    const serviceData = {
+    // User is logged in, proceed with adding to cart
+    console.log('Adding service to cart:', {
         id: serviceId,
         title: title,
         price: price,
-        image: image,
-        seller: seller,
         type: 'service'
-    };
+    });
     
-    // Add to cart using the global cart system
-    cart.addItem(serviceData);
+    // Send to cart API directly
+    fetch(`cart-api.php?action=add`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: new URLSearchParams({
+            service_id: serviceId
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Update cart badge if element exists
+            const cartBadge = document.getElementById('cartBadge');
+            if (cartBadge && data.cart_count) {
+                cartBadge.textContent = data.cart_count;
+                cartBadge.style.transform = 'scale(1)';
+            }
+            
+            // Refresh cart dropdown if cart object exists
+            if (typeof cart !== 'undefined' && cart.loadCartFromServer) {
+                cart.loadCartFromServer();
+            }
+        } else {
+            if (data.redirect) {
+                // Server says user not authenticated, redirect to login
+                window.location.href = data.redirect + '?redirect=' + encodeURIComponent(window.location.href);
+            } else {
+                showError('Failed to add service to cart: ' + (data.error || 'Unknown error'));
+            }
+        }
+    })
+    .catch(error => {
+        console.error('Error adding to cart:', error);
+        showError('Error adding service to cart. Please try again.');
+    });
 }
 </script>

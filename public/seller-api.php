@@ -190,6 +190,20 @@ try {
                 'other' => 13           // SaaS
             ];
             
+            // For services, use different category mapping to service_categories table
+            if ($productType === 'service') {
+                $categoryMap = [
+                    'web-design' => 7,      // Design & Development
+                    'mobile-app' => 7,      // Design & Development
+                    'ui-ux' => 7,           // Design & Development
+                    'graphics' => 7,        // Design & Development
+                    'development' => 7,     // Design & Development
+                    'marketing' => 8,       // Digital Marketing
+                    'business' => 10,       // Business Services
+                    'other' => 10           // Business Services
+                ];
+            }
+            
             $categorySlug = $_POST['category'];
             $categoryId = $categoryMap[$categorySlug] ?? 1; // Default to Business
             
@@ -551,15 +565,77 @@ try {
                 throw new Exception('Not authenticated');
             }
             
-            $productType = $input['type'] ?? 'template';
-            $productId = intval($input['id'] ?? 0);
-            $productData = $input['product_data'] ?? [];
+            // Handle both JSON input and FormData
+            $productType = $input['type'] ?? $_POST['product_type'] ?? 'template';
+            $productId = intval($input['id'] ?? $_POST['product_id'] ?? 0);
+            $productData = $input['product_data'] ?? $_POST;
+            
+            error_log("🔧 Update product called with:");
+            error_log("Product Type: " . $productType);
+            error_log("Product ID: " . $productId);
+            error_log("POST data: " . json_encode($_POST));
+            error_log("Input data: " . json_encode($input));
             
             if (!$productId) {
                 throw new Exception('Product ID is required');
             }
             
-            $result = $sellerManager->updateProduct($_SESSION['user_id'], $productId, $productData, $productType);
+            // Handle file uploads if present
+            if (isset($_FILES['preview_image']) && $_FILES['preview_image']['error'] === UPLOAD_ERR_OK) {
+                try {
+                    $folder = $productType === 'template' ? 'templates' : 'services';
+                    $uploadResult = $cloudinary->uploadImage($_FILES['preview_image'], $folder);
+                    
+                    if ($uploadResult['success']) {
+                        $productData['preview_image'] = $uploadResult['public_id'];
+                        error_log("✅ Preview image updated to Cloudinary: " . $uploadResult['public_id']);
+                    } else {
+                        error_log("❌ Preview image upload failed: " . $uploadResult['error']);
+                        throw new Exception('Failed to upload preview image: ' . $uploadResult['error']);
+                    }
+                } catch (Exception $e) {
+                    error_log("❌ Cloudinary upload exception: " . $e->getMessage());
+                    throw new Exception('Failed to upload preview image: ' . $e->getMessage());
+                }
+            }
+            
+            // Handle product files upload for templates
+            if ($productType === 'template' && isset($_FILES['product_files']) && $_FILES['product_files']['error'] === UPLOAD_ERR_OK) {
+                try {
+                    $uploadResult = $cloudinary->uploadImage($_FILES['product_files'], null, 'templates/files');
+                    
+                    if ($uploadResult['success']) {
+                        $productData['download_file'] = $uploadResult['public_id'];
+                        error_log("✅ Product file updated to Cloudinary: " . $uploadResult['public_id']);
+                    } else {
+                        error_log("❌ Product file upload failed: " . $uploadResult['error']);
+                        throw new Exception('Failed to upload product files: ' . $uploadResult['error']);
+                    }
+                } catch (Exception $e) {
+                    error_log("❌ Cloudinary file upload exception: " . $e->getMessage());
+                    throw new Exception('Failed to upload product files: ' . $e->getMessage());
+                }
+            }
+            
+            // Process tags if present
+            if (isset($productData['tags']) && !empty($productData['tags'])) {
+                $tagArray = array_map('trim', explode(',', $productData['tags']));
+                $tagArray = array_filter($tagArray); // Remove empty tags
+                if (!empty($tagArray)) {
+                    $productData['tags'] = json_encode($tagArray);
+                    error_log('📝 Tags processed: ' . $productData['tags']);
+                } else {
+                    $productData['tags'] = null;
+                }
+            }
+            
+            // Process features if present (for services and templates)
+            if (isset($productData['features']) && is_array($productData['features'])) {
+                $productData['features'] = implode(',', array_filter($productData['features']));
+                error_log('📝 Features processed: ' . $productData['features']);
+            }
+            
+            $result = $sellerManager->updateProduct($_SESSION['user_id'], $productType, $productId, $productData);
             
             if (!$result) {
                 throw new Exception('Failed to update product');

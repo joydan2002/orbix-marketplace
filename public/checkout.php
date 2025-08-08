@@ -10,6 +10,7 @@ if (session_status() === PHP_SESSION_NONE) {
 }
 
 require_once __DIR__ . '/../config/database.php';
+require_once __DIR__ . '/../config/cloudinary-config.php';
 
 // Check if user is logged in
 if (!isset($_SESSION['user_id'])) {
@@ -22,13 +23,25 @@ try {
     $pdo = DatabaseConfig::getConnection();
     $userId = $_SESSION['user_id'];
     
-    // Get cart items
+    // Get cart items - support both templates and services
     $stmt = $pdo->prepare("
-        SELECT c.*, t.title, t.preview_image, t.price, t.description,
-               u.first_name as seller_first_name, u.last_name as seller_last_name
+        SELECT c.*,
+               COALESCE(t.title, s.title) as title,
+               COALESCE(t.preview_image, s.preview_image) as preview_image,
+               COALESCE(t.price, s.price) as price,
+               COALESCE(t.description, s.description) as description,
+               COALESCE(tu.first_name, su.first_name) as seller_first_name,
+               COALESCE(tu.last_name, su.last_name) as seller_last_name,
+               CASE 
+                   WHEN c.template_id IS NOT NULL THEN 'template'
+                   WHEN c.service_id IS NOT NULL THEN 'service'
+               END as item_type,
+               COALESCE(c.template_id, c.service_id) as item_id
         FROM cart c
-        JOIN templates t ON c.template_id = t.id
-        LEFT JOIN users u ON t.seller_id = u.id
+        LEFT JOIN templates t ON c.template_id = t.id
+        LEFT JOIN services s ON c.service_id = s.id
+        LEFT JOIN users tu ON t.seller_id = tu.id
+        LEFT JOIN users su ON s.seller_id = su.id
         WHERE c.user_id = ?
         ORDER BY c.added_at DESC
     ");
@@ -71,106 +84,7 @@ $total = $subtotal + $tax;
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css" rel="stylesheet">
-    <style>
-        :where([class^="ri-"])::before {
-            content: "\f3c2";
-        }
-        
-        .gradient-bg {
-            background: linear-gradient(135deg, #ffffff 0%, #f8fafc 50%, #ffffff 100%);
-        }
-        
-        .checkout-card {
-            background: rgba(255, 255, 255, 0.9);
-            backdrop-filter: blur(10px);
-            border-radius: 1.5rem;
-            transition: all 0.3s ease;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
-        }
-        
-        .form-group {
-            margin-bottom: 1.5rem;
-        }
-        
-        .form-input {
-            width: 100%;
-            padding: 1rem;
-            border: 2px solid #e5e7eb;
-            border-radius: 0.75rem;
-            font-size: 1rem;
-            transition: all 0.3s ease;
-            background: rgba(255, 255, 255, 0.9);
-        }
-        
-        .form-input:focus {
-            outline: none;
-            border-color: #FF5F1F;
-            box-shadow: 0 0 0 4px rgba(255, 95, 31, 0.1);
-        }
-        
-        .btn-primary {
-            background: linear-gradient(135deg, #FF5F1F, #FF8C42);
-            color: white;
-            padding: 1rem 2rem;
-            border-radius: 0.75rem;
-            font-weight: 600;
-            transition: all 0.3s ease;
-            border: none;
-            box-shadow: 0 4px 15px rgba(255, 95, 31, 0.3);
-            width: 100%;
-            font-size: 1.1rem;
-        }
-        
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(255, 95, 31, 0.4);
-        }
-        
-        .btn-primary:disabled {
-            opacity: 0.6;
-            transform: none;
-            cursor: not-allowed;
-        }
-        
-        .payment-method {
-            border: 2px solid #e5e7eb;
-            border-radius: 0.75rem;
-            padding: 1rem;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-        
-        .payment-method:hover {
-            border-color: #FF5F1F;
-            background: rgba(255, 95, 31, 0.05);
-        }
-        
-        .payment-method.selected {
-            border-color: #FF5F1F;
-            background: rgba(255, 95, 31, 0.1);
-        }
-        
-        .order-item {
-            display: flex;
-            align-items: center;
-            padding: 1rem;
-            background: rgba(249, 250, 251, 0.8);
-            border-radius: 0.75rem;
-            margin-bottom: 1rem;
-        }
-        
-        .security-badge {
-            display: inline-flex;
-            align-items: center;
-            padding: 0.5rem 1rem;
-            background: rgba(34, 197, 94, 0.1);
-            color: #059669;
-            border-radius: 0.5rem;
-            font-size: 0.875rem;
-            font-weight: 500;
-        }
-    </style>
+    <link rel="stylesheet" href="../assets/css/checkout.css">
     <script>
         tailwind.config = {
             theme: {
@@ -194,7 +108,7 @@ $total = $subtotal + $tax;
 
     <!-- Checkout Content -->
     <section class="pt-24 pb-16">
-        <div class="max-w-7xl mx-auto px-6">
+        <div class="max-w-7xl mx-auto px-6 lg:px-6 md:px-4 sm:px-3">
             <!-- Breadcrumb -->
             <div class="flex items-center space-x-2 text-sm mb-8">
                 <a href="index.php" class="text-gray-500 hover:text-primary transition-colors">Home</a>
@@ -206,13 +120,13 @@ $total = $subtotal + $tax;
 
             <!-- Page Header -->
             <div class="text-center mb-12">
-                <h1 class="text-4xl font-bold text-secondary mb-4">Secure Checkout</h1>
-                <p class="text-gray-600">Complete your purchase securely</p>
+                <h1 class="text-4xl lg:text-4xl md:text-3xl sm:text-2xl font-bold text-secondary mb-4">Secure Checkout</h1>
+                <p class="text-gray-600 lg:text-base md:text-sm sm:text-sm">Complete your purchase securely</p>
             </div>
 
-            <div class="grid lg:grid-cols-2 gap-12">
+            <div class="grid lg:grid-cols-2 gap-12 lg:gap-12 md:gap-8 sm:gap-6">
                 <!-- Checkout Form -->
-                <div class="checkout-card p-8">
+                <div class="checkout-card checkout-form p-8">
                     <form id="checkoutForm" onsubmit="processPayment(event)">
                         <!-- Billing Information -->
                         <div class="mb-8">
@@ -221,7 +135,7 @@ $total = $subtotal + $tax;
                                 Billing Information
                             </h2>
                             
-                            <div class="grid md:grid-cols-2 gap-4">
+                            <div class="grid md:grid-cols-2 sm:grid-cols-1 gap-4">
                                 <div class="form-group">
                                     <label class="block text-sm font-medium text-gray-700 mb-2">First Name</label>
                                     <input type="text" name="first_name" class="form-input" 
@@ -265,13 +179,13 @@ $total = $subtotal + $tax;
                             
                             <div class="space-y-4 mb-6">
                                 <div class="payment-method selected" onclick="selectPaymentMethod(this, 'card')">
-                                    <div class="flex items-center">
+                                    <div class="payment-method-content flex items-center lg:flex-row">
                                         <input type="radio" name="payment_method" value="card" checked class="mr-3">
                                         <div class="flex-1">
                                             <div class="font-semibold">Credit/Debit Card</div>
                                             <div class="text-sm text-gray-600">Visa, MasterCard, American Express</div>
                                         </div>
-                                        <div class="flex space-x-2">
+                                        <div class="payment-icons flex space-x-2">
                                             <img src="https://img.icons8.com/color/48/visa.png" alt="Visa" class="w-10 h-6 object-contain">
                                             <img src="https://img.icons8.com/color/48/mastercard.png" alt="MasterCard" class="w-10 h-6 object-contain">
                                             <img src="https://img.icons8.com/color/48/amex.png" alt="American Express" class="w-10 h-6 object-contain">
@@ -280,7 +194,7 @@ $total = $subtotal + $tax;
                                 </div>
                                 
                                 <div class="payment-method" onclick="selectPaymentMethod(this, 'paypal')">
-                                    <div class="flex items-center">
+                                    <div class="payment-method-content flex items-center lg:flex-row">
                                         <input type="radio" name="payment_method" value="paypal" class="mr-3">
                                         <div class="flex-1">
                                             <div class="font-semibold">PayPal</div>
@@ -339,14 +253,23 @@ $total = $subtotal + $tax;
                     <div class="mb-6">
                         <?php foreach ($cartItems as $item): ?>
                         <div class="order-item">
-                            <img src="<?= htmlspecialchars($item['preview_image']) ?>" 
-                                 alt="<?= htmlspecialchars($item['title']) ?>" 
-                                 class="w-16 h-12 rounded-lg object-cover mr-4">
-                            <div class="flex-1">
-                                <h4 class="font-semibold text-secondary"><?= htmlspecialchars($item['title']) ?></h4>
-                                <p class="text-sm text-gray-600">by <?= htmlspecialchars($item['seller_first_name'] . ' ' . $item['seller_last_name']) ?></p>
+                            <div class="order-item-content lg:flex lg:items-center lg:w-full">
+                                <img src="<?= htmlspecialchars(getOptimizedImageUrl($item['preview_image'], 'thumb')) ?>" 
+                                     alt="<?= htmlspecialchars($item['title']) ?>" 
+                                     class="order-item-image w-16 h-12 rounded-lg object-cover mr-4"
+                                     onerror="this.src='../assets/images/<?= $item['item_type'] === 'service' ? 'default-service.jpg' : 'default-template.jpg' ?>'">
+                                <div class="order-item-info flex-1">
+                                    <h4 class="order-item-title font-semibold text-secondary">
+                                        <?= htmlspecialchars($item['title']) ?>
+                                        <span class="ml-2 text-xs px-2 py-1 rounded-full <?= $item['item_type'] === 'service' ? 'bg-blue-100 text-blue-600' : 'bg-green-100 text-green-600' ?>">
+                                            <?= ucfirst($item['item_type']) ?>
+                                        </span>
+                                    </h4>
+                                    <p class="order-item-seller text-sm text-gray-600">by <?= htmlspecialchars($item['seller_first_name'] . ' ' . $item['seller_last_name']) ?></p>
+                                </div>
                             </div>
-                            <div class="font-bold text-primary">$<?= number_format($item['price'], 2) ?></div>
+                            <div class="order-item-price font-bold text-primary lg:hidden">$<?= number_format($item['price'], 2) ?></div>
+                            <div class="hidden lg:block font-bold text-primary">$<?= number_format($item['price'], 2) ?></div>
                         </div>
                         <?php endforeach; ?>
                     </div>
@@ -448,7 +371,7 @@ $total = $subtotal + $tax;
                 
             } catch (error) {
                 console.error('Payment error:', error);
-                alert('Payment failed. Please try again or contact support.');
+                showError('Payment failed. Please try again or contact support.');
                 
                 // Reset button
                 submitBtn.disabled = false;

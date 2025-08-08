@@ -227,73 +227,7 @@ if (isset($_GET['action']) && $_GET['action'] === 'verify') {
     <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css" rel="stylesheet">
     <script src="https://accounts.google.com/gsi/client" async defer></script>
-    
-    <style>
-        .glass-effect {
-            backdrop-filter: blur(20px);
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-        }
-        .glass-card {
-            backdrop-filter: blur(30px);
-            background: rgba(255, 255, 255, 0.15);
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-        }
-        .floating-animation {
-            animation: float 6s ease-in-out infinite;
-        }
-        @keyframes float {
-            0%, 100% { transform: translateY(0px) rotate(0deg); }
-            50% { transform: translateY(-20px) rotate(2deg); }
-        }
-        .gradient-bg {
-            background: linear-gradient(135deg, #FF5F1D 0%, #FF8C42 25%, #FFB366 50%, #FF8C42 75%, #FF5F1D 100%);
-            background-size: 400% 400%;
-            animation: gradientShift 8s ease infinite;
-        }
-        @keyframes gradientShift {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-        }
-        .input-focus {
-            transition: all 0.3s ease;
-        }
-        .input-focus:focus {
-            transform: translateY(-1px);
-            box-shadow: 0 8px 20px rgba(255, 95, 31, 0.2);
-        }
-        .btn-hover {
-            transition: all 0.3s ease;
-        }
-        .btn-hover:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 10px 25px rgba(255, 95, 31, 0.3);
-        }
-        .compact-form {
-            max-height: 90vh;
-            overflow-y: auto;
-        }
-        /* Custom scrollbar for form */
-        .compact-form::-webkit-scrollbar {
-            width: 4px;
-        }
-        .compact-form::-webkit-scrollbar-track {
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 2px;
-        }
-        .compact-form::-webkit-scrollbar-thumb {
-            background: rgba(255, 255, 255, 0.3);
-            border-radius: 2px;
-        }
-        @media (max-height: 700px) {
-            .floating-animation {
-                display: none;
-            }
-        }
-    </style>
-    
+    <link rel="stylesheet" href="../assets/css/auth.css">
     <script>
         tailwind.config = {
             theme: {

@@ -27,112 +27,8 @@ if (isset($_SESSION['user_id']) && isset($_SESSION['user_type']) && $_SESSION['u
     include 'sections/seller-init.php';
     
     ?>
-    <style>
-        .dashboard-container {
-            min-height: 100vh;
-            background: linear-gradient(135deg, #FF5F1F 0%, #FF8C42 50%, #FFB366 100%);
-            padding: 0;
-            padding-top: 100px; /* Increased spacing from header */
-        }
-        .sidebar {
-            background: rgba(255, 255, 255, 0.15);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            box-shadow: 0 8px 32px rgba(255, 95, 31, 0.1);
-            border-radius: 24px;
-            margin: 24px;
-            margin-right: 12px;
-            padding: 20px 20px 80px; /* extra bottom padding for Settings and Logout */
-            height: 100vh; /* Adjusted for new padding */
-            overflow: visible; /* Disable scrolling */
-        }
-        .content-area {
-            background: rgba(255, 255, 255, 0.15);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            border-radius: 24px;
-            margin: 24px;
-            margin-left: 12px;
-            padding: 32px;
-            min-height: calc(100vh - 200px); /* Adjusted for new padding */
-        }
-        .nav-item {
-            transition: all 0.3s ease;
-            cursor: pointer;
-            border-radius: 16px;
-            padding: 16px 20px;
-            margin-bottom: 8px;
-            backdrop-filter: blur(10px);
-            background: rgba(255, 255, 255, 0.15);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-        .nav-item:hover {
-            background: rgba(255, 255, 255, 0.25);
-            border-color: rgba(255, 255, 255, 0.4);
-            transform: translateX(8px);
-            box-shadow: 0 4px 15px rgba(255, 95, 31, 0.2);
-        }
-        .nav-item.active {
-            background: rgba(255, 255, 255, 0.9);
-            color: #FF5F1F;
-            border-color: rgba(255, 95, 31, 0.5);
-            box-shadow: 0 8px 25px rgba(255, 95, 31, 0.3);
-        }
-        .nav-item.active:hover {
-            transform: translateX(0);
-        }
-        .sidebar h2 {
-            color: white;
-            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-        }
-        .sidebar p {
-            color: rgba(255, 255, 255, 0.9);
-        }
-        .nav-item span {
-            color: rgba(255, 255, 255, 0.95);
-            font-weight: 500;
-        }
-        .nav-item.active span {
-            color: #FF5F1F;
-            font-weight: 600;
-        }
-        .nav-item i {
-            color: rgba(255, 255, 255, 0.8);
-        }
-        .nav-item.active i {
-            color: #FF5F1F;
-        }
-        .logout-section {
-            margin-top: 32px;
-            padding-top: 32px;
-            border-top: 1px solid rgba(255, 255, 255, 0.3);
-        }
-        .logout-link {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            color: rgba(255, 255, 255, 0.9);
-            padding: 16px 20px;
-            border-radius: 16px;
-            transition: all 0.3s ease;
-            text-decoration: none;
-            background: rgba(220, 38, 38, 0.15);
-            border: 1px solid rgba(220, 38, 38, 0.3);
-            backdrop-filter: blur(10px);
-        }
-        .logout-link:hover {
-            background: rgba(220, 38, 38, 0.25);
-            color: white;
-            transform: translateX(8px);
-            box-shadow: 0 4px 15px rgba(220, 38, 38, 0.2);
-        }
-    </style>
-    
+    <link rel="stylesheet" href="../assets/css/seller-channel.css">
+
     <div class="dashboard-container">
         <div class="flex min-h-screen">
             <!-- Sidebar -->
@@ -337,57 +233,69 @@ if (isset($_SESSION['user_id']) && isset($_SESSION['user_type']) && $_SESSION['u
         }
 
         function duplicateProduct(type, id) {
-            if (confirm('Are you sure you want to duplicate this product?')) {
-                fetch('seller-api.php', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        action: 'duplicate_product',
-                        type: type,
-                        id: id
+            showConfirm(
+                'Are you sure you want to duplicate this product?',
+                () => {
+                    fetch('seller-api.php', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            action: 'duplicate_product',
+                            type: type,
+                            id: id
+                        })
                     })
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        showSuccessToast('Product duplicated successfully');
-                        setTimeout(() => loadSection('products'), 1000);
-                    } else {
-                        showErrorToast(data.message || 'Failed to duplicate product');
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    showErrorToast('Error duplicating product');
-                });
-            }
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            showSuccessToast('Product duplicated successfully');
+                            setTimeout(() => loadSection('products'), 1000);
+                        } else {
+                            showErrorToast(data.message || 'Failed to duplicate product');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        showErrorToast('Error duplicating product');
+                    });
+                },
+                () => {
+                    // User cancelled
+                }
+            );
         }
 
         function deleteProduct(type, id) {
-            if (confirm('Are you sure you want to delete this product? This action cannot be undone.')) {
-                fetch('seller-api.php', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        action: 'delete_product',
-                        type: type,
-                        id: id
+            showConfirm(
+                'Are you sure you want to delete this product? This action cannot be undone.',
+                () => {
+                    fetch('seller-api.php', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            action: 'delete_product',
+                            type: type,
+                            id: id
+                        })
                     })
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        showSuccessToast('Product deleted successfully');
-                        setTimeout(() => loadSection('products'), 1000);
-                    } else {
-                        showErrorToast(data.message || 'Failed to delete product');
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    showErrorToast('Error deleting product');
-                });
-            }
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            showSuccessToast('Product deleted successfully');
+                            setTimeout(() => loadSection('products'), 1000);
+                        } else {
+                            showErrorToast(data.message || 'Failed to delete product');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        showErrorToast('Error deleting product');
+                    });
+                },
+                () => {
+                    // User cancelled
+                }
+            );
         }
 
         function toggleProductMenu(id) {
@@ -550,7 +458,7 @@ if (isset($_SESSION['user_id']) && isset($_SESSION['user_type']) && $_SESSION['u
                 // Create a fallback function
                 window.editProduct = function(id, type = 'template') {
                     console.error('❌ editProduct fallback called - modal may not be loaded');
-                    alert('Edit function not available. Please reload the page.');
+                    showError('Edit function not available. Please reload the page.');
                 };
             }
         });

@@ -138,159 +138,7 @@ $template['category_slug'] = $template['category_slug'] ?? 'general';
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css" rel="stylesheet">
-    <style>
-        :where([class^="ri-"])::before {
-            content: "\f3c2";
-        }
-        
-        .glass-effect {
-            backdrop-filter: blur(20px);
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-        }
-        
-        .gradient-bg {
-            background: linear-gradient(135deg, #ffffff 0%, #f8fafc 50%, #ffffff 100%);
-        }
-        
-        .template-image {
-            width: 100%;
-            height: 500px;
-            object-fit: cover;
-            object-position: top;
-            border-radius: 1rem;
-        }
-        
-        .thumbnail {
-            width: 100px;
-            height: 75px;
-            object-fit: cover;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            border-radius: 0.5rem;
-        }
-        
-        .thumbnail:hover, .thumbnail.active {
-            border: 3px solid #FF5F1F;
-            transform: scale(1.05);
-        }
-        
-        .feature-card {
-            background: rgba(255, 255, 255, 0.9);
-            backdrop-filter: blur(10px);
-            border-radius: 1rem;
-            padding: 1.5rem;
-            transition: all 0.3s ease;
-            border: 1px solid rgba(255, 95, 31, 0.1);
-        }
-        
-        .feature-card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 20px 40px rgba(255, 95, 31, 0.1);
-            border-color: rgba(255, 95, 31, 0.2);
-        }
-        
-        .rating-stars {
-            color: #fbbf24;
-        }
-        
-        .tag {
-            background: rgba(255, 95, 31, 0.1);
-            color: #FF5F1F;
-            padding: 0.5rem 1rem;
-            border-radius: 9999px;
-            font-size: 0.875rem;
-            font-weight: 600;
-            border: 1px solid rgba(255, 95, 31, 0.2);
-        }
-        
-        .sticky-sidebar {
-            position: sticky;
-            top: 2rem;
-        }
-        
-        .zoom-container {
-            position: relative;
-            overflow: hidden;
-            border-radius: 1rem;
-        }
-        
-        .zoom-image {
-            transition: transform 0.3s ease;
-        }
-        
-        .zoom-container:hover .zoom-image {
-            transform: scale(1.05);
-        }
-        
-        .template-card {
-            background: rgba(255, 255, 255, 0.9);
-            backdrop-filter: blur(10px);
-            border-radius: 1.5rem;
-            transition: all 0.3s ease;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-        }
-        
-        .template-card:hover {
-            transform: translateY(-8px);
-            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.1);
-        }
-        
-        .price-badge {
-            background: linear-gradient(135deg, #FF5F1F, #FF8C42);
-            color: white;
-            font-weight: 700;
-            font-size: 2rem;
-            padding: 1rem 2rem;
-            border-radius: 1rem;
-            text-align: center;
-            box-shadow: 0 10px 25px rgba(255, 95, 31, 0.3);
-        }
-        
-        .btn-primary {
-            background: linear-gradient(135deg, #FF5F1F, #FF8C42);
-            color: white;
-            padding: 0.875rem 2rem;
-            border-radius: 0.75rem;
-            font-weight: 600;
-            transition: all 0.3s ease;
-            border: none;
-            box-shadow: 0 4px 15px rgba(255, 95, 31, 0.3);
-        }
-        
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(255, 95, 31, 0.4);
-        }
-        
-        .btn-secondary {
-            background: rgba(255, 255, 255, 0.9);
-            border: 2px solid #FF5F1F;
-            color: #FF5F1F;
-            padding: 0.875rem 2rem;
-            border-radius: 0.75rem;
-            font-weight: 600;
-            transition: all 0.3s ease;
-        }
-        
-        .btn-secondary:hover {
-            background: #FF5F1F;
-            color: white;
-            transform: translateY(-2px);
-        }
-        
-        .tech-badge {
-            background: linear-gradient(135deg, #3B82F6, #60A5FA);
-            color: white;
-            padding: 0.5rem 1rem;
-            border-radius: 9999px;
-            font-size: 0.875rem;
-            font-weight: 600;
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-    </style>
+    <link href="../assets/css/template-detail.css" rel="stylesheet">
     <script>
         tailwind.config = {
             theme: {
@@ -671,7 +519,7 @@ $template['category_slug'] = $template['category_slug'] ?? 'general';
             
             // Implementation for contacting seller
             console.log('Contacting seller for template:', templateId);
-            alert('Contact seller feature will be implemented soon!');
+            showInfo('Contact seller feature will be implemented soon!');
         }
 
         // Add to favorites
@@ -684,7 +532,7 @@ $template['category_slug'] = $template['category_slug'] ?? 'general';
             
             // Implementation for adding to favorites
             console.log('Adding template to favorites:', templateId);
-            alert('Template added to favorites!');
+            showSuccess('Template added to favorites!');
         }
 
         // Smooth scroll for internal links

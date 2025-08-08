@@ -81,13 +81,6 @@
     </div>
 </footer>
 
-<!-- AI Mascot -->
-<div class="ai-mascot">
-    <button class="w-16 h-16 bg-primary rounded-full flex items-center justify-center shadow-lg hover:shadow-xl transition-all neon-glow">
-        <i class="ri-robot-line text-white text-2xl"></i>
-    </button>
-</div>
-
 <!-- Scripts - Exactly matching original file -->
 <script id="header-interactions">
 document.addEventListener('DOMContentLoaded', function() {
@@ -157,17 +150,6 @@ document.addEventListener('DOMContentLoaded', function() {
             this.classList.add('bg-primary', 'text-white');
         });
     });
-});
-</script>
-
-<script id="ai-mascot-interaction">
-document.addEventListener('DOMContentLoaded', function() {
-    const mascot = document.querySelector('.ai-mascot button');
-    if (mascot) {
-        mascot.addEventListener('click', function() {
-            alert('Hi! I\'m your AI assistant. How can I help you find the perfect template today?');
-        });
-    }
 });
 </script>
 

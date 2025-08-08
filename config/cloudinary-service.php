@@ -11,12 +11,14 @@ class CloudinaryService {
     private $api_key;
     private $api_secret;
     private $environment;
+    private $upload_preset;
     
     public function __construct() {
         $this->cloud_name = CLOUDINARY_CLOUD_NAME;
         $this->api_key = CLOUDINARY_API_KEY;
         $this->api_secret = CLOUDINARY_API_SECRET;
         $this->environment = getCloudinaryEnvironment();
+        $this->upload_preset = CLOUDINARY_PRODUCT_PRESET ?? 'orbix_products';
     }
     
     /**
@@ -447,8 +449,10 @@ class CloudinaryService {
     /**
      * Generate unique public ID
      */
-    private function generatePublicId($folder) {
-        return $folder . '_' . uniqid() . '_' . time();
+    private function generatePublicId($file_name = null, $folder = null) {
+        $base_name = !empty($file_name) ? pathinfo($file_name, PATHINFO_FILENAME) : 'file';
+        $prefix = !empty($folder) ? $folder . '_' : '';
+        return $prefix . $base_name . '_' . uniqid() . '_' . time();
     }
     
     /**

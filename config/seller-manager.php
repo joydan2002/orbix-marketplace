@@ -492,13 +492,15 @@ class SellerManager {
             $values = [];
             
             // Common fields that can be updated
-            $allowedFields = ['title', 'description', 'price', 'category', 'preview_image', 'demo_url'];
+            $allowedFields = ['title', 'description', 'price', 'preview_image', 'demo_url', 'tags', 'status'];
             
             // Type-specific fields
             if ($type === 'template') {
                 $allowedFields[] = 'technology';
+                $allowedFields[] = 'download_file'; // For template files
             } else {
                 $allowedFields[] = 'delivery_time';
+                $allowedFields[] = 'features'; // For service features
             }
             
             foreach ($allowedFields as $field) {
@@ -506,6 +508,41 @@ class SellerManager {
                     $fields[] = "$field = ?";
                     $values[] = $data[$field];
                 }
+            }
+            
+            // Handle category mapping (form sends 'category' but DB has 'category_id')
+            if (isset($data['category']) && $data['category'] !== '') {
+                // Map category slug to category_id
+                $categoryMap = [
+                    'web-design' => 1,      // Business
+                    'mobile-app' => 2,      // Mobile Apps
+                    'ui-ux' => 3,           // Portfolio
+                    'graphics' => 4,        // Landing Page
+                    'development' => 5,     // Admin Dashboard
+                    'marketing' => 9,       // E-commerce
+                    'business' => 12,       // Blog
+                    'other' => 13           // SaaS
+                ];
+                
+                // For services, use different category mapping to service_categories table
+                if ($type === 'service') {
+                    $categoryMap = [
+                        'web-design' => 7,      // Design & Development
+                        'mobile-app' => 7,      // Design & Development
+                        'ui-ux' => 7,           // Design & Development
+                        'graphics' => 7,        // Design & Development
+                        'development' => 7,     // Design & Development
+                        'marketing' => 8,       // Digital Marketing
+                        'business' => 10,       // Business Services
+                        'other' => 10           // Business Services
+                    ];
+                }
+                
+                $categoryId = $categoryMap[$data['category']] ?? ($type === 'service' ? 10 : 1); // Default to Business Services for services, Business for templates
+                $fields[] = "category_id = ?";
+                $values[] = $categoryId;
+                
+                error_log("🔧 Category mapping: '{$data['category']}' -> $categoryId (type: $type)");
             }
             
             // Always update the updated_at timestamp

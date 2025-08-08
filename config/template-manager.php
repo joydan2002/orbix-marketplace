@@ -100,7 +100,8 @@ class TemplateManager {
         
         // Process templates data
         foreach ($templates as &$template) {
-            $template['tags'] = json_decode($template['tags'], true) ?: [];
+            $template['tags'] = !empty($template['tags']) ? json_decode($template['tags'], true) : [];
+            $template['tags'] = is_array($template['tags']) ? $template['tags'] : [];
             $template['avg_rating'] = round((float)$template['avg_rating'], 1);
             
             // Generate optimized image URLs for JavaScript
@@ -173,7 +174,8 @@ class TemplateManager {
         
         if ($template) {
             $template['seller_name'] = trim($template['first_name'] . ' ' . $template['last_name']);
-            $template['tags'] = json_decode($template['tags'], true) ?: [];
+            $template['tags'] = !empty($template['tags']) ? json_decode($template['tags'], true) : [];
+            $template['tags'] = is_array($template['tags']) ? $template['tags'] : [];
             $template['avg_rating'] = round((float)$template['avg_rating'], 1);
             
             // Increment view count

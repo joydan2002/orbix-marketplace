@@ -88,137 +88,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_contact'])) {
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css" rel="stylesheet">
-    <style>
-        :where([class^="ri-"])::before {
-            content: "\f3c2";
-        }
-        
-        .glass-effect {
-            backdrop-filter: blur(20px);
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-        }
-        
-        .glass-card {
-            backdrop-filter: blur(20px);
-            background: rgba(255, 255, 255, 0.9);
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            border-radius: 24px;
-            box-shadow: 
-                0 8px 32px rgba(255, 95, 31, 0.1),
-                0 2px 16px rgba(0, 0, 0, 0.05);
-        }
-        
-        .glass-card:hover {
-            transform: translateY(-4px);
-            box-shadow: 
-                0 20px 40px rgba(255, 95, 31, 0.15),
-                0 8px 32px rgba(0, 0, 0, 0.1);
-        }
-        
-        .gradient-bg {
-            background: linear-gradient(135deg, 
-                #ffffff 0%, 
-                #fff7ed 25%, 
-                #fed7aa 50%, 
-                #fff7ed 75%, 
-                #ffffff 100%);
-        }
-        
-        .hero-gradient {
-            background: linear-gradient(135deg, 
-                #FF5F1F 0%, 
-                #FF8C42 25%, 
-                #FFB366 50%, 
-                #FF8C42 75%, 
-                #FF5F1F 100%);
-        }
-        
-        .floating-animation {
-            animation: float 6s ease-in-out infinite;
-        }
-        
-        @keyframes float {
-            0%, 100% { transform: translateY(0px); }
-            50% { transform: translateY(-20px); }
-        }
-        
-        .faq-item {
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        
-        .faq-item:hover {
-            transform: translateX(8px);
-            background: rgba(255, 95, 31, 0.05);
-        }
-        
-        .faq-answer {
-            max-height: 0;
-            overflow: hidden;
-            transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        
-        .faq-answer.open {
-            max-height: 500px;
-        }
-        
-        .category-pill {
-            transition: all 0.3s ease;
-            backdrop-filter: blur(10px);
-            background: rgba(255, 255, 255, 0.8);
-            border: 1px solid rgba(255, 95, 31, 0.2);
-        }
-        
-        .category-pill.active {
-            background: #FF5F1F;
-            color: white;
-            box-shadow: 0 4px 20px rgba(255, 95, 31, 0.3);
-        }
-        
-        .category-pill:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(255, 95, 31, 0.2);
-        }
-        
-        .contact-form {
-            backdrop-filter: blur(20px);
-            background: rgba(255, 255, 255, 0.95);
-            border: 1px solid rgba(255, 255, 255, 0.5);
-        }
-        
-        .form-input {
-            background: rgba(255, 255, 255, 0.9);
-            border: 2px solid rgba(255, 95, 31, 0.1);
-            transition: all 0.3s ease;
-        }
-        
-        .form-input:focus {
-            border-color: #FF5F1F;
-            box-shadow: 0 0 0 4px rgba(255, 95, 31, 0.1);
-            background: rgba(255, 255, 255, 1);
-        }
-        
-        .pulse-animation {
-            animation: pulse 2s infinite;
-        }
-        
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-        }
-        
-        .support-icon {
-            background: linear-gradient(135deg, #FF5F1F 0%, #FF8C42 100%);
-            box-shadow: 0 8px 25px rgba(255, 95, 31, 0.3);
-        }
-        
-        .category-icon {
-            background: linear-gradient(135deg, 
-                rgba(255, 95, 31, 0.1) 0%, 
-                rgba(255, 95, 31, 0.2) 100%);
-            border: 2px solid rgba(255, 95, 31, 0.2);
-        }
-    </style>
+    <link rel="stylesheet" href="../assets/css/support.css">
     <script>
         tailwind.config = {
             theme: {
@@ -244,40 +114,40 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_contact'])) {
     <?php include '../includes/header.php'; ?>
 
     <!-- Hero Section -->
-    <section class="pt-24 pb-16 relative overflow-hidden">
+    <section class="hero-section pt-24 pb-16 lg:pt-24 lg:pb-16 md:pt-20 md:pb-12 sm:pt-16 sm:pb-8 relative overflow-hidden">
         <div class="absolute inset-0 hero-gradient opacity-10"></div>
         <div class="absolute inset-0">
-            <div class="floating-animation absolute top-20 left-20 w-32 h-32 bg-primary/5 rounded-full"></div>
-            <div class="floating-animation absolute top-40 right-32 w-24 h-24 bg-primary/10 rounded-full" style="animation-delay: -2s;"></div>
-            <div class="floating-animation absolute bottom-32 left-1/3 w-20 h-20 bg-primary/5 rounded-full" style="animation-delay: -4s;"></div>
+            <div class="floating-animation absolute top-20 left-20 w-32 h-32 bg-primary/5 rounded-full lg:block hidden"></div>
+            <div class="floating-animation absolute top-40 right-32 w-24 h-24 bg-primary/10 rounded-full lg:block hidden" style="animation-delay: -2s;"></div>
+            <div class="floating-animation absolute bottom-32 left-1/3 w-20 h-20 bg-primary/5 rounded-full lg:block hidden" style="animation-delay: -4s;"></div>
         </div>
         
-        <div class="max-w-7xl mx-auto px-6 relative z-10">
+        <div class="max-w-7xl mx-auto px-6 lg:px-6 md:px-4 sm:px-3 relative z-10">
             <div class="text-center">
-                <div class="inline-flex items-center justify-center w-20 h-20 support-icon rounded-3xl mb-8 pulse-animation">
-                    <i class="ri-customer-service-line text-3xl text-white"></i>
+                <div class="inline-flex items-center justify-center w-20 h-20 lg:w-20 lg:h-20 md:w-16 md:h-16 sm:w-12 sm:h-12 support-icon rounded-3xl mb-8 pulse-animation">
+                    <i class="ri-customer-service-line text-3xl lg:text-3xl md:text-2xl sm:text-xl text-white"></i>
                 </div>
                 
-                <h1 class="text-5xl lg:text-6xl font-bold text-secondary mb-6">
+                <h1 class="hero-title text-5xl lg:text-6xl md:text-4xl sm:text-3xl font-bold text-secondary mb-6">
                     How Can We
                     <span class="text-primary">Help You?</span>
                 </h1>
                 
-                <p class="text-xl text-gray-600 max-w-3xl mx-auto mb-12 leading-relaxed">
+                <p class="hero-subtitle text-xl lg:text-xl md:text-lg sm:text-base text-gray-600 max-w-3xl mx-auto mb-12 lg:mb-12 md:mb-8 sm:mb-6 leading-relaxed">
                     Our dedicated support team is here to assist you 24/7. 
                     Find answers to common questions or get in touch with us directly.
                 </p>
                 
                 <!-- Quick Search -->
-                <div class="max-w-2xl mx-auto">
-                    <div class="glass-card p-2 flex items-center">
-                        <div class="w-6 h-6 flex items-center justify-center ml-4">
-                            <i class="ri-search-line text-gray-400"></i>
+                <div class="max-w-2xl mx-auto lg:max-w-2xl md:max-w-xl sm:max-w-full">
+                    <div class="relative quick-search glass-card p-2 lg:p-2 md:p-2 sm:p-1 flex items-center">
+                        <div class="search-icon w-6 h-6 flex items-center justify-center ml-4 lg:ml-4 md:ml-4 sm:ml-3">
+                            <i class="ri-search-line text-gray-400 lg:text-base md:text-base sm:text-sm"></i>
                         </div>
                         <input type="text" id="faqSearch" placeholder="Search frequently asked questions..." 
-                               class="flex-1 px-4 py-4 bg-transparent border-none outline-none text-lg">
-                        <button class="bg-primary text-white px-8 py-4 rounded-2xl font-medium hover:bg-primary/90 transition-colors">
-                            Search
+                               class="search-input flex-1 px-4 py-4 lg:px-4 lg:py-4 md:px-3 md:py-3 sm:px-2 sm:py-3 bg-transparent border-none outline-none text-lg lg:text-lg md:text-base sm:text-sm" oninput="toggleSearchIcon('faq')">
+                        <button class="absolute right-4 lg:right-4 md:right-4 sm:right-3 text-orange-500 hover:text-orange-600 transition-colors hidden" id="faq-search-btn" onclick="performFaqSearch()">
+                            <i class="ri-send-plane-fill text-lg lg:text-lg md:text-lg sm:text-base"></i>
                         </button>
                     </div>
                 </div>
@@ -286,31 +156,31 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_contact'])) {
     </section>
 
     <!-- Quick Stats -->
-    <section class="pb-16">
-        <div class="max-w-7xl mx-auto px-6">
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                <div class="glass-card p-8 text-center transition-all duration-300 hover:scale-105">
-                    <div class="w-16 h-16 support-icon rounded-2xl flex items-center justify-center mx-auto mb-4">
-                        <i class="ri-time-line text-2xl text-white"></i>
+    <section class="pb-16 lg:pb-16 md:pb-12 sm:pb-8">
+        <div class="max-w-7xl mx-auto px-6 lg:px-6 md:px-4 sm:px-3">
+            <div class="stats-grid grid grid-cols-1 md:grid-cols-3 lg:grid-cols-3 gap-8 lg:gap-8 md:gap-6 sm:gap-4">
+                <div class="stat-card glass-card p-8 lg:p-8 md:p-6 sm:p-4 text-center transition-all duration-300 hover:scale-105">
+                    <div class="stat-icon w-16 h-16 lg:w-16 lg:h-16 md:w-14 md:h-14 sm:w-12 sm:h-12 support-icon rounded-2xl flex items-center justify-center mx-auto mb-4">
+                        <i class="ri-time-line text-2xl lg:text-2xl md:text-xl sm:text-lg text-white"></i>
                     </div>
-                    <h3 class="text-2xl font-bold text-secondary mb-2">< 24 Hours</h3>
-                    <p class="text-gray-600">Average Response Time</p>
+                    <h3 class="text-2xl lg:text-2xl md:text-xl sm:text-lg font-bold text-secondary mb-2">< 24 Hours</h3>
+                    <p class="text-gray-600 lg:text-base md:text-sm sm:text-sm">Average Response Time</p>
                 </div>
                 
-                <div class="glass-card p-8 text-center transition-all duration-300 hover:scale-105">
-                    <div class="w-16 h-16 support-icon rounded-2xl flex items-center justify-center mx-auto mb-4">
-                        <i class="ri-team-line text-2xl text-white"></i>
+                <div class="stat-card glass-card p-8 lg:p-8 md:p-6 sm:p-4 text-center transition-all duration-300 hover:scale-105">
+                    <div class="stat-icon w-16 h-16 lg:w-16 lg:h-16 md:w-14 md:h-14 sm:w-12 sm:h-12 support-icon rounded-2xl flex items-center justify-center mx-auto mb-4">
+                        <i class="ri-team-line text-2xl lg:text-2xl md:text-xl sm:text-lg text-white"></i>
                     </div>
-                    <h3 class="text-2xl font-bold text-secondary mb-2">50,000+</h3>
-                    <p class="text-gray-600">Happy Customers Helped</p>
+                    <h3 class="text-2xl lg:text-2xl md:text-xl sm:text-lg font-bold text-secondary mb-2">50,000+</h3>
+                    <p class="text-gray-600 lg:text-base md:text-sm sm:text-sm">Happy Customers Helped</p>
                 </div>
                 
-                <div class="glass-card p-8 text-center transition-all duration-300 hover:scale-105">
-                    <div class="w-16 h-16 support-icon rounded-2xl flex items-center justify-center mx-auto mb-4">
-                        <i class="ri-star-line text-2xl text-white"></i>
+                <div class="stat-card glass-card p-8 lg:p-8 md:p-6 sm:p-4 text-center transition-all duration-300 hover:scale-105">
+                    <div class="stat-icon w-16 h-16 lg:w-16 lg:h-16 md:w-14 md:h-14 sm:w-12 sm:h-12 support-icon rounded-2xl flex items-center justify-center mx-auto mb-4">
+                        <i class="ri-star-line text-2xl lg:text-2xl md:text-xl sm:text-lg text-white"></i>
                     </div>
-                    <h3 class="text-2xl font-bold text-secondary mb-2">4.9/5</h3>
-                    <p class="text-gray-600">Customer Satisfaction</p>
+                    <h3 class="text-2xl lg:text-2xl md:text-xl sm:text-lg font-bold text-secondary mb-2">4.9/5</h3>
+                    <p class="text-gray-600 lg:text-base md:text-sm sm:text-sm">Customer Satisfaction</p>
                 </div>
             </div>
         </div>
@@ -318,31 +188,31 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_contact'])) {
 
     <!-- Popular FAQs -->
     <?php if (!empty($popularFaqs)): ?>
-    <section class="pb-16">
-        <div class="max-w-7xl mx-auto px-6">
-            <div class="text-center mb-16">
-                <h2 class="text-4xl font-bold text-secondary mb-4">
+    <section class="pb-16 lg:pb-16 md:pb-12 sm:pb-8">
+        <div class="max-w-7xl mx-auto px-6 lg:px-6 md:px-4 sm:px-3">
+            <div class="text-center mb-16 lg:mb-16 md:mb-12 sm:mb-8">
+                <h2 class="section-title text-4xl lg:text-4xl md:text-3xl sm:text-2xl font-bold text-secondary mb-4">
                     Popular Questions
                 </h2>
-                <p class="text-xl text-gray-600 max-w-2xl mx-auto">
+                <p class="section-subtitle text-xl lg:text-xl md:text-lg sm:text-base text-gray-600 max-w-2xl mx-auto">
                     Quick answers to the most common questions from our community
                 </p>
             </div>
             
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div class="faq-grid grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-6 md:gap-4 sm:gap-3">
                 <?php foreach ($popularFaqs as $faq): ?>
-                <div class="glass-card p-6 faq-item">
+                <div class="glass-card p-6 lg:p-6 md:p-4 sm:p-3 faq-item">
                     <button class="faq-question w-full text-left flex items-center justify-between" 
                             onclick="toggleFaq(this)">
-                        <h3 class="text-lg font-semibold text-secondary pr-4">
+                        <h3 class="text-lg lg:text-lg md:text-base sm:text-sm font-semibold text-secondary pr-4">
                             <?= htmlspecialchars($faq['question']) ?>
                         </h3>
-                        <div class="w-8 h-8 flex items-center justify-center bg-primary/10 rounded-full flex-shrink-0">
+                        <div class="faq-toggle-icon w-8 h-8 lg:w-8 lg:h-8 md:w-7 md:h-7 sm:w-6 sm:h-6 flex items-center justify-center bg-primary/10 rounded-full flex-shrink-0">
                             <i class="ri-add-line text-primary transition-transform duration-300"></i>
                         </div>
                     </button>
                     <div class="faq-answer mt-4">
-                        <p class="text-gray-600 leading-relaxed">
+                        <p class="text-gray-600 lg:text-base md:text-sm sm:text-sm leading-relaxed">
                             <?= htmlspecialchars($faq['answer']) ?>
                         </p>
                     </div>
@@ -354,21 +224,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_contact'])) {
     <?php endif; ?>
 
     <!-- FAQ Categories -->
-    <section class="pb-16">
-        <div class="max-w-7xl mx-auto px-6">
-            <div class="text-center mb-16">
-                <h2 class="text-4xl font-bold text-secondary mb-4">
+    <section class="pb-16 lg:pb-16 md:pb-12 sm:pb-8">
+        <div class="max-w-7xl mx-auto px-6 lg:px-6 md:px-4 sm:px-3">
+            <div class="text-center mb-16 lg:mb-16 md:mb-12 sm:mb-8">
+                <h2 class="section-title text-4xl lg:text-4xl md:text-3xl sm:text-2xl font-bold text-secondary mb-4">
                     Browse by Category
                 </h2>
-                <p class="text-xl text-gray-600 max-w-2xl mx-auto">
+                <p class="section-subtitle text-xl lg:text-xl md:text-lg sm:text-base text-gray-600 max-w-2xl mx-auto">
                     Find specific help for different aspects of our platform
                 </p>
             </div>
             
             <!-- Category Pills -->
-            <div class="flex flex-wrap justify-center gap-4 mb-12">
+            <div class="category-pills flex flex-wrap justify-center lg:justify-center md:justify-center sm:justify-start gap-4 lg:gap-4 md:gap-3 sm:gap-2 mb-12 lg:mb-12 md:mb-8 sm:mb-6">
                 <?php foreach ($faqCategories as $index => $category): ?>
-                <button class="category-pill px-6 py-3 rounded-full font-medium capitalize <?= $index === 0 ? 'active' : '' ?>" 
+                <button class="category-pill px-6 py-3 lg:px-6 lg:py-3 md:px-4 md:py-2 sm:px-3 sm:py-2 rounded-full font-medium capitalize <?= $index === 0 ? 'active' : '' ?>" 
                         onclick="showCategory('<?= $category ?>', this)">
                     <?= ucfirst($category) ?>
                 </button>
@@ -378,23 +248,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_contact'])) {
             <!-- FAQ Categories Content -->
             <?php foreach ($faqCategories as $index => $category): ?>
             <div class="faq-category <?= $index !== 0 ? 'hidden' : '' ?>" id="category-<?= $category ?>">
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div class="faq-grid grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-6 md:gap-4 sm:gap-3">
                     <?php 
                     $categoryFaqs = $faqsByCategory[$category] ?? [];
                     foreach ($categoryFaqs as $faq): 
                     ?>
-                    <div class="glass-card p-6 faq-item">
+                    <div class="glass-card p-6 lg:p-6 md:p-4 sm:p-3 faq-item">
                         <button class="faq-question w-full text-left flex items-center justify-between" 
                                 onclick="toggleFaq(this)">
-                            <h3 class="text-lg font-semibold text-secondary pr-4">
+                            <h3 class="text-lg lg:text-lg md:text-base sm:text-sm font-semibold text-secondary pr-4">
                                 <?= htmlspecialchars($faq['question']) ?>
                             </h3>
-                            <div class="w-8 h-8 flex items-center justify-center bg-primary/10 rounded-full flex-shrink-0">
+                            <div class="faq-toggle-icon w-8 h-8 lg:w-8 lg:h-8 md:w-7 md:h-7 sm:w-6 sm:h-6 flex items-center justify-center bg-primary/10 rounded-full flex-shrink-0">
                                 <i class="ri-add-line text-primary transition-transform duration-300"></i>
                             </div>
                         </button>
                         <div class="faq-answer mt-4">
-                            <p class="text-gray-600 leading-relaxed">
+                            <p class="text-gray-600 lg:text-base md:text-sm sm:text-sm leading-relaxed">
                                 <?= htmlspecialchars($faq['answer']) ?>
                             </p>
                         </div>
@@ -407,53 +277,53 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_contact'])) {
     </section>
 
     <!-- Contact Form Section -->
-    <section class="pb-20">
-        <div class="max-w-7xl mx-auto px-6">
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-start">
+    <section class="pb-20 lg:pb-20 md:pb-16 sm:pb-12">
+        <div class="max-w-7xl mx-auto px-6 lg:px-6 md:px-4 sm:px-3">
+            <div class="contact-grid grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-16 md:gap-12 sm:gap-8 items-start">
                 <!-- Contact Info -->
                 <div>
-                    <h2 class="text-4xl font-bold text-secondary mb-6">
+                    <h2 class="contact-info-title text-4xl lg:text-4xl md:text-3xl sm:text-2xl font-bold text-secondary mb-6">
                         Still Need Help?
                     </h2>
-                    <p class="text-xl text-gray-600 mb-12 leading-relaxed">
+                    <p class="text-xl lg:text-xl md:text-lg sm:text-base text-gray-600 mb-12 lg:mb-12 md:mb-8 sm:mb-6 leading-relaxed">
                         Can't find what you're looking for? Our friendly support team is ready to help you with any questions or issues.
                     </p>
                     
-                    <div class="space-y-8">
-                        <div class="flex items-start space-x-4">
-                            <div class="w-12 h-12 category-icon rounded-2xl flex items-center justify-center flex-shrink-0">
-                                <i class="ri-mail-line text-primary text-xl"></i>
+                    <div class="space-y-8 lg:space-y-8 md:space-y-6 sm:space-y-4">
+                        <div class="contact-info-item flex items-start lg:items-start space-x-4">
+                            <div class="contact-icon w-12 h-12 lg:w-12 lg:h-12 md:w-10 md:h-10 sm:w-8 sm:h-8 category-icon rounded-2xl flex items-center justify-center flex-shrink-0">
+                                <i class="ri-mail-line text-primary text-xl lg:text-xl md:text-lg sm:text-base"></i>
                             </div>
                             <div>
-                                <h3 class="text-xl font-semibold text-secondary mb-2">Email Support</h3>
-                                <p class="text-gray-600 mb-2">Get detailed help via email</p>
-                                <a href="mailto:support@orbixmarket.com" class="text-primary font-medium hover:underline">
+                                <h3 class="text-xl lg:text-xl md:text-lg sm:text-base font-semibold text-secondary mb-2">Email Support</h3>
+                                <p class="text-gray-600 lg:text-base md:text-sm sm:text-sm mb-2">Get detailed help via email</p>
+                                <a href="mailto:support@orbixmarket.com" class="text-primary font-medium hover:underline lg:text-base md:text-sm sm:text-sm">
                                     support@orbixmarket.com
                                 </a>
                             </div>
                         </div>
                         
-                        <div class="flex items-start space-x-4">
-                            <div class="w-12 h-12 category-icon rounded-2xl flex items-center justify-center flex-shrink-0">
-                                <i class="ri-phone-line text-primary text-xl"></i>
+                        <div class="contact-info-item flex items-start lg:items-start space-x-4">
+                            <div class="contact-icon w-12 h-12 lg:w-12 lg:h-12 md:w-10 md:h-10 sm:w-8 sm:h-8 category-icon rounded-2xl flex items-center justify-center flex-shrink-0">
+                                <i class="ri-phone-line text-primary text-xl lg:text-xl md:text-lg sm:text-base"></i>
                             </div>
                             <div>
-                                <h3 class="text-xl font-semibold text-secondary mb-2">Phone Support</h3>
-                                <p class="text-gray-600 mb-2">Talk to us directly</p>
-                                <a href="tel:1-800-ORBIX-HELP" class="text-primary font-medium hover:underline">
+                                <h3 class="text-xl lg:text-xl md:text-lg sm:text-base font-semibold text-secondary mb-2">Phone Support</h3>
+                                <p class="text-gray-600 lg:text-base md:text-sm sm:text-sm mb-2">Talk to us directly</p>
+                                <a href="tel:1-800-ORBIX-HELP" class="text-primary font-medium hover:underline lg:text-base md:text-sm sm:text-sm">
                                     1-800-ORBIX-HELP
                                 </a>
                             </div>
                         </div>
                         
-                        <div class="flex items-start space-x-4">
-                            <div class="w-12 h-12 category-icon rounded-2xl flex items-center justify-center flex-shrink-0">
-                                <i class="ri-chat-3-line text-primary text-xl"></i>
+                        <div class="contact-info-item flex items-start lg:items-start space-x-4">
+                            <div class="contact-icon w-12 h-12 lg:w-12 lg:h-12 md:w-10 md:h-10 sm:w-8 sm:h-8 category-icon rounded-2xl flex items-center justify-center flex-shrink-0">
+                                <i class="ri-chat-3-line text-primary text-xl lg:text-xl md:text-lg sm:text-base"></i>
                             </div>
                             <div>
-                                <h3 class="text-xl font-semibold text-secondary mb-2">Live Chat</h3>
-                                <p class="text-gray-600 mb-2">Available 24/7 for instant help</p>
-                                <button class="text-primary font-medium hover:underline" onclick="openLiveChat()">
+                                <h3 class="text-xl lg:text-xl md:text-lg sm:text-base font-semibold text-secondary mb-2">Live Chat</h3>
+                                <p class="text-gray-600 lg:text-base md:text-sm sm:text-sm mb-2">Available 24/7 for instant help</p>
+                                <button class="text-primary font-medium hover:underline lg:text-base md:text-sm sm:text-sm" onclick="openLiveChat()">
                                     Start Chat
                                 </button>
                             </div>
@@ -462,27 +332,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_contact'])) {
                 </div>
                 
                 <!-- Contact Form -->
-                <div class="contact-form rounded-3xl p-8">
-                    <h3 class="text-2xl font-bold text-secondary mb-6">Send us a Message</h3>
+                <div class="contact-form rounded-3xl lg:rounded-3xl md:rounded-2xl sm:rounded-xl p-8 lg:p-8 md:p-6 sm:p-4">
+                    <h3 class="text-2xl lg:text-2xl md:text-xl sm:text-lg font-bold text-secondary mb-6">Send us a Message</h3>
                     
                     <?php if (!empty($formMessage)): ?>
-                    <div class="mb-6 p-4 rounded-2xl <?= $formSuccess ? 'bg-green-50 border border-green-200 text-green-700' : 'bg-red-50 border border-red-200 text-red-700' ?>">
+                    <div class="mb-6 p-4 lg:p-4 md:p-3 sm:p-3 rounded-2xl lg:rounded-2xl md:rounded-xl sm:rounded-lg <?= $formSuccess ? 'bg-green-50 border border-green-200 text-green-700' : 'bg-red-50 border border-red-200 text-red-700' ?>">
                         <div class="flex items-center">
-                            <i class="<?= $formSuccess ? 'ri-check-line' : 'ri-error-warning-line' ?> text-xl mr-3"></i>
-                            <span><?= htmlspecialchars($formMessage) ?></span>
+                            <i class="<?= $formSuccess ? 'ri-check-line' : 'ri-error-warning-line' ?> text-xl lg:text-xl md:text-lg sm:text-base mr-3"></i>
+                            <span class="lg:text-base md:text-sm sm:text-sm"><?= htmlspecialchars($formMessage) ?></span>
                         </div>
                     </div>
                     <?php endif; ?>
                     
-                    <form method="POST" class="space-y-6">
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <form method="POST" class="space-y-6 lg:space-y-6 md:space-y-4 sm:space-y-3">
+                        <div class="form-grid grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6 lg:gap-6 md:gap-4 sm:gap-3">
                             <div>
                                 <label for="name" class="block text-sm font-semibold text-secondary mb-2">
                                     Full Name *
                                 </label>
                                 <input type="text" id="name" name="name" required
                                        value="<?= htmlspecialchars($_POST['name'] ?? '') ?>"
-                                       class="form-input w-full px-4 py-3 rounded-xl border-0 outline-none"
+                                       class="form-input w-full px-4 py-3 lg:px-4 lg:py-3 md:px-3 md:py-3 sm:px-3 sm:py-2 rounded-xl lg:rounded-xl md:rounded-lg sm:rounded-lg border-0 outline-none"
                                        placeholder="Enter your full name">
                             </div>
                             
@@ -492,19 +362,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_contact'])) {
                                 </label>
                                 <input type="email" id="email" name="email" required
                                        value="<?= htmlspecialchars($_POST['email'] ?? '') ?>"
-                                       class="form-input w-full px-4 py-3 rounded-xl border-0 outline-none"
+                                       class="form-input w-full px-4 py-3 lg:px-4 lg:py-3 md:px-3 md:py-3 sm:px-3 sm:py-2 rounded-xl lg:rounded-xl md:rounded-lg sm:rounded-lg border-0 outline-none"
                                        placeholder="Enter your email">
                             </div>
                         </div>
                         
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="form-grid grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6 lg:gap-6 md:gap-4 sm:gap-3">
                             <div>
                                 <label for="subject" class="block text-sm font-semibold text-secondary mb-2">
                                     Subject *
                                 </label>
                                 <input type="text" id="subject" name="subject" required
                                        value="<?= htmlspecialchars($_POST['subject'] ?? '') ?>"
-                                       class="form-input w-full px-4 py-3 rounded-xl border-0 outline-none"
+                                       class="form-input w-full px-4 py-3 lg:px-4 lg:py-3 md:px-3 md:py-3 sm:px-3 sm:py-2 rounded-xl lg:rounded-xl md:rounded-lg sm:rounded-lg border-0 outline-none"
                                        placeholder="What's this about?">
                             </div>
                             
@@ -513,7 +383,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_contact'])) {
                                     Category
                                 </label>
                                 <select id="category" name="category" 
-                                        class="form-input w-full px-4 py-3 rounded-xl border-0 outline-none">
+                                        class="form-input w-full px-4 py-3 lg:px-4 lg:py-3 md:px-3 md:py-3 sm:px-3 sm:py-2 rounded-xl lg:rounded-xl md:rounded-lg sm:rounded-lg border-0 outline-none">
                                     <option value="general" <?= ($_POST['category'] ?? '') === 'general' ? 'selected' : '' ?>>General Question</option>
                                     <option value="templates" <?= ($_POST['category'] ?? '') === 'templates' ? 'selected' : '' ?>>Templates</option>
                                     <option value="billing" <?= ($_POST['category'] ?? '') === 'billing' ? 'selected' : '' ?>>Billing & Payment</option>
@@ -528,12 +398,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_contact'])) {
                                 Message *
                             </label>
                             <textarea id="message" name="message" required rows="6"
-                                      class="form-input w-full px-4 py-3 rounded-xl border-0 outline-none resize-none"
+                                      class="form-input w-full px-4 py-3 lg:px-4 lg:py-3 md:px-3 md:py-3 sm:px-3 sm:py-2 rounded-xl lg:rounded-xl md:rounded-lg sm:rounded-lg border-0 outline-none resize-none"
                                       placeholder="Tell us more about your question or issue..."><?= htmlspecialchars($_POST['message'] ?? '') ?></textarea>
                         </div>
                         
                         <button type="submit" name="submit_contact" 
-                                class="w-full bg-primary text-white py-4 px-8 rounded-xl font-semibold text-lg hover:bg-primary/90 transition-all duration-300 transform hover:scale-105">
+                                class="submit-button w-full bg-primary text-white py-4 px-8 lg:py-4 lg:px-8 md:py-3 md:px-6 sm:py-3 sm:px-4 rounded-xl lg:rounded-xl md:rounded-lg sm:rounded-lg font-semibold text-lg lg:text-lg md:text-base sm:text-sm hover:bg-primary/90 transition-all duration-300 transform hover:scale-105">
                             <i class="ri-send-plane-line mr-2"></i>
                             Send Message
                         </button>
@@ -618,9 +488,37 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_contact'])) {
             });
         });
         
+        // Toggle search icon functionality (like index.php)
+        function toggleSearchIcon(type) {
+            const input = document.getElementById(type + 'Search');
+            const button = document.getElementById(type + '-search-btn');
+            
+            if (input.value.trim().length > 0) {
+                button.classList.remove('hidden');
+            } else {
+                button.classList.add('hidden');
+            }
+        }
+        
+        // Perform FAQ search (like index.php)
+        function performFaqSearch() {
+            const searchTerm = document.getElementById('faqSearch').value.trim();
+            if (searchTerm) {
+                // Trigger the existing search functionality
+                const event = new Event('input');
+                document.getElementById('faqSearch').dispatchEvent(event);
+                
+                // Optional: scroll to first result
+                const firstVisibleItem = document.querySelector('.faq-item[style="display: block;"], .faq-item:not([style*="display: none"])');
+                if (firstVisibleItem) {
+                    firstVisibleItem.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+            }
+        }
+        
         // Live chat placeholder
         function openLiveChat() {
-            alert('Live chat feature will be available soon! Please use the contact form or email for now.');
+            showInfo('Live chat feature will be available soon! Please use the contact form or email for now.');
         }
         
         // Highlight search terms
@@ -649,7 +547,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_contact'])) {
             
             if (!name || !email || !subject || !message) {
                 e.preventDefault();
-                alert('Please fill in all required fields.');
+                showWarning('Please fill in all required fields.');
                 return;
             }
             
@@ -657,7 +555,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_contact'])) {
             const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
             if (!emailRegex.test(email)) {
                 e.preventDefault();
-                alert('Please enter a valid email address.');
+                showWarning('Please enter a valid email address.');
                 return;
             }
         });

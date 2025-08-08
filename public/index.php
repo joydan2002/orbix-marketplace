@@ -50,55 +50,41 @@ $showLoginSuccess = isset($_GET['login']) && $_GET['login'] === 'success';
 ?>
 
 <!-- Hero Section -->
-<section class="pt-24 pb-32 relative overflow-hidden min-h-screen flex items-center" style="background-image: url('https://readdy.ai/api/search-image?query=futuristic%20digital%20marketplace%20abstract%20background%20with%20floating%20geometric%20shapes%20holographic%20elements%20neon%20orange%20accents%20modern%20technology%20theme%20clean%20white%20base%20professional%20design&width=1920&height=800&seq=hero1&orientation=landscape'); background-size: cover; background-position: center;">
+<section class="pt-20 sm:pt-24 pb-16 sm:pb-32 relative overflow-hidden min-h-[90vh] sm:min-h-screen flex items-center" style="background-image: url('https://readdy.ai/api/search-image?query=futuristic%20digital%20marketplace%20abstract%20background%20with%20floating%20geometric%20shapes%20holographic%20elements%20neon%20orange%20accents%20modern%20technology%20theme%20clean%20white%20base%20professional%20design&width=1920&height=800&seq=hero1&orientation=landscape'); background-size: cover; background-position: center;">
     <div class="absolute inset-0 bg-white/80 backdrop-blur-sm"></div>
-    <div class="max-w-7xl mx-auto px-6 relative z-10 w-full">
-        <div class="grid lg:grid-cols-2 gap-12 items-center">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 relative z-10 w-full">
+        <div class="grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
             <!-- Left Content -->
-            <div class="space-y-8">
+            <div class="space-y-6 sm:space-y-8 text-center lg:text-left">
                 <div class="space-y-4">
-                    <h1 class="text-5xl lg:text-6xl font-bold text-secondary leading-tight">
+                    <h1 class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-secondary leading-tight">
                         Premium Website
                         <span class="text-primary">Templates</span>
-                        Marketplace
+                        <span class="block">Marketplace</span>
                     </h1>
-                    <p class="text-xl text-gray-600 leading-relaxed">
+                    <p class="text-lg sm:text-xl text-gray-600 leading-relaxed max-w-lg mx-auto lg:mx-0">
                         Discover thousands of professional website templates, UI kits, and digital assets created by talented designers worldwide.
                     </p>
                 </div>
                 
                 <!-- Search Bar -->
-                <div class="flex items-center bg-white rounded-full p-2 shadow-lg max-w-md">
-                    <div class="w-6 h-6 flex items-center justify-center ml-4">
-                        <i class="ri-search-line text-gray-400"></i>
-                    </div>
-                    <input type="text" placeholder="Search for templates..." class="flex-1 px-4 py-3 border-none outline-none text-sm rounded-full bg-transparent">
-                    <button class="bg-primary text-white px-6 py-3 !rounded-full font-medium hover:bg-primary/90 transition-colors whitespace-nowrap">
-                        Search
-                    </button>
-                </div>
-                
-                <!-- Stats -->
-                <div class="flex items-center space-x-8">
-                    <div class="text-center">
-                        <div class="text-3xl font-bold text-secondary"><?php echo number_format($templateCount); ?>+</div>
-                        <div class="text-sm text-gray-500">Templates</div>
-                    </div>
-                    <div class="text-center">
-                        <div class="text-3xl font-bold text-secondary"><?php echo number_format($sellerCount); ?>+</div>
-                        <div class="text-sm text-gray-500">Active Sellers</div>
-                    </div>
-                    <div class="text-center">
-                        <div class="text-3xl font-bold text-secondary"><?php echo number_format($totalDownloads); ?>+</div>
-                        <div class="text-sm text-gray-500">Happy Customers</div>
+                <div class="relative max-w-2xl mx-auto lg:mx-0">
+                    <div class="flex items-center bg-white rounded-full shadow-lg border border-gray-200 overflow-hidden">
+                        <div class="flex items-center pl-6 pr-4">
+                            <i class="ri-search-line text-gray-400 text-lg"></i>
+                        </div>
+                        <input type="text" placeholder="Search for templates..." class="flex-1 py-4 px-2 border-none outline-none text-base bg-transparent pr-12" id="hero-search-input" oninput="toggleSearchIcon('hero')">
+                        <button class="absolute right-4 text-orange-500 hover:text-orange-600 transition-colors hidden" id="hero-search-btn" onclick="performHeroSearch()">
+                            <i class="ri-send-plane-fill text-lg"></i>
+                        </button>
                     </div>
                 </div>
             </div>
             
             <!-- Right Content - Floating Templates (will be loaded from API) -->
-            <div class="relative">
+            <div class="relative mt-8 lg:mt-0 order-first lg:order-last">
                 <div class="floating-animation">
-                    <div class="grid grid-cols-2 gap-4" id="hero-templates">
+                    <div class="grid grid-cols-2 gap-2 sm:gap-4" id="hero-templates">
                         <!-- Templates will be loaded here via JavaScript -->
                     </div>
                 </div>
@@ -108,41 +94,60 @@ $showLoginSuccess = isset($_GET['login']) && $_GET['login'] === 'success';
 </section>
 
 <!-- Template Categories Section -->
-<section id="templates" class="py-20 bg-gray-50">
-    <div class="max-w-7xl mx-auto px-6">
-        <div class="text-center mb-16">
-            <h2 class="text-3xl md:text-4xl font-bold mb-4 text-secondary">
+<section id="templates" class="py-16 sm:py-20 bg-gray-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6">
+        <div class="text-center mb-12 sm:mb-16">
+            <h2 class="text-2xl sm:text-3xl md:text-4xl font-bold mb-4 text-secondary">
                 Template Categories
             </h2>
-            <p class="text-gray-600 max-w-2xl mx-auto">
+            <p class="text-gray-600 max-w-2xl mx-auto px-4">
                 Explore our diverse collection of professionally designed templates 
                 for all your business needs.
             </p>
         </div>
         
-        <!-- Category Filter Pills -->
-        <div class="flex flex-wrap items-center justify-center mb-10">
-            <button class="m-2 px-6 py-2 rounded-full bg-primary text-white whitespace-nowrap transition-colors" data-category="">
-                All Templates
-            </button>
-            <?php foreach ($categories as $category): ?>
-            <button class="m-2 px-6 py-2 rounded-full bg-gray-200 text-gray-700 hover:bg-primary hover:text-white whitespace-nowrap transition-colors" data-category="<?php echo $category['slug']; ?>">
-                <?php echo htmlspecialchars($category['name']); ?>
-            </button>
-            <?php endforeach; ?>
+        <!-- Category Filters -->
+        <div class="mb-8 sm:mb-10">
+            <!-- Desktop view -->
+            <div class="hidden sm:flex flex-wrap items-center justify-center gap-2 sm:gap-3">
+                <button class="category-filter active px-4 sm:px-6 py-2 sm:py-3 rounded-full bg-primary text-white font-medium transition-all hover:shadow-lg text-sm sm:text-base" data-category="">
+                    All Categories
+                </button>
+                <?php foreach ($categories as $category): ?>
+                <button class="category-filter px-4 sm:px-6 py-2 sm:py-3 rounded-full bg-white text-gray-700 font-medium transition-all hover:shadow-lg border border-gray-200 hover:border-primary text-sm sm:text-base" data-category="<?= $category['id'] ?>">
+                    <?= htmlspecialchars($category['name']) ?>
+                </button>
+                <?php endforeach; ?>
+            </div>
+            
+            <!-- Mobile horizontal scroll view -->
+            <div class="block sm:hidden">
+                <div class="overflow-x-auto scrollbar-hide pb-2">
+                    <div class="flex gap-3 px-4 min-w-max">
+                        <button class="category-filter active px-4 py-2 rounded-full bg-primary text-white font-medium transition-all hover:shadow-lg text-sm whitespace-nowrap flex-shrink-0" data-category="">
+                            All Categories
+                        </button>
+                        <?php foreach ($categories as $category): ?>
+                        <button class="category-filter px-4 py-2 rounded-full bg-white text-gray-700 font-medium transition-all hover:shadow-lg border border-gray-200 hover:border-primary text-sm whitespace-nowrap flex-shrink-0" data-category="<?= $category['id'] ?>">
+                            <?= htmlspecialchars($category['name']) ?>
+                        </button>
+                        <?php endforeach; ?>
+                    </div>
+                </div>
+            </div>
         </div>
         
         <!-- Templates Grid -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8" id="main-templates-grid">
-            <!-- Templates will be loaded here via JavaScript -->
-            <div class="col-span-full text-center py-8">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8" id="main-templates-grid">
+            <!-- Loading state -->
+            <div class="col-span-full text-center py-8 sm:py-12">
                 <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
                 <p class="mt-2 text-gray-600">Loading templates...</p>
             </div>
         </div>
         
-        <div class="text-center mt-12">
-            <a href="templates.php" class="bg-gradient-to-r from-primary to-primary/80 text-white px-8 py-3 rounded-button whitespace-nowrap font-medium inline-block hover:shadow-lg transition-all">
+        <div class="text-center mt-8 sm:mt-12">
+            <a href="templates.php" class="bg-gradient-to-r from-primary to-primary/80 text-white px-6 sm:px-8 py-3 rounded-button whitespace-nowrap font-medium inline-block hover:shadow-lg transition-all text-sm sm:text-base">
                 View All Templates
             </a>
         </div>
@@ -150,11 +155,11 @@ $showLoginSuccess = isset($_GET['login']) && $_GET['login'] === 'success';
 </section>
 
 <!-- Featured Templates Section -->
-<section id="featured" class="py-20 bg-white">
-    <div class="max-w-7xl mx-auto px-6">
-        <div class="text-center mb-16">
-            <h2 class="text-3xl md:text-4xl font-bold mb-4 text-secondary">Featured Templates</h2>
-            <p class="text-gray-600 max-w-2xl mx-auto">
+<section id="featured" class="py-16 sm:py-20 bg-white">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6">
+        <div class="text-center mb-12 sm:mb-16">
+            <h2 class="text-2xl sm:text-3xl md:text-4xl font-bold mb-4 text-secondary">Featured Templates</h2>
+            <p class="text-gray-600 max-w-2xl mx-auto px-4">
                 Discover the most popular website templates with modern design 
                 and cutting-edge features.
             </p>
@@ -165,16 +170,26 @@ $showLoginSuccess = isset($_GET['login']) && $_GET['login'] === 'success';
                 <!-- Featured templates will be loaded here -->
             </div>
             
-            <!-- Navigation Buttons -->
-            <button id="prev-slide" class="absolute left-2 top-1/2 transform -translate-y-1/2 w-12 h-12 flex items-center justify-center bg-white rounded-full shadow-lg z-10 hover:shadow-xl transition-shadow">
-                <i class="ri-arrow-left-s-line text-xl text-gray-700"></i>
+            <!-- Navigation Buttons - Hidden on mobile, visible on tablet+ -->
+            <button id="prev-slide" class="hidden sm:flex absolute left-2 top-1/2 transform -translate-y-1/2 w-10 h-10 sm:w-12 sm:h-12 items-center justify-center bg-white rounded-full shadow-lg z-10 hover:shadow-xl transition-shadow">
+                <i class="ri-arrow-left-s-line text-lg sm:text-xl text-gray-700"></i>
             </button>
-            <button id="next-slide" class="absolute right-2 top-1/2 transform -translate-y-1/2 w-12 h-12 flex items-center justify-center bg-white rounded-full shadow-lg z-10 hover:shadow-xl transition-shadow">
-                <i class="ri-arrow-right-s-line text-xl text-gray-700"></i>
+            <button id="next-slide" class="hidden sm:flex absolute right-2 top-1/2 transform -translate-y-1/2 w-10 h-10 sm:w-12 sm:h-12 items-center justify-center bg-white rounded-full shadow-lg z-10 hover:shadow-xl transition-shadow">
+                <i class="ri-arrow-right-s-line text-lg sm:text-xl text-gray-700"></i>
             </button>
             
+            <!-- Mobile Navigation Buttons -->
+            <div class="flex sm:hidden justify-center mt-4 space-x-4">
+                <button id="prev-slide-mobile" class="w-10 h-10 flex items-center justify-center bg-gray-100 rounded-full shadow hover:shadow-md transition-shadow">
+                    <i class="ri-arrow-left-s-line text-lg text-gray-700"></i>
+                </button>
+                <button id="next-slide-mobile" class="w-10 h-10 flex items-center justify-center bg-gray-100 rounded-full shadow hover:shadow-md transition-shadow">
+                    <i class="ri-arrow-right-s-line text-lg text-gray-700"></i>
+                </button>
+            </div>
+            
             <!-- Slider Indicators -->
-            <div class="flex justify-center mt-8">
+            <div class="flex justify-center mt-6 sm:mt-8">
                 <div class="flex space-x-2" id="slider-indicators">
                     <!-- Indicators will be generated by JavaScript -->
                 </div>
@@ -188,30 +203,30 @@ $showLoginSuccess = isset($_GET['login']) && $_GET['login'] === 'success';
 <?php include '../includes/testimonials.php'; ?>
 
 <!-- CTA Section -->
-<section class="py-20 bg-white">
-    <div class="max-w-7xl mx-auto px-6">
-        <div class="bg-gradient-to-r from-primary to-primary/80 rounded-2xl overflow-hidden shadow-xl">
+<section class="py-16 sm:py-20 bg-white">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6">
+        <div class="bg-gradient-to-r from-primary to-primary/80 rounded-xl sm:rounded-2xl overflow-hidden shadow-xl">
             <div class="flex flex-col md:flex-row">
-                <div class="md:w-1/2 p-8 md:p-12 flex items-center">
-                    <div>
-                        <h2 class="text-3xl md:text-4xl font-bold text-white mb-6">
+                <div class="md:w-1/2 p-6 sm:p-8 md:p-12 flex items-center">
+                    <div class="w-full text-center md:text-left">
+                        <h2 class="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-4 sm:mb-6">
                             Ready to Upgrade Your Website?
                         </h2>
-                        <p class="text-white/90 mb-8">
+                        <p class="text-white/90 mb-6 sm:mb-8 text-sm sm:text-base">
                             Sign up today to receive a special 30% discount for new customers. 
                             Applies to all service packages.
                         </p>
-                        <div class="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
-                            <a href="#pricing" class="bg-white text-primary px-8 py-3 rounded-button font-medium hover:bg-gray-100 transition-colors whitespace-nowrap text-center">
+                        <div class="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-4">
+                            <a href="#pricing" class="bg-white text-primary px-6 sm:px-8 py-3 rounded-button font-medium hover:bg-gray-100 transition-colors whitespace-nowrap text-center text-sm sm:text-base">
                                 View Pricing
                             </a>
-                            <a href="#contact" class="bg-transparent border-2 border-white text-white px-8 py-3 rounded-button font-medium hover:bg-white/10 transition-colors whitespace-nowrap text-center">
+                            <a href="#contact" class="bg-transparent border-2 border-white text-white px-6 sm:px-8 py-3 rounded-button font-medium hover:bg-white/10 transition-colors whitespace-nowrap text-center text-sm sm:text-base">
                                 Contact Us
                             </a>
                         </div>
                     </div>
                 </div>
-                <div class="md:w-1/2 relative">
+                <div class="md:w-1/2 relative min-h-[200px] sm:min-h-[300px]">
                     <img src="https://images.unsplash.com/photo-1551650975-87deedd944c3?w=800&h=600&fit=crop" alt="3D Web Design" class="w-full h-full object-cover" />
                 </div>
             </div>
@@ -321,23 +336,23 @@ function renderHeroTemplates(templates) {
     const rightColumn = templates.slice(2, 4);
     
     container.innerHTML = `
-        <div class="space-y-4">
+        <div class="space-y-2 sm:space-y-4">
             ${leftColumn.map(template => `
-                <div class="bg-white/90 backdrop-blur-sm rounded-xl p-4 shadow-lg hover:shadow-xl transition-all hover:scale-105">
-                    <img src="${getOptimizedImageUrlJS(template.preview_image, 'thumb')}" alt="${template.title}" class="w-full h-24 object-cover rounded-lg" onerror="this.src='../assets/images/default-template.jpg'">
-                    <div class="mt-2">
-                        <h4 class="font-semibold text-sm text-secondary">${template.title}</h4>
+                <div class="bg-white/90 backdrop-blur-sm rounded-lg sm:rounded-xl p-2 sm:p-4 shadow-lg hover:shadow-xl transition-all hover:scale-105">
+                    <img src="${getOptimizedImageUrlJS(template.preview_image, 'thumb')}" alt="${template.title}" class="w-full h-16 sm:h-20 md:h-24 object-cover rounded-md sm:rounded-lg" onerror="this.src='../assets/images/default-template.jpg'">
+                    <div class="mt-1 sm:mt-2">
+                        <h4 class="font-semibold text-xs sm:text-sm text-secondary truncate">${template.title}</h4>
                         <p class="text-xs text-primary font-medium">$${template.price}</p>
                     </div>
                 </div>
             `).join('')}
         </div>
-        <div class="space-y-4 mt-8">
+        <div class="space-y-2 sm:space-y-4 mt-4 sm:mt-8">
             ${rightColumn.map(template => `
-                <div class="bg-white/90 backdrop-blur-sm rounded-xl p-4 shadow-lg hover:shadow-xl transition-all hover:scale-105">
-                    <img src="${getOptimizedImageUrlJS(template.preview_image, 'thumb')}" alt="${template.title}" class="w-full h-24 object-cover rounded-lg" onerror="this.src='../assets/images/default-template.jpg'">
-                    <div class="mt-2">
-                        <h4 class="font-semibold text-sm text-secondary">${template.title}</h4>
+                <div class="bg-white/90 backdrop-blur-sm rounded-lg sm:rounded-xl p-2 sm:p-4 shadow-lg hover:shadow-xl transition-all hover:scale-105">
+                    <img src="${getOptimizedImageUrlJS(template.preview_image, 'thumb')}" alt="${template.title}" class="w-full h-16 sm:h-20 md:h-24 object-cover rounded-md sm:rounded-lg" onerror="this.src='../assets/images/default-template.jpg'">
+                    <div class="mt-1 sm:mt-2">
+                        <h4 class="font-semibold text-xs sm:text-sm text-secondary truncate">${template.title}</h4>
                         <p class="text-xs text-primary font-medium">$${template.price}</p>
                     </div>
                 </div>
@@ -369,18 +384,18 @@ function createMainTemplateCard(template) {
     ).join('');
     
     const badges = template.is_featured ? 
-        '<div class="absolute top-4 right-4 bg-primary text-white px-3 py-1 rounded-full text-sm font-medium">Featured</div>' :
-        '<div class="absolute top-4 right-4 bg-green-500 text-white px-3 py-1 rounded-full text-sm font-medium">New</div>';
+        '<div class="absolute top-2 sm:top-4 right-2 sm:right-4 bg-primary text-white px-2 sm:px-3 py-1 rounded-full text-xs sm:text-sm font-medium">Featured</div>' :
+        '<div class="absolute top-2 sm:top-4 right-2 sm:right-4 bg-green-500 text-white px-2 sm:px-3 py-1 rounded-full text-xs sm:text-sm font-medium">New</div>';
 
     return `
         <div class="bg-white rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-all hover:-translate-y-2">
             <div class="relative">
-                <img src="${getOptimizedImageUrlJS(template.preview_image, 'card')}" alt="${template.title}" class="w-full h-64 object-cover" onerror="this.src='../assets/images/default-template.jpg'">
+                <img src="${getOptimizedImageUrlJS(template.preview_image, 'card')}" alt="${template.title}" class="w-full h-48 sm:h-56 md:h-64 object-cover" onerror="this.src='../assets/images/default-template.jpg'">
                 ${badges}
             </div>
-            <div class="p-6">
-                <div class="flex justify-between items-center mb-3">
-                    <h3 class="text-xl font-bold text-secondary">${template.title}</h3>
+            <div class="p-4 sm:p-6">
+                <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-3 space-y-2 sm:space-y-0">
+                    <h3 class="text-lg sm:text-xl font-bold text-secondary">${template.title}</h3>
                     <div class="flex items-center">
                         <div class="text-yellow-400 flex text-sm">
                             ${starHtml}
@@ -388,20 +403,20 @@ function createMainTemplateCard(template) {
                         <span class="text-gray-600 ml-1 text-sm">(${template.review_count || Math.floor(Math.random() * 200) + 50})</span>
                     </div>
                 </div>
-                <p class="text-gray-600 mb-4 leading-relaxed">
+                <p class="text-gray-600 mb-4 leading-relaxed text-sm sm:text-base">
                     ${template.description.substring(0, 100)}${template.description.length > 100 ? '...' : ''}
                 </p>
-                <div class="flex justify-between items-center">
+                <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center space-y-3 sm:space-y-0">
                     <span class="text-primary font-bold text-xl">$${template.price}</span>
-                    <div class="flex space-x-2">
-                        <button onclick="viewTemplateDetails(${template.id})" class="w-10 h-10 flex items-center justify-center bg-gray-100 rounded-full hover:bg-gray-200 transition-colors">
-                            <i class="ri-eye-line text-gray-600"></i>
+                    <div class="flex justify-center sm:justify-end space-x-2">
+                        <button onclick="viewTemplateDetails(${template.id})" class="w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center bg-gray-100 rounded-full hover:bg-gray-200 transition-colors">
+                            <i class="ri-eye-line text-gray-600 text-sm sm:text-base"></i>
                         </button>
-                        <button onclick="addToFavorites(${template.id}, 'template')" class="w-10 h-10 flex items-center justify-center bg-gray-100 rounded-full hover:bg-gray-200 transition-colors">
-                            <i class="ri-heart-line text-gray-600"></i>
+                        <button onclick="addToFavorites(${template.id}, 'template')" class="w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center bg-gray-100 rounded-full hover:bg-gray-200 transition-colors">
+                            <i class="ri-heart-line text-gray-600 text-sm sm:text-base"></i>
                         </button>
-                        <button onclick="addToCart(${template.id}, '${escapeHtml(template.title)}', ${template.price}, '${escapeHtml(getOptimizedImageUrlJS(template.preview_image, 'thumb'))}', '${escapeHtml(template.seller_name || 'Unknown')}', 'template')" class="w-10 h-10 flex items-center justify-center bg-primary rounded-full hover:bg-primary/90 transition-colors">
-                            <i class="ri-shopping-cart-line text-white"></i>
+                        <button onclick="addToCart(${template.id}, '${escapeHtml(template.title)}', ${template.price}, '${escapeHtml(getOptimizedImageUrlJS(template.preview_image, 'thumb'))}', '${escapeHtml(template.seller_name || 'Unknown')}', 'template')" class="w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center bg-primary rounded-full hover:bg-primary/90 transition-colors">
+                            <i class="ri-shopping-cart-line text-white text-sm sm:text-base"></i>
                         </button>
                     </div>
                 </div>
@@ -500,7 +515,10 @@ function setupCategoryFilters() {
 function setupSlider() {
     const prevBtn = document.getElementById('prev-slide');
     const nextBtn = document.getElementById('next-slide');
+    const prevBtnMobile = document.getElementById('prev-slide-mobile');
+    const nextBtnMobile = document.getElementById('next-slide-mobile');
     
+    // Desktop buttons
     if (prevBtn) {
         prevBtn.addEventListener('click', () => {
             currentSlide = currentSlide > 0 ? currentSlide - 1 : totalSlides - 1;
@@ -515,13 +533,70 @@ function setupSlider() {
         });
     }
     
-    // Auto-play slider
-    setInterval(() => {
-        if (totalSlides > 1) {
+    // Mobile buttons
+    if (prevBtnMobile) {
+        prevBtnMobile.addEventListener('click', () => {
+            currentSlide = currentSlide > 0 ? currentSlide - 1 : totalSlides - 1;
+            goToSlide(currentSlide);
+        });
+    }
+    
+    if (nextBtnMobile) {
+        nextBtnMobile.addEventListener('click', () => {
             currentSlide = currentSlide < totalSlides - 1 ? currentSlide + 1 : 0;
             goToSlide(currentSlide);
-        }
-    }, 5000);
+        });
+    }
+    
+    // Touch/swipe support for mobile
+    let startX = 0;
+    let startY = 0;
+    let distX = 0;
+    let distY = 0;
+    
+    const slider = document.getElementById('featured-slider');
+    if (slider) {
+        slider.addEventListener('touchstart', (e) => {
+            startX = e.touches[0].clientX;
+            startY = e.touches[0].clientY;
+        });
+        
+        slider.addEventListener('touchmove', (e) => {
+            if (!startX || !startY) return;
+            
+            distX = e.touches[0].clientX - startX;
+            distY = e.touches[0].clientY - startY;
+        });
+        
+        slider.addEventListener('touchend', () => {
+            if (Math.abs(distX) > Math.abs(distY) && Math.abs(distX) > 50) {
+                if (distX > 0) {
+                    // Swipe right - go to previous slide
+                    currentSlide = currentSlide > 0 ? currentSlide - 1 : totalSlides - 1;
+                } else {
+                    // Swipe left - go to next slide
+                    currentSlide = currentSlide < totalSlides - 1 ? currentSlide + 1 : 0;
+                }
+                goToSlide(currentSlide);
+            }
+            
+            startX = 0;
+            startY = 0;
+            distX = 0;
+            distY = 0;
+        });
+    }
+    
+    // Auto-play slider (pause on mobile for better UX)
+    const isDesktop = window.innerWidth >= 768;
+    if (isDesktop) {
+        setInterval(() => {
+            if (totalSlides > 1) {
+                currentSlide = currentSlide < totalSlides - 1 ? currentSlide + 1 : 0;
+                goToSlide(currentSlide);
+            }
+        }, 5000);
+    }
 }
 
 // Go to specific slide
@@ -577,7 +652,7 @@ function addToFavorites(itemId, itemType) {
             position: 'top-right'
         });
     } else {
-        alert(`${itemType === 'template' ? 'Template' : 'Service'} added to favorites!`);
+        showSuccess(`${itemType === 'template' ? 'Template' : 'Service'} added to favorites!`);
     }
 }
 
@@ -601,6 +676,47 @@ function addToCart(itemId, title, price, image, seller, itemType) {
     // Add to cart using the global cart system
     cart.addItem(itemData);
 }
+
+// Search function for hero search bar
+function performHeroSearch() {
+    const searchInput = document.getElementById('hero-search-input');
+    const searchTerm = searchInput.value.trim();
+    
+    if (searchTerm) {
+        // Redirect to templates page with search parameter
+        window.location.href = `templates.php?search=${encodeURIComponent(searchTerm)}`;
+    } else {
+        // If empty, just go to templates page
+        window.location.href = 'templates.php';
+    }
+}
+
+// Toggle search icon visibility based on input content
+function toggleSearchIcon(type) {
+    const input = document.getElementById(type + '-search-input');
+    const button = document.getElementById(type + '-search-btn');
+    
+    if (input && button) {
+        if (input.value.trim().length > 0) {
+            button.classList.remove('hidden');
+        } else {
+            button.classList.add('hidden');
+        }
+    }
+}
+
+// Handle Enter key press in search inputs
+document.addEventListener('DOMContentLoaded', function() {
+    const heroSearchInput = document.getElementById('hero-search-input');
+    
+    if (heroSearchInput) {
+        heroSearchInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                performHeroSearch();
+            }
+        });
+    }
+});
 
 // Helper function to escape HTML for JavaScript strings
 function escapeHtml(text) {
@@ -638,6 +754,120 @@ function getOptimizedImageUrlJS(imageUrl, transformType = 'thumb') {
     // Return Cloudinary URL
     return `https://res.cloudinary.com/<?= CLOUDINARY_CLOUD_NAME ?>/image/upload/${transformation}/templates/${filename}`;
 }
+
+// Additional responsive utilities
+function initResponsiveUtilities() {
+    // Handle viewport changes
+    window.addEventListener('resize', () => {
+        // Recalculate slider dimensions on resize
+        if (totalSlides > 0) {
+            goToSlide(currentSlide);
+        }
+    });
+    
+    // Optimize images for different screen sizes
+    const isMobile = window.innerWidth < 768;
+    const isTablet = window.innerWidth >= 768 && window.innerWidth < 1024;
+    
+    // Adjust lazy loading based on device
+    if (isMobile) {
+        // Preload fewer images on mobile to save bandwidth
+        document.querySelectorAll('img[data-lazy]').forEach((img, index) => {
+            if (index < 3) { // Only preload first 3 images on mobile
+                img.src = img.dataset.lazy;
+            }
+        });
+    }
+}
+
+// Initialize responsive utilities
+document.addEventListener('DOMContentLoaded', initResponsiveUtilities);
+</script>
+
+<!-- Additional responsive CSS -->
+<style>
+/* Mobile horizontal scroll for category filters */
+.scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+    display: none;
+}
+
+/* Smooth scrolling for mobile category filters */
+@media (max-width: 639px) {
+    .overflow-x-auto {
+        scroll-behavior: smooth;
+        -webkit-overflow-scrolling: touch;
+    }
+    
+    /* Mobile category filter improvements */
+    .category-filter {
+        touch-action: manipulation;
+        -webkit-tap-highlight-color: rgba(255, 95, 31, 0.1);
+    }
+    
+    .category-filter:active {
+        transform: scale(0.98);
+    }
+}
+
+@media (max-width: 640px) {
+    /* Mobile-specific optimizations */
+    .floating-animation {
+        animation: none; /* Disable animations on mobile for better performance */
+    }
+    
+    /* Ensure proper touch targets */
+    button, a {
+        min-height: 44px;
+        min-width: 44px;
+    }
+    
+    /* Improve readability on small screens */
+    h1, h2, h3 {
+        line-height: 1.2;
+    }
+    
+    /* Better spacing for mobile */
+    .space-y-8 > * + * {
+        margin-top: 1.5rem;
+    }
+}
+
+@media (max-width: 768px) {
+    /* Tablet optimizations */
+    .category-filter {
+        flex-shrink: 0;
+    }
+    
+    /* Ensure grid items don't become too small */
+    .grid-cols-2 {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (orientation: landscape) and (max-height: 500px) {
+    /* Landscape mobile optimizations */
+    .min-h-screen {
+        min-height: 100vh;
+    }
+    
+    .py-20, .py-16 {
+        padding-top: 2rem;
+        padding-bottom: 2rem;
+    }
+}
+
+/* Print styles */
+@media print {
+    .fixed, button, nav {
+        display: none !important;
+    }
+}
+</style>
 </script>
 
 <?php include '../includes/footer.php'; ?>
