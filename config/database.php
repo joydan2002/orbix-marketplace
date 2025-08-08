@@ -5,6 +5,12 @@
  * Now supports both local development and production deployment
  */
 
+// Load Railway environment config if on Railway
+if (isset($_ENV['RAILWAY_ENVIRONMENT']) || getenv('RAILWAY_ENVIRONMENT') || 
+    !file_exists('/Applications/XAMPP/xamppfiles/var/mysql/mysql.sock')) {
+    require_once __DIR__ . '/railway-env.php';
+}
+
 // Load production config if available
 if (file_exists(__DIR__ . '/production-config.php')) {
     require_once __DIR__ . '/production-config.php';

@@ -3,8 +3,12 @@
  * Database Connection Test for Railway Deployment
  */
 
+echo "=== Railway Environment Detection ===\n";
+echo "RAILWAY_ENVIRONMENT: " . ($_ENV['RAILWAY_ENVIRONMENT'] ?? getenv('RAILWAY_ENVIRONMENT') ?? 'NOT SET') . "\n";
+echo "Socket file exists: " . (file_exists('/Applications/XAMPP/xamppfiles/var/mysql/mysql.sock') ? 'YES (Local)' : 'NO (Railway)') . "\n";
+
 // Test environment variables
-echo "=== Environment Variables Test ===\n";
+echo "\n=== Environment Variables Test ===\n";
 echo "DB_HOST: " . ($_ENV['DB_HOST'] ?? getenv('DB_HOST') ?? 'NOT SET') . "\n";
 echo "DB_NAME: " . ($_ENV['DB_NAME'] ?? getenv('DB_NAME') ?? 'NOT SET') . "\n";
 echo "DB_USER: " . ($_ENV['DB_USER'] ?? getenv('DB_USER') ?? 'NOT SET') . "\n";
@@ -19,35 +23,37 @@ echo "MYSQLUSER: " . ($_ENV['MYSQLUSER'] ?? getenv('MYSQLUSER') ?? 'NOT SET') . 
 echo "MYSQLPASSWORD: " . (($_ENV['MYSQLPASSWORD'] ?? getenv('MYSQLPASSWORD')) ? 'SET' : 'NOT SET') . "\n";
 echo "MYSQLPORT: " . ($_ENV['MYSQLPORT'] ?? getenv('MYSQLPORT') ?? 'NOT SET') . "\n";
 
-// Test direct PDO connection
-echo "\n=== Direct PDO Connection Test ===\n";
-$host = $_ENV['MYSQLHOST'] ?? getenv('MYSQLHOST');
-$db = $_ENV['MYSQLDATABASE'] ?? getenv('MYSQLDATABASE');
-$user = $_ENV['MYSQLUSER'] ?? getenv('MYSQLUSER');
-$pass = $_ENV['MYSQLPASSWORD'] ?? getenv('MYSQLPASSWORD');
-$port = $_ENV['MYSQLPORT'] ?? getenv('MYSQLPORT');
+// Test direct PDO connection with external Railway connection
+echo "\n=== Direct Railway Connection Test ===\n";
+$railwayHost = 'interchange.proxy.rlwy.net';
+$railwayPort = '32514';
+$railwayUser = 'root';
+$railwayPass = 'lvegkEtkrgHuUXRXtcdNmgWxNnOioLXc';
+$railwayDb = 'railway';
 
-if ($host && $db && $user) {
-    echo "Using Railway variables:\n";
-    echo "Host: $host\n";
-    echo "Database: $db\n";
-    echo "User: $user\n";
-    echo "Port: $port\n";
+echo "Using Railway external connection:\n";
+echo "Host: $railwayHost\n";
+echo "Port: $railwayPort\n";
+echo "Database: $railwayDb\n";
+echo "User: $railwayUser\n";
+
+try {
+    $dsn = "mysql:host=$railwayHost;port=$railwayPort;dbname=$railwayDb;charset=utf8mb4";
+    echo "DSN: $dsn\n";
     
-    try {
-        $dsn = "mysql:host=$host;port=$port;dbname=$db;charset=utf8mb4";
-        echo "DSN: $dsn\n";
-        
-        $pdo = new PDO($dsn, $user, $pass, [
-            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-            PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-        ]);
-        echo "✅ Direct PDO connection successful!\n";
-    } catch (Exception $e) {
-        echo "❌ Direct PDO connection failed: " . $e->getMessage() . "\n";
-    }
-} else {
-    echo "❌ Railway MySQL variables not found\n";
+    $pdo = new PDO($dsn, $railwayUser, $railwayPass, [
+        PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+        PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+    ]);
+    echo "✅ Direct Railway connection successful!\n";
+    
+    // Test query
+    $stmt = $pdo->query("SELECT COUNT(*) as table_count FROM information_schema.tables WHERE table_schema = '$railwayDb'");
+    $result = $stmt->fetch();
+    echo "✅ Found {$result['table_count']} tables in Railway database\n";
+    
+} catch (Exception $e) {
+    echo "❌ Direct Railway connection failed: " . $e->getMessage() . "\n";
 }
 
 // Test database connection using our config
