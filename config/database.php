@@ -14,21 +14,43 @@ class DatabaseConfig {
     /**
      * Get database configuration based on environment
      */
+    /**
+     * Get database configuration based on environment
+     */
     private static function getDbConfig() {
-        // Check environment variables first (Railway/Production)
+        // Check Railway provided variables first
+        $railwayHost = $_ENV['MYSQLHOST'] ?? getenv('MYSQLHOST');
+        $railwayDb = $_ENV['MYSQLDATABASE'] ?? getenv('MYSQLDATABASE');
+        $railwayUser = $_ENV['MYSQLUSER'] ?? getenv('MYSQLUSER');
+        $railwayPass = $_ENV['MYSQLPASSWORD'] ?? getenv('MYSQLPASSWORD');
+        $railwayPort = $_ENV['MYSQLPORT'] ?? getenv('MYSQLPORT');
+        
+        if ($railwayHost && $railwayDb && $railwayUser) {
+            // Railway production environment
+            return [
+                'host' => $railwayHost,
+                'dbname' => $railwayDb,
+                'username' => $railwayUser,
+                'password' => $railwayPass ?? '',
+                'port' => $railwayPort ?? '3306',
+                'charset' => 'utf8mb4'
+            ];
+        }
+        
+        // Check custom environment variables (backup)
         $envHost = $_ENV['DB_HOST'] ?? getenv('DB_HOST');
         $envName = $_ENV['DB_NAME'] ?? getenv('DB_NAME');
         $envUser = $_ENV['DB_USER'] ?? getenv('DB_USER');
         $envPass = $_ENV['DB_PASSWORD'] ?? getenv('DB_PASSWORD');
         $envPort = $_ENV['DB_PORT'] ?? getenv('DB_PORT');
         
-        if ($envHost && $envName && $envUser && isset($envPass)) {
-            // Production environment (Railway)
+        if ($envHost && $envName && $envUser) {
+            // Custom environment variables
             return [
                 'host' => $envHost,
                 'dbname' => $envName,
                 'username' => $envUser,
-                'password' => $envPass,
+                'password' => $envPass ?? '',
                 'port' => $envPort ?? '3306',
                 'charset' => 'utf8mb4'
             ];

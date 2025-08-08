@@ -12,15 +12,46 @@ echo "DB_PASSWORD: " . (($_ENV['DB_PASSWORD'] ?? getenv('DB_PASSWORD')) ? 'SET' 
 echo "DB_PORT: " . ($_ENV['DB_PORT'] ?? getenv('DB_PORT') ?? 'NOT SET') . "\n";
 echo "ENVIRONMENT: " . ($_ENV['ENVIRONMENT'] ?? getenv('ENVIRONMENT') ?? 'NOT SET') . "\n";
 
-echo "\n=== Railway Variables Test ===\n";
+echo "\n=== Railway MySQL Variables Test ===\n";
 echo "MYSQLHOST: " . ($_ENV['MYSQLHOST'] ?? getenv('MYSQLHOST') ?? 'NOT SET') . "\n";
 echo "MYSQLDATABASE: " . ($_ENV['MYSQLDATABASE'] ?? getenv('MYSQLDATABASE') ?? 'NOT SET') . "\n";
 echo "MYSQLUSER: " . ($_ENV['MYSQLUSER'] ?? getenv('MYSQLUSER') ?? 'NOT SET') . "\n";
 echo "MYSQLPASSWORD: " . (($_ENV['MYSQLPASSWORD'] ?? getenv('MYSQLPASSWORD')) ? 'SET' : 'NOT SET') . "\n";
 echo "MYSQLPORT: " . ($_ENV['MYSQLPORT'] ?? getenv('MYSQLPORT') ?? 'NOT SET') . "\n";
 
-// Test database connection
-echo "\n=== Database Connection Test ===\n";
+// Test direct PDO connection
+echo "\n=== Direct PDO Connection Test ===\n";
+$host = $_ENV['MYSQLHOST'] ?? getenv('MYSQLHOST');
+$db = $_ENV['MYSQLDATABASE'] ?? getenv('MYSQLDATABASE');
+$user = $_ENV['MYSQLUSER'] ?? getenv('MYSQLUSER');
+$pass = $_ENV['MYSQLPASSWORD'] ?? getenv('MYSQLPASSWORD');
+$port = $_ENV['MYSQLPORT'] ?? getenv('MYSQLPORT');
+
+if ($host && $db && $user) {
+    echo "Using Railway variables:\n";
+    echo "Host: $host\n";
+    echo "Database: $db\n";
+    echo "User: $user\n";
+    echo "Port: $port\n";
+    
+    try {
+        $dsn = "mysql:host=$host;port=$port;dbname=$db;charset=utf8mb4";
+        echo "DSN: $dsn\n";
+        
+        $pdo = new PDO($dsn, $user, $pass, [
+            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+            PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+        ]);
+        echo "✅ Direct PDO connection successful!\n";
+    } catch (Exception $e) {
+        echo "❌ Direct PDO connection failed: " . $e->getMessage() . "\n";
+    }
+} else {
+    echo "❌ Railway MySQL variables not found\n";
+}
+
+// Test database connection using our config
+echo "\n=== Database Config Test ===\n";
 require_once __DIR__ . '/config/database.php';
 
 try {
