@@ -4,8 +4,9 @@
  * Modern UI with glassmorphism effects and Google OAuth integration
  */
 
-require_once '../config/database.php';
-require_once '../config/email-service.php';
+require_once 'config/database.php';
+require_once 'config/email-service.php';
+require_once 'config/asset-config.php';
 
 // Handle form submissions
 $mode = $_GET['mode'] ?? 'signin';
@@ -227,7 +228,8 @@ if (isset($_GET['action']) && $_GET['action'] === 'verify') {
     <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css" rel="stylesheet">
     <script src="https://accounts.google.com/gsi/client" async defer></script>
-    <link rel="stylesheet" href="../assets/css/auth.css">
+    <link rel="stylesheet" href="<?php echo AssetConfig::getCssPath('auth.css'); ?>">
+    <link rel="stylesheet" href="<?php echo AssetConfig::getCssPath('universal-fix.css'); ?>">
     <script>
         tailwind.config = {
             theme: {

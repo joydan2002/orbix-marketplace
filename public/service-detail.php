@@ -142,7 +142,7 @@ $service['delivery_time_formatted'] = formatDeliveryTime($service['delivery_time
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css" rel="stylesheet">
-    <link href="../assets/css/service-detail.css" rel="stylesheet">
+    <link href="assets/css/service-detail.css" rel="stylesheet">
     <script>
         tailwind.config = {
             theme: {

@@ -27,7 +27,7 @@ if (isset($_SESSION['user_id']) && isset($_SESSION['user_type']) && $_SESSION['u
     include 'sections/seller-init.php';
     
     ?>
-    <link rel="stylesheet" href="../assets/css/seller-channel.css">
+    <link rel="stylesheet" href="assets/css/seller-channel.css">
 
     <div class="dashboard-container">
         <div class="flex min-h-screen">

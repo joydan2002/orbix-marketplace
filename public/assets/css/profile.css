@@ -1,0 +1,90 @@
+/* Glass Morphism Effects - Same as auth page */
+.glass-effect {
+    backdrop-filter: blur(20px);
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.glass-card {
+    backdrop-filter: blur(30px);
+    background: rgba(255, 255, 255, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+}
+
+.glass-card-light {
+    backdrop-filter: blur(25px);
+    background: rgba(255, 255, 255, 0.12);
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    box-shadow: 0 15px 35px -5px rgba(0, 0, 0, 0.15);
+}
+
+/* Floating animation */
+.floating-animation {
+    animation: float 6s ease-in-out infinite;
+}
+
+@keyframes float {
+    0%, 100% { transform: translateY(0px) rotate(0deg); }
+    50% { transform: translateY(-20px) rotate(2deg); }
+}
+
+/* Gradient background - same as auth */
+.gradient-bg {
+    background: linear-gradient(135deg, #FF5F1D 0%, #FF8C42 25%, #FFB366 50%, #FF8C42 75%, #FF5F1D 100%);
+    background-size: 400% 400%;
+    animation: gradientShift 8s ease infinite;
+}
+
+@keyframes gradientShift {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+/* Avatar glow effect */
+.avatar-glow {
+    box-shadow: 0 0 30px rgba(255, 95, 31, 0.4);
+}
+
+/* Custom scrollbar */
+.custom-scrollbar::-webkit-scrollbar {
+    width: 6px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 3px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 3px;
+}
+
+/* Status badges */
+.status-badge {
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.status-completed {
+    background: rgba(34, 197, 94, 0.2);
+    color: #16a34a;
+}
+
+.status-pending {
+    background: rgba(251, 191, 36, 0.2);
+    color: #d97706;
+}
+
+/* Main container adjustments */
+.main-container {
+    min-height: 100vh;
+    padding-top: 120px;
+}
+
+/* Text shadows for better readability */
+.text-shadow {
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}

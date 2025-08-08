@@ -84,7 +84,7 @@ $total = $subtotal + $tax;
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="../assets/css/checkout.css">
+    <link rel="stylesheet" href="assets/css/checkout.css">
     <script>
         tailwind.config = {
             theme: {
@@ -257,7 +257,7 @@ $total = $subtotal + $tax;
                                 <img src="<?= htmlspecialchars(getOptimizedImageUrl($item['preview_image'], 'thumb')) ?>" 
                                      alt="<?= htmlspecialchars($item['title']) ?>" 
                                      class="order-item-image w-16 h-12 rounded-lg object-cover mr-4"
-                                     onerror="this.src='../assets/images/<?= $item['item_type'] === 'service' ? 'default-service.jpg' : 'default-template.jpg' ?>'">
+                                     onerror="this.src='assets/images/<?= $item['item_type'] === 'service' ? 'default-service.jpg' : 'default-template.jpg' ?>'">
                                 <div class="order-item-info flex-1">
                                     <h4 class="order-item-title font-semibold text-secondary">
                                         <?= htmlspecialchars($item['title']) ?>

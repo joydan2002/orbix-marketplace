@@ -1,0 +1,209 @@
+/* Universal CSS Fix for Railway Production */
+/* This ensures consistent styling across all pages */
+
+/* Reset and base styles */
+* {
+    box-sizing: border-box !important;
+}
+
+body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+    line-height: 1.6 !important;
+    color: #1f2937 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+/* Ensure page backgrounds work */
+.min-h-screen {
+    min-height: 100vh !important;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+}
+
+.bg-gradient-auth {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+}
+
+.bg-gradient-support {
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%) !important;
+}
+
+/* Fix glassmorphism effects */
+.glass-card,
+.backdrop-blur-md {
+    background: rgba(255, 255, 255, 0.25) !important;
+    backdrop-filter: blur(10px) !important;
+    -webkit-backdrop-filter: blur(10px) !important;
+    border: 1px solid rgba(255, 255, 255, 0.18) !important;
+    border-radius: 12px !important;
+}
+
+/* Fix primary colors */
+.text-primary { color: #FF5F1D !important; }
+.bg-primary { background-color: #FF5F1D !important; }
+.border-primary { border-color: #FF5F1D !important; }
+
+.text-secondary { color: #1f2937 !important; }
+.bg-secondary { background-color: #1f2937 !important; }
+
+/* Fix button styles */
+.btn,
+button,
+input[type="submit"] {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 0.75rem 1.5rem !important;
+    border-radius: 8px !important;
+    font-weight: 500 !important;
+    transition: all 0.3s ease !important;
+    text-decoration: none !important;
+    cursor: pointer !important;
+    border: none !important;
+}
+
+.btn-primary {
+    background-color: #FF5F1D !important;
+    color: white !important;
+}
+
+.btn-primary:hover {
+    background-color: #e55a1b !important;
+    transform: translateY(-2px) !important;
+}
+
+/* Fix form elements */
+input,
+textarea,
+select {
+    width: 100% !important;
+    padding: 0.75rem !important;
+    border: 1px solid #d1d5db !important;
+    border-radius: 8px !important;
+    font-size: 1rem !important;
+    transition: border-color 0.3s ease !important;
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+    outline: none !important;
+    border-color: #FF5F1D !important;
+    box-shadow: 0 0 0 3px rgba(255, 95, 29, 0.1) !important;
+}
+
+/* Fix cards */
+.card {
+    background: white !important;
+    border-radius: 12px !important;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1) !important;
+    overflow: hidden !important;
+    padding: 1.5rem !important;
+}
+
+/* Fix responsive utilities */
+.hidden { display: none !important; }
+.block { display: block !important; }
+.flex { display: flex !important; }
+.grid { display: grid !important; }
+.inline-flex { display: inline-flex !important; }
+
+/* Fix text utilities */
+.text-center { text-align: center !important; }
+.text-left { text-align: left !important; }
+.text-right { text-align: right !important; }
+
+.font-bold { font-weight: 700 !important; }
+.font-semibold { font-weight: 600 !important; }
+.font-medium { font-weight: 500 !important; }
+
+/* Fix spacing */
+.p-6 { padding: 1.5rem !important; }
+.p-8 { padding: 2rem !important; }
+.px-6 { padding-left: 1.5rem !important; padding-right: 1.5rem !important; }
+.py-6 { padding-top: 1.5rem !important; padding-bottom: 1.5rem !important; }
+
+.m-4 { margin: 1rem !important; }
+.mb-4 { margin-bottom: 1rem !important; }
+.mt-4 { margin-top: 1rem !important; }
+
+/* Fix layout */
+.container {
+    max-width: 1200px !important;
+    margin: 0 auto !important;
+    padding: 0 1rem !important;
+}
+
+.max-w-md { max-width: 28rem !important; }
+.max-w-lg { max-width: 32rem !important; }
+.max-w-xl { max-width: 36rem !important; }
+
+/* Fix images */
+img {
+    max-width: 100% !important;
+    height: auto !important;
+}
+
+/* Fix navigation */
+nav {
+    z-index: 1000 !important;
+}
+
+/* Fix modals */
+.modal,
+.modal-overlay {
+    z-index: 9999 !important;
+}
+
+/* Fix animations */
+.transition-all {
+    transition: all 0.3s ease !important;
+}
+
+.hover\:shadow-lg:hover {
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* Mobile responsive fixes */
+@media (max-width: 768px) {
+    .container {
+        padding: 0 0.5rem !important;
+    }
+    
+    .p-6 { padding: 1rem !important; }
+    .p-8 { padding: 1.5rem !important; }
+    
+    .text-2xl { font-size: 1.5rem !important; }
+    .text-3xl { font-size: 1.875rem !important; }
+    .text-4xl { font-size: 2.25rem !important; }
+}
+
+/* Ensure visibility */
+body, html {
+    opacity: 1 !important;
+    visibility: visible !important;
+}
+
+/* Fix specific page issues */
+.auth-page {
+    min-height: 100vh !important;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+}
+
+.support-page {
+    min-height: 100vh !important;
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%) !important;
+}
+
+/* Force background for auth pages specifically */
+.gradient-bg {
+    background: linear-gradient(135deg, #FF5F1D 0%, #FF8C42 25%, #FFB366 50%, #FF8C42 75%, #FF5F1D 100%) !important;
+    background-size: 400% 400% !important;
+    animation: gradientShift 8s ease infinite !important;
+}
+
+@keyframes gradientShift {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}

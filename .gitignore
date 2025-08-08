@@ -1,0 +1,37 @@
+# Environment files
+.env
+.env.local
+.env.production
+
+# Logs
+logs/*.log
+logs/emails/*.html
+
+# Vendor (will be installed on deployment)
+vendor/
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Backup files
+*.bak
+*~
+*.tmp
+
+# Development files
+test-*.php
+debug-*.php
+
+# Upload directories (if any)
+uploads/temp/
+
+# Cache files
+cache/
+*.cache

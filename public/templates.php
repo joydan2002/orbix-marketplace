@@ -95,7 +95,7 @@ $technologies = $templateManager->getTechnologyFilters();
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css" rel="stylesheet">
-    <link href="../assets/css/template.css" rel="stylesheet">
+    <link href="assets/css/template.css" rel="stylesheet">
     <script>
         tailwind.config = {
             theme: {
@@ -459,7 +459,7 @@ $technologies = $templateManager->getTechnologyFilters();
                                      alt="<?= htmlspecialchars($template['title']) ?>" 
                                      class="template-image"
                                      loading="lazy"
-                                     onerror="this.src='../assets/images/default-template.jpg'">
+                                     onerror="this.src='assets/images/default-template.jpg'">
                                 <div class="absolute top-2 sm:top-3 right-2 sm:right-3">
                                     <button class="w-6 h-6 sm:w-8 sm:h-8 bg-white/80 rounded-full flex items-center justify-center hover:bg-white transition-colors">
                                         <i class="ri-heart-line text-gray-600 text-xs sm:text-sm"></i>
@@ -481,7 +481,7 @@ $technologies = $templateManager->getTechnologyFilters();
                                             <img src="<?= getOptimizedImageUrl($template['profile_image'], 'avatar_small') ?>" 
                                                  alt="<?= htmlspecialchars($template['seller_name']) ?>" 
                                                  class="w-4 h-4 sm:w-6 sm:h-6 rounded-full object-cover flex-shrink-0"
-                                                 onerror="this.src='../assets/images/default-avatar.png'">
+                                                 onerror="this.src='assets/images/default-avatar.png'">
                                             <span class="text-xs sm:text-sm text-gray-600 truncate"><?= htmlspecialchars($template['seller_name']) ?></span>
                                         </div>
                                     </div>
@@ -890,11 +890,11 @@ $technologies = $templateManager->getTechnologyFilters();
             grid.innerHTML = templates.map(template => `
                 <div class="template-card rounded-xl sm:rounded-2xl overflow-hidden">
                     <div class="relative">
-                        <img src="${template.preview_image_url || '../assets/images/default-template.jpg'}" 
+                        <img src="${template.preview_image_url || 'assets/images/default-template.jpg'}" 
                              alt="${escapeHtml(template.title)}" 
                              class="template-image"
                              loading="lazy"
-                             onerror="this.src='../assets/images/default-template.jpg'">
+                             onerror="this.src='assets/images/default-template.jpg'">
                         <div class="absolute top-2 sm:top-3 right-2 sm:right-3">
                             <button class="w-6 h-6 sm:w-8 sm:h-8 bg-white/80 rounded-full flex items-center justify-center hover:bg-white transition-colors">
                                 <i class="ri-heart-line text-gray-600 text-xs sm:text-sm"></i>
@@ -909,10 +909,10 @@ $technologies = $templateManager->getTechnologyFilters();
                         <div class="template-header">
                             <div class="flex-1 min-w-0">
                                 <div class="flex items-center space-x-1.5 sm:space-x-2">
-                                    <img src="${template.seller_avatar_url || '../assets/images/default-avatar.png'}" 
+                                    <img src="${template.seller_avatar_url || 'assets/images/default-avatar.png'}" 
                                          alt="${escapeHtml(template.seller_name)}" 
                                          class="w-4 h-4 sm:w-6 sm:h-6 rounded-full object-cover flex-shrink-0"
-                                         onerror="this.src='../assets/images/default-avatar.png'">
+                                         onerror="this.src='assets/images/default-avatar.png'">
                                     <span class="text-xs sm:text-sm text-gray-600 truncate">${escapeHtml(template.seller_name)}</span>
                                 </div>
                             </div>
@@ -931,7 +931,7 @@ $technologies = $templateManager->getTechnologyFilters();
                             </div>
                         </div>
                         <div class="template-actions">
-                            <button onclick="handleAddToCart(${template.id}, '${addslashes(template.title)}', ${template.price}, '${addslashes(template.preview_image_url || '../assets/images/default-template.jpg')}', '${addslashes(template.seller_name)}')" 
+                            <button onclick="handleAddToCart(${template.id}, '${addslashes(template.title)}', ${template.price}, '${addslashes(template.preview_image_url || 'assets/images/default-template.jpg')}', '${addslashes(template.seller_name)}')" 
                                     class="flex-1 bg-primary text-white py-1.5 sm:py-2 px-2 sm:px-4 rounded-button text-xs sm:text-sm font-medium hover:bg-primary/90 transition-colors">
                                 <i class="ri-shopping-cart-line mr-1"></i><span class="hidden sm:inline">Add to Cart</span><span class="sm:hidden">Add</span>
                             </button>
@@ -957,11 +957,11 @@ $technologies = $templateManager->getTechnologyFilters();
             grid.innerHTML = templates.map(template => `
                 <div class="template-card-list">
                     <div class="relative">
-                        <img src="${template.preview_image_url || '../assets/images/default-template.jpg'}" 
+                        <img src="${template.preview_image_url || 'assets/images/default-template.jpg'}" 
                              alt="${escapeHtml(template.title)}" 
                              class="template-image"
                              loading="lazy"
-                             onerror="this.src='../assets/images/default-template.jpg'">
+                             onerror="this.src='assets/images/default-template.jpg'">
                         <div class="absolute top-3 right-3">
                             <button class="w-8 h-8 bg-white/80 rounded-full flex items-center justify-center hover:bg-white transition-colors">
                                 <i class="ri-heart-line text-gray-600"></i>
@@ -977,10 +977,10 @@ $technologies = $templateManager->getTechnologyFilters();
                             <div class="flex-1">
                                 <h3 class="template-title">${escapeHtml(template.title)}</h3>
                                 <div class="flex items-center space-x-2 mb-3">
-                                    <img src="${template.seller_avatar_url || '../assets/images/default-avatar.png'}" 
+                                    <img src="${template.seller_avatar_url || 'assets/images/default-avatar.png'}" 
                                          alt="${escapeHtml(template.seller_name)}" 
                                          class="w-6 h-6 rounded-full object-cover"
-                                         onerror="this.src='../assets/images/default-avatar.png'">
+                                         onerror="this.src='assets/images/default-avatar.png'">
                                     <span class="text-sm text-gray-600">${escapeHtml(template.seller_name)}</span>
                                 </div>
                             </div>
@@ -996,7 +996,7 @@ $technologies = $templateManager->getTechnologyFilters();
                             <p class="template-description">${escapeHtml(template.description)}</p>
                         </div>
                         <div class="template-actions">
-                            <button onclick="handleAddToCart(${template.id}, '${addslashes(template.title)}', ${template.price}, '${addslashes(template.preview_image_url || '../assets/images/default-template.jpg')}', '${addslashes(template.seller_name)}')" 
+                            <button onclick="handleAddToCart(${template.id}, '${addslashes(template.title)}', ${template.price}, '${addslashes(template.preview_image_url || 'assets/images/default-template.jpg')}', '${addslashes(template.seller_name)}')" 
                                     class="bg-primary text-white py-2 px-6 rounded-button text-sm font-medium hover:bg-primary/90 transition-colors whitespace-nowrap">
                                 <i class="ri-shopping-cart-line mr-2"></i>Add to Cart
                             </button>
@@ -1786,7 +1786,7 @@ $technologies = $templateManager->getTechnologyFilters();
     </script>
     
     <!-- Toast Notification System - Load at the end to ensure it's available -->
-    <script src="../assets/js/toast.js"></script>
+    <script src="assets/js/toast.js"></script>
     <script>
         // Debug: Check if toast functions are loaded
         console.log('Toast functions available:', {

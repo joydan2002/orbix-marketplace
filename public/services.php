@@ -128,7 +128,7 @@ $deliveryTimes = $serviceManager->getDeliveryTimeFilters();
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css" rel="stylesheet">
-    <link href="../assets/css/services.css" rel="stylesheet">
+    <link href="assets/css/services.css" rel="stylesheet">
     <script>
         tailwind.config = {
             theme: {
@@ -482,7 +482,7 @@ $deliveryTimes = $serviceManager->getDeliveryTimeFilters();
                                      alt="<?= htmlspecialchars($service['title']) ?>" 
                                      class="service-image"
                                      loading="lazy"
-                                     onerror="this.src='../assets/images/default-service.jpg'">
+                                     onerror="this.src='assets/images/default-service.jpg'">
                                 <div class="absolute top-3 right-3">
                                     <button class="w-8 h-8 bg-white/80 rounded-full flex items-center justify-center hover:bg-white transition-colors">
                                         <i class="ri-heart-line text-gray-600"></i>
@@ -504,7 +504,7 @@ $deliveryTimes = $serviceManager->getDeliveryTimeFilters();
                                             <img src="<?= getOptimizedImageUrl($service['profile_image'], 'avatar_small') ?>" 
                                                  alt="<?= htmlspecialchars($service['seller_name']) ?>" 
                                                  class="w-6 h-6 rounded-full object-cover"
-                                                 onerror="this.src='../assets/images/default-avatar.png'">
+                                                 onerror="this.src='assets/images/default-avatar.png'">
                                             <span class="text-sm text-gray-600"><?= htmlspecialchars($service['seller_name']) ?></span>
                                         </div>
                                     </div>
@@ -769,7 +769,7 @@ $deliveryTimes = $serviceManager->getDeliveryTimeFilters();
                              alt="${escapeHtml(service.title)}" 
                              class="service-image"
                              loading="lazy"
-                             onerror="this.src='../assets/images/default-service.jpg'">
+                             onerror="this.src='assets/images/default-service.jpg'">
                         <div class="absolute top-3 right-3">
                             <button class="w-8 h-8 bg-white/80 rounded-full flex items-center justify-center hover:bg-white transition-colors">
                                 <i class="ri-heart-line text-gray-600"></i>
@@ -787,7 +787,7 @@ $deliveryTimes = $serviceManager->getDeliveryTimeFilters();
                                     <img src="${getOptimizedImageUrlJS(service.profile_image, 'avatar_small')}" 
                                          alt="${escapeHtml(service.seller_name)}" 
                                          class="w-6 h-6 rounded-full object-cover"
-                                         onerror="this.src='../assets/images/default-avatar.png'">
+                                         onerror="this.src='assets/images/default-avatar.png'">
                                     <span class="text-sm text-gray-600">${escapeHtml(service.seller_name)}</span>
                                 </div>
                             </div>
@@ -840,7 +840,7 @@ $deliveryTimes = $serviceManager->getDeliveryTimeFilters();
                              alt="${escapeHtml(service.title)}" 
                              class="service-image"
                              loading="lazy"
-                             onerror="this.src='../assets/images/default-service.jpg'">
+                             onerror="this.src='assets/images/default-service.jpg'">
                         <div class="absolute top-3 right-3">
                             <button class="w-8 h-8 bg-white/80 rounded-full flex items-center justify-center hover:bg-white transition-colors">
                                 <i class="ri-heart-line text-gray-600"></i>
@@ -859,7 +859,7 @@ $deliveryTimes = $serviceManager->getDeliveryTimeFilters();
                                     <img src="${getOptimizedImageUrlJS(service.profile_image, 'avatar_small')}" 
                                          alt="${escapeHtml(service.seller_name)}" 
                                          class="w-6 h-6 rounded-full object-cover"
-                                         onerror="this.src='../assets/images/default-avatar.png'">
+                                         onerror="this.src='assets/images/default-avatar.png'">
                                     <span class="text-sm text-gray-600">${escapeHtml(service.seller_name)}</span>
                                 </div>
                             </div>
@@ -1427,13 +1427,13 @@ $deliveryTimes = $serviceManager->getDeliveryTimeFilters();
             if (!publicId) {
                 // Return default image based on size
                 const defaults = {
-                    'thumb': '../assets/images/default-service.jpg',
-                    'medium': '../assets/images/default-service.jpg', 
-                    'avatar_small': '../assets/images/default-avatar.png',
-                    'avatar_medium': '../assets/images/default-avatar.png',
-                    'avatar_large': '../assets/images/default-avatar.png'
+                    'thumb': 'assets/images/default-service.jpg',
+                    'medium': 'assets/images/default-service.jpg', 
+                    'avatar_small': 'assets/images/default-avatar.png',
+                    'avatar_medium': 'assets/images/default-avatar.png',
+                    'avatar_large': 'assets/images/default-avatar.png'
                 };
-                return defaults[size] || '../assets/images/default-service.jpg';
+                return defaults[size] || 'assets/images/default-service.jpg';
             }
             
             // If it's already a full URL, return as is

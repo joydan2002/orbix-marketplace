@@ -246,7 +246,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Show login/logout success messages
     <?php if ($showLoginSuccess): ?>
         // Load toast notification system first
-        loadScript('../assets/js/components/toast-notification.js').then(() => {
+        loadScript('assets/js/components/toast-notification.js').then(() => {
             setTimeout(() => {
                 if (window.toast) {
                     window.toast.success('Welcome back! You have successfully signed in to your account.', {
@@ -260,7 +260,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
     <?php if ($showLogoutSuccess): ?>
         // Load toast notification system first
-        loadScript('../assets/js/components/toast-notification.js').then(() => {
+        loadScript('assets/js/components/toast-notification.js').then(() => {
             setTimeout(() => {
                 if (window.toast) {
                     window.toast.success('You have been successfully logged out. See you again soon!', {
@@ -339,7 +339,7 @@ function renderHeroTemplates(templates) {
         <div class="space-y-2 sm:space-y-4">
             ${leftColumn.map(template => `
                 <div class="bg-white/90 backdrop-blur-sm rounded-lg sm:rounded-xl p-2 sm:p-4 shadow-lg hover:shadow-xl transition-all hover:scale-105">
-                    <img src="${getOptimizedImageUrlJS(template.preview_image, 'thumb')}" alt="${template.title}" class="w-full h-16 sm:h-20 md:h-24 object-cover rounded-md sm:rounded-lg" onerror="this.src='../assets/images/default-template.jpg'">
+                    <img src="${getOptimizedImageUrlJS(template.preview_image, 'thumb')}" alt="${template.title}" class="w-full h-16 sm:h-20 md:h-24 object-cover rounded-md sm:rounded-lg" onerror="this.src='assets/images/default-template.jpg'">
                     <div class="mt-1 sm:mt-2">
                         <h4 class="font-semibold text-xs sm:text-sm text-secondary truncate">${template.title}</h4>
                         <p class="text-xs text-primary font-medium">$${template.price}</p>
@@ -350,7 +350,7 @@ function renderHeroTemplates(templates) {
         <div class="space-y-2 sm:space-y-4 mt-4 sm:mt-8">
             ${rightColumn.map(template => `
                 <div class="bg-white/90 backdrop-blur-sm rounded-lg sm:rounded-xl p-2 sm:p-4 shadow-lg hover:shadow-xl transition-all hover:scale-105">
-                    <img src="${getOptimizedImageUrlJS(template.preview_image, 'thumb')}" alt="${template.title}" class="w-full h-16 sm:h-20 md:h-24 object-cover rounded-md sm:rounded-lg" onerror="this.src='../assets/images/default-template.jpg'">
+                    <img src="${getOptimizedImageUrlJS(template.preview_image, 'thumb')}" alt="${template.title}" class="w-full h-16 sm:h-20 md:h-24 object-cover rounded-md sm:rounded-lg" onerror="this.src='assets/images/default-template.jpg'">
                     <div class="mt-1 sm:mt-2">
                         <h4 class="font-semibold text-xs sm:text-sm text-secondary truncate">${template.title}</h4>
                         <p class="text-xs text-primary font-medium">$${template.price}</p>
@@ -390,7 +390,7 @@ function createMainTemplateCard(template) {
     return `
         <div class="bg-white rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-all hover:-translate-y-2">
             <div class="relative">
-                <img src="${getOptimizedImageUrlJS(template.preview_image, 'card')}" alt="${template.title}" class="w-full h-48 sm:h-56 md:h-64 object-cover" onerror="this.src='../assets/images/default-template.jpg'">
+                <img src="${getOptimizedImageUrlJS(template.preview_image, 'card')}" alt="${template.title}" class="w-full h-48 sm:h-56 md:h-64 object-cover" onerror="this.src='assets/images/default-template.jpg'">
                 ${badges}
             </div>
             <div class="p-4 sm:p-6">
@@ -465,7 +465,7 @@ function createFeaturedTemplateCard(template) {
     return `
         <div class="flex-1 bg-white rounded-lg overflow-hidden shadow-xl hover:shadow-2xl transition-all hover:-translate-y-1">
             <div class="relative">
-                <img src="${getOptimizedImageUrlJS(template.preview_image, 'card')}" alt="${template.title}" class="w-full h-64 object-cover" onerror="this.src='../assets/images/default-template.jpg'">
+                <img src="${getOptimizedImageUrlJS(template.preview_image, 'card')}" alt="${template.title}" class="w-full h-64 object-cover" onerror="this.src='assets/images/default-template.jpg'">
                 <div class="absolute inset-0 bg-black bg-opacity-20 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity">
                     <button onclick="viewTemplateDetails(${template.id})" class="bg-white text-gray-800 px-6 py-2 rounded-button font-medium hover:bg-gray-100 transition-colors">
                         View Details
@@ -731,7 +731,7 @@ function escapeHtml(text) {
 
 // Add Cloudinary optimization function for JavaScript
 function getOptimizedImageUrlJS(imageUrl, transformType = 'thumb') {
-    if (!imageUrl) return '../assets/images/default-template.jpg';
+    if (!imageUrl) return 'assets/images/default-template.jpg';
     
     // If already a Cloudinary URL, return as is
     if (imageUrl.includes('cloudinary.com')) {
@@ -740,7 +740,7 @@ function getOptimizedImageUrlJS(imageUrl, transformType = 'thumb') {
     
     // If it's a relative or full path, check if it exists in Cloudinary
     const filename = imageUrl.split('/').pop();
-    if (!filename) return '../assets/images/default-template.jpg';
+    if (!filename) return 'assets/images/default-template.jpg';
     
     // Define transformations based on type
     const transformations = {
