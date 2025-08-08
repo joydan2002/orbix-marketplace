@@ -4,9 +4,29 @@
  */
 
 require_once 'email-config.php';
-require_once __DIR__ . '/../vendor/phpmailer/src/PHPMailer.php';
-require_once __DIR__ . '/../vendor/phpmailer/src/SMTP.php';
-require_once __DIR__ . '/../vendor/phpmailer/src/Exception.php';
+
+// Smart vendor path detection for Railway deployment
+$vendorPaths = [
+    __DIR__ . '/../../vendor/phpmailer/src/PHPMailer.php',    // From public/config/ to root vendor/
+    __DIR__ . '/../vendor/phpmailer/src/PHPMailer.php',       // Alternative path
+    '/app/vendor/phpmailer/src/PHPMailer.php',                // Railway absolute path
+];
+
+$phpmailerLoaded = false;
+foreach ($vendorPaths as $path) {
+    $basePath = dirname($path);
+    if (file_exists($path)) {
+        require_once $path;
+        require_once $basePath . '/SMTP.php';
+        require_once $basePath . '/Exception.php';
+        $phpmailerLoaded = true;
+        break;
+    }
+}
+
+if (!$phpmailerLoaded) {
+    throw new Exception('PHPMailer not found. Checked paths: ' . implode(', ', $vendorPaths));
+}
 
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\SMTP;
