@@ -91,13 +91,13 @@ function getOptimizedImageUrl($image_path, $size = 'medium') {
     if (empty($image_path)) {
         // Return default image based on size
         $defaults = [
-            'thumb' => '/orbix/assets/images/default-template.jpg',
-            'medium' => '/orbix/assets/images/default-template.jpg', 
-            'avatar_small' => '/orbix/assets/images/default-avatar.png',
-            'avatar_medium' => '/orbix/assets/images/default-avatar.png',
-            'avatar_large' => '/orbix/assets/images/default-avatar.png'
+            'thumb' => '/orbix/public/assets/images/default-template.jpg',
+            'medium' => '/orbix/public/assets/images/default-template.jpg', 
+            'avatar_small' => '/orbix/public/assets/images/default-avatar.png',
+            'avatar_medium' => '/orbix/public/assets/images/default-avatar.png',
+            'avatar_large' => '/orbix/public/assets/images/default-avatar.png'
         ];
-        return $defaults[$size] ?? '/orbix/assets/images/default-template.jpg';
+        return $defaults[$size] ?? '/orbix/public/assets/images/default-template.jpg';
     }
     
     // If it's already a full URL (external or Cloudinary), return as-is
@@ -133,13 +133,13 @@ function getOptimizedImageUrl($image_path, $size = 'medium') {
     } catch (Exception $e) {
         // Return default image if Cloudinary URL building fails
         $defaults = [
-            'thumb' => '/orbix/assets/images/default-template.jpg',
-            'medium' => '/orbix/assets/images/default-template.jpg', 
-            'avatar_small' => '/orbix/assets/images/default-avatar.png',
-            'avatar_medium' => '/orbix/assets/images/default-avatar.png',
-            'avatar_large' => '/orbix/assets/images/default-avatar.png'
+            'thumb' => '/orbix/public/assets/images/default-template.jpg',
+            'medium' => '/orbix/public/assets/images/default-template.jpg', 
+            'avatar_small' => '/orbix/public/assets/images/default-avatar.png',
+            'avatar_medium' => '/orbix/public/assets/images/default-avatar.png',
+            'avatar_large' => '/orbix/public/assets/images/default-avatar.png'
         ];
-        return $defaults[$size] ?? '/orbix/assets/images/default-template.jpg';
+        return $defaults[$size] ?? '/orbix/public/assets/images/default-template.jpg';
     }
 }
 ?>

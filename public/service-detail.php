@@ -70,7 +70,7 @@ if (!empty($service['preview_image'])) {
 
 // Ensure we have at least one image
 if (empty($images)) {
-    $images[] = getOptimizedImageUrl('/orbix/assets/images/default-service.jpg', 'large');
+    $images[] = getOptimizedImageUrl('/orbix/public/assets/images/default-service.jpg', 'large');
 }
 
 // Get service tags
@@ -127,7 +127,7 @@ function formatDeliveryTime($deliveryTime) {
 }
 
 // Optimize profile image
-$service['profile_image'] = getOptimizedImageUrl($service['profile_image'] ?? '/assets/images/default-avatar.png', 'avatar');
+$service['profile_image'] = getOptimizedImageUrl($service['profile_image'] ?? '/orbix/public/assets/images/default-avatar.png', 'avatar');
 $service['preview_image_optimized'] = getOptimizedImageUrl($service['preview_image'], 'large');
 $service['delivery_time_formatted'] = formatDeliveryTime($service['delivery_time']);
 ?>
@@ -191,7 +191,7 @@ $service['delivery_time_formatted'] = formatDeliveryTime($service['delivery_time
                                 <h1 class="text-4xl lg:text-4xl md:text-3xl sm:text-2xl font-bold text-secondary mb-4 lg:mb-4 md:mb-3 sm:mb-2"><?= htmlspecialchars($service['title']) ?></h1>
                                 <div class="service-meta-mobile flex items-center space-x-6 lg:space-x-6 md:space-x-4 sm:space-x-3 text-sm text-gray-600 mb-4 lg:mb-4 md:mb-3 sm:mb-2">
                                     <div class="flex items-center space-x-2">
-                                        <img src="<?= htmlspecialchars($service['profile_image'] ?? '/assets/images/default-avatar.png') ?>" alt="<?= htmlspecialchars($service['seller_name']) ?>" class="seller-profile-mobile w-8 h-8 lg:w-8 lg:h-8 md:w-7 md:h-7 sm:w-6 sm:h-6 rounded-full object-cover">
+                                        <img src="<?= htmlspecialchars($service['profile_image'] ?? 'assets/images/default-avatar.png') ?>" alt="<?= htmlspecialchars($service['seller_name']) ?>" class="seller-profile-mobile w-8 h-8 lg:w-8 lg:h-8 md:w-7 md:h-7 sm:w-6 sm:h-6 rounded-full object-cover">
                                         <span class="font-medium lg:text-sm md:text-sm sm:text-xs"><?= htmlspecialchars($service['seller_name']) ?></span>
                                     </div>
                                     <div class="flex items-center space-x-1">
@@ -389,7 +389,7 @@ $service['delivery_time_formatted'] = formatDeliveryTime($service['delivery_time
                         <div class="service-card p-6 lg:p-6 md:p-4 sm:p-3">
                             <h4 class="text-xl lg:text-xl md:text-lg sm:text-base font-bold text-secondary mb-4 lg:mb-4 md:mb-3 sm:mb-2">About the Seller</h4>
                             <div class="flex items-center space-x-4 lg:space-x-4 md:space-x-3 sm:space-x-2 mb-4 lg:mb-4 md:mb-3 sm:mb-2">
-                                <img src="<?= htmlspecialchars($service['profile_image'] ?? '/assets/images/default-avatar.png') ?>" alt="<?= htmlspecialchars($service['seller_name']) ?>" class="w-16 h-16 lg:w-16 lg:h-16 md:w-14 md:h-14 sm:w-12 sm:h-12 rounded-full object-cover">
+                                <img src="<?= htmlspecialchars($service['profile_image'] ?? 'assets/images/default-avatar.png') ?>" alt="<?= htmlspecialchars($service['seller_name']) ?>" class="w-16 h-16 lg:w-16 lg:h-16 md:w-14 md:h-14 sm:w-12 sm:h-12 rounded-full object-cover">
                                 <div>
                                     <p class="font-bold text-lg lg:text-lg md:text-base sm:text-sm text-secondary"><?= htmlspecialchars($service['seller_name']) ?></p>
                                     <div class="flex items-center space-x-1">
@@ -439,7 +439,7 @@ $service['delivery_time_formatted'] = formatDeliveryTime($service['delivery_time
                     </div>
                     <div class="p-6 lg:p-6 md:p-4 sm:p-3">
                         <div class="flex items-center space-x-2 lg:space-x-2 md:space-x-1 sm:space-x-1 mb-3 lg:mb-3 md:mb-2 sm:mb-2">
-                            <img src="<?= htmlspecialchars(getOptimizedImageUrl($related['profile_image'] ?? '/assets/images/default-avatar.png', 'avatar')) ?>" alt="<?= htmlspecialchars($related['seller_name']) ?>" class="w-6 h-6 lg:w-6 lg:h-6 md:w-5 md:h-5 sm:w-4 sm:h-4 rounded-full object-cover">
+                            <img src="<?= htmlspecialchars(getOptimizedImageUrl($related['profile_image'] ?? '/orbix/public/assets/images/default-avatar.png', 'avatar')) ?>" alt="<?= htmlspecialchars($related['seller_name']) ?>" class="w-6 h-6 lg:w-6 lg:h-6 md:w-5 md:h-5 sm:w-4 sm:h-4 rounded-full object-cover">
                             <span class="text-sm lg:text-sm md:text-xs sm:text-xs text-gray-600 font-medium"><?= htmlspecialchars($related['seller_name']) ?></span>
                         </div>
                         <h4 class="text-xl lg:text-xl md:text-lg sm:text-base font-bold text-secondary mb-2 lg:mb-2 md:mb-1 sm:mb-1"><?= htmlspecialchars($related['title']) ?></h4>

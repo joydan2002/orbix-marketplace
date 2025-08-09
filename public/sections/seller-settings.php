@@ -55,7 +55,7 @@
                         <div class="flex items-center space-x-6">
                             <div class="w-24 h-24 bg-gray-200 rounded-full overflow-hidden">
                                 <img id="profilePreview" 
-                                     src="<?= $sellerData['profile_picture'] ? htmlspecialchars($sellerData['profile_picture']) : '/assets/images/default-avatar.png' ?>" 
+                                     src="<?= $sellerData['profile_picture'] ? htmlspecialchars($sellerData['profile_picture']) : 'assets/images/default-avatar.png' ?>" 
                                      alt="Profile Picture"
                                      class="w-full h-full object-cover">
                             </div>

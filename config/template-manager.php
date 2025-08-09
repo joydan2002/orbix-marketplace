@@ -127,7 +127,7 @@ class TemplateManager {
             if (!empty($template['profile_image'])) {
                 $template['seller_avatar_url'] = getOptimizedImageUrl($template['profile_image'], 'avatar_small');
             } else {
-                $template['seller_avatar_url'] = '../assets/images/default-avatar.png';
+                $template['seller_avatar_url'] = 'public/assets/images/default-avatar.png';
             }
         }
         
@@ -268,17 +268,17 @@ class TemplateManager {
     private function generateFallbackImage($category) {
         // Use the actual default images that exist
         $fallbackImages = [
-            'business' => '/orbix/assets/images/default-template.jpg',
-            'ecommerce' => '/orbix/assets/images/default-template.jpg',
-            'e-commerce' => '/orbix/assets/images/default-template.jpg',
-            'portfolio' => '/orbix/assets/images/default-template.jpg',
-            'landing' => '/orbix/assets/images/default-template.jpg',
-            'admin' => '/orbix/assets/images/default-template.jpg',
-            'blog' => '/orbix/assets/images/default-template.jpg',
-            'education' => '/orbix/assets/images/default-template.jpg'
+            'business' => '/orbix/public/assets/images/default-template.jpg',
+            'ecommerce' => '/orbix/public/assets/images/default-template.jpg',
+            'e-commerce' => '/orbix/public/assets/images/default-template.jpg',
+            'portfolio' => '/orbix/public/assets/images/default-template.jpg',
+            'landing' => '/orbix/public/assets/images/default-template.jpg',
+            'admin' => '/orbix/public/assets/images/default-template.jpg',
+            'blog' => '/orbix/public/assets/images/default-template.jpg',
+            'education' => '/orbix/public/assets/images/default-template.jpg'
         ];
         
-        return $fallbackImages[$category] ?? '/orbix/assets/images/default-template.jpg';
+        return $fallbackImages[$category] ?? '/orbix/public/assets/images/default-template.jpg';
     }
     
     /**

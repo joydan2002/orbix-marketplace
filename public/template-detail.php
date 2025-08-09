@@ -89,7 +89,7 @@ if (!empty($template['preview_image'])) {
 
 // Ensure we have at least one image
 if (empty($images)) {
-    $images[] = getOptimizedImageUrl('/orbix/assets/images/default-template.jpg', 'large');
+    $images[] = getOptimizedImageUrl('/orbix/public/assets/images/default-template.jpg', 'large');
 }
 
 // Get template tags
@@ -116,7 +116,7 @@ if (!empty($template['features'])) {
 
 // Set default values for missing fields with optimized images
 $template['seller_name'] = $template['seller_name'] ?? 'Unknown';
-$template['profile_image'] = getOptimizedImageUrl($template['profile_image'] ?? '/assets/images/default-avatar.png', 'avatar');
+$template['profile_image'] = getOptimizedImageUrl($template['profile_image'] ?? '/orbix/public/assets/images/default-avatar.png', 'avatar');
 $template['preview_image_optimized'] = getOptimizedImageUrl($template['preview_image'], 'large');
 $template['avg_rating'] = $template['avg_rating'] ?? 4.5;
 $template['review_count'] = $template['review_count'] ?? 0;
@@ -187,7 +187,7 @@ $template['category_slug'] = $template['category_slug'] ?? 'general';
                                 <h1 class="text-4xl font-bold text-secondary mb-4"><?= htmlspecialchars($template['title']) ?></h1>
                                 <div class="flex items-center space-x-6 text-sm text-gray-600 mb-4">
                                     <div class="flex items-center space-x-2">
-                                        <img src="<?= htmlspecialchars($template['profile_image'] ?? '/assets/images/default-avatar.png') ?>" alt="<?= htmlspecialchars($template['seller_name']) ?>" class="w-8 h-8 rounded-full object-cover">
+                                        <img src="<?= htmlspecialchars($template['profile_image'] ?? 'assets/images/default-avatar.png') ?>" alt="<?= htmlspecialchars($template['seller_name']) ?>" class="w-8 h-8 rounded-full object-cover">
                                         <span class="font-medium"><?= htmlspecialchars($template['seller_name']) ?></span>
                                     </div>
                                     <div class="flex items-center space-x-1">
@@ -387,7 +387,7 @@ $template['category_slug'] = $template['category_slug'] ?? 'general';
                         <div class="template-card p-6">
                             <h4 class="text-xl font-bold text-secondary mb-4">About the Author</h4>
                             <div class="flex items-center space-x-4 mb-4">
-                                <img src="<?= htmlspecialchars($template['profile_image'] ?? '/assets/images/default-avatar.png') ?>" alt="<?= htmlspecialchars($template['seller_name']) ?>" class="w-16 h-16 rounded-full object-cover">
+                                <img src="<?= htmlspecialchars($template['profile_image'] ?? 'assets/images/default-avatar.png') ?>" alt="<?= htmlspecialchars($template['seller_name']) ?>" class="w-16 h-16 rounded-full object-cover">
                                 <div>
                                     <p class="font-bold text-lg text-secondary"><?= htmlspecialchars($template['seller_name']) ?></p>
                                     <div class="flex items-center space-x-1">

@@ -480,8 +480,8 @@ try {
         <div class="mobile-user-section">
             <?php if ($isLoggedIn && $userData): ?>
                 <div class="mobile-user-info">
-                    <img src="<?php echo htmlspecialchars($userData['profile_image'] ?? '/orbix/assets/images/default-avatar.png'); ?>" 
-                         alt="Avatar" class="mobile-avatar" onerror="this.src='/orbix/assets/images/default-avatar.png'">
+                    <img src="<?php echo htmlspecialchars($userData['profile_image'] ?? 'assets/images/default-avatar.png'); ?>" 
+                         alt="Avatar" class="mobile-avatar" onerror="this.src='assets/images/default-avatar.png'">
                     <div class="mobile-user-details">
                         <span class="mobile-username"><?php echo htmlspecialchars($userData['username'] ?? $userData['first_name'] ?? 'User'); ?></span>
                         <span class="mobile-user-role"><?php echo $userData['user_type'] === 'seller' ? 'Seller' : 'Customer'; ?></span>

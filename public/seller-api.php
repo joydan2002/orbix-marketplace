@@ -547,9 +547,9 @@ try {
                 ]);
             } catch (Exception $e) {
                 // If Cloudinary fails, try to fallback to default image
-                $fallbackUrl = $size === 'small' ? '/assets/images/default-template.jpg' : 
-                              ($size === 'large' ? '/assets/images/default-template.jpg' : 
-                               '/assets/images/default-template.jpg');
+                $fallbackUrl = $size === 'small' ? 'assets/images/default-template.jpg' : 
+                              ($size === 'large' ? 'assets/images/default-template.jpg' : 
+                               'assets/images/default-template.jpg');
                 
                 echo json_encode([
                     'success' => false,

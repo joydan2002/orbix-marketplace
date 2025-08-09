@@ -139,7 +139,7 @@ function displayOrderDetails(order) {
                     <div class="space-y-4">
                         ${order.items.map(item => `
                             <div class="flex items-center space-x-4 p-4 bg-white rounded-lg">
-                                <img src="${item.image || '/assets/images/default-service.jpg'}" 
+                                <img src="${item.image || 'assets/images/default-service.jpg'}" 
                                      alt="${item.name}" 
                                      class="w-16 h-16 object-cover rounded-lg">
                                 <div class="flex-1">

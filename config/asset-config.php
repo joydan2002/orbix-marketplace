@@ -19,8 +19,8 @@ class AssetConfig {
         if ($isFromPublic) {
             $basePath = 'assets/';
         } else {
-            // If running from subdirectory (local), use ../assets/
-            $basePath = '../assets/';
+            // If running from root directory (local), use public/assets/
+            $basePath = 'public/assets/';
         }
         
         return $basePath . $asset;
