@@ -5,8 +5,9 @@
  */
 
 session_start();
-require_once 'config/database.php';
-require_once 'config/user-manager.php';
+require_once __DIR__ . '/../config/bootstrap.php';
+require_once __DIR__ . '/../config/database.php';
+require_once __DIR__ . '/../config/user-manager.php';
 
 // Check if user is logged in
 if (!isset($_SESSION['user_id'])) {
@@ -79,13 +80,8 @@ $userData['user_type'] = $userData['user_type'] ?? ($_SESSION['user_type'] ?? 'b
 $userData['created_at'] = $userData['created_at'] ?? date('Y-m-d H:i:s');
 $userData['email_verified'] = $userData['email_verified'] ?? 1;
 
-// Helper function to safely format numbers
-function safeNumberFormat($value, $decimals = 0) {
-    return number_format(floatval($value ?? 0), $decimals);
-}
-
 // Include header
-include '../includes/header.php';
+include __DIR__ . '/../includes/header.php';
 ?>
 
 <!DOCTYPE html>
@@ -453,6 +449,6 @@ include '../includes/header.php';
         </div>
     </div>
 
-    <?php include '../includes/footer.php'; ?>
+    <?php include __DIR__ . '/../includes/footer.php'; ?>
 </body>
 </html>

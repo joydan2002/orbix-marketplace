@@ -4,6 +4,8 @@
  * Handles all user-related operations and statistics for both buyers and sellers
  */
 
+require_once __DIR__ . '/global-helpers.php';
+
 class UserManager {
     private $pdo;
     
