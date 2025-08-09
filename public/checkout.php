@@ -402,7 +402,7 @@ $total = $subtotal + $tax;
         async function clearCartAndRedirect() {
             try {
                 // Clear cart
-                await fetch('cart-api.php?action=clear', { method: 'POST' });
+                await fetch('../api/cart.php?action=clear', { method: 'POST' });
                 
                 // Redirect to success page or downloads
                 window.location.href = 'index.php?purchase=success';

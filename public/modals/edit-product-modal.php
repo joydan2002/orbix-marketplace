@@ -356,7 +356,7 @@ function editProduct(id, type = 'template') {
     editProductType = type;
     
     // Fetch product data first
-    fetch(`seller-api.php?action=get_product&id=${id}&type=${type}`)
+    fetch(`../api/seller.php?action=get_product&id=${id}&type=${type}`)
         .then(response => response.json())
         .then(data => {
             if (data.success) {
@@ -414,7 +414,7 @@ function editProduct(id, type = 'template') {
                         document.getElementById('current-preview-container').style.display = 'block';
                     } else {
                         // Use AJAX to get the proper Cloudinary URL
-                        fetch(`seller-api.php?action=get_image_url&image=${encodeURIComponent(product.preview_image)}&size=medium`)
+                        fetch(`../api/seller.php?action=get_image_url&image=${encodeURIComponent(product.preview_image)}&size=medium`)
                             .then(response => response.json())
                             .then(urlData => {
                                 console.log('🔗 Image URL response:', urlData);
@@ -554,7 +554,7 @@ function deleteProduct(type, id) {
         deleteBtn.innerHTML = '<i class="ri-loader-4-line mr-2 animate-spin"></i>Deleting...';
         deleteBtn.disabled = true;
         
-        fetch('seller-api.php', {
+        fetch('../api/seller.php', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -641,7 +641,7 @@ function duplicateProduct(type, id) {
         duplicateBtn.innerHTML = '<i class="ri-loader-4-line mr-2 animate-spin"></i>Duplicating...';
         duplicateBtn.disabled = true;
         
-        fetch('seller-api.php', {
+        fetch('../api/seller.php', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -741,9 +741,9 @@ function submitEditForm() {
         submitBtn.innerHTML = '<i class="ri-loader-4-line mr-2 animate-spin"></i>Updating...';
         submitBtn.disabled = true;
         
-        console.log('🚀 Sending manual request to seller-api.php');
+        console.log('🚀 Sending manual request to ../api/seller.php');
         
-        fetch('seller-api.php', {
+        fetch('../api/seller.php', {
             method: 'POST',
             body: formData
         })

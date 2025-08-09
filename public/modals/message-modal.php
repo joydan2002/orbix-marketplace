@@ -63,7 +63,7 @@
 <script>
 function viewMessage(threadId) {
     // Fetch message thread
-    fetch(`seller-api.php?action=get_message_thread&thread_id=${threadId}`)
+    fetch(`../api/seller.php?action=get_message_thread&thread_id=${threadId}`)
         .then(response => response.json())
         .then(data => {
             if (data.success) {
@@ -127,7 +127,7 @@ function attachFile() {
 function markAsResolved() {
     const threadId = document.getElementById('reply-thread-id').value;
     
-    fetch('seller-api.php', {
+    fetch('../api/seller.php', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/x-www-form-urlencoded',
@@ -163,7 +163,7 @@ document.getElementById('replyForm').addEventListener('submit', function(e) {
     submitBtn.innerHTML = '<i class="ri-loader-4-line mr-2 animate-spin"></i>Sending...';
     submitBtn.disabled = true;
     
-    fetch('seller-api.php', {
+    fetch('../api/seller.php', {
         method: 'POST',
         body: formData
     })

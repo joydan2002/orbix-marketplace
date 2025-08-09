@@ -373,7 +373,7 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 function downloadAnalyticsReport() {
-    window.open('seller-api.php?action=download_analytics_report', '_blank');
+    window.open('../api/seller.php?action=download_analytics_report', '_blank');
 }
 
 // Chart toggle button styles

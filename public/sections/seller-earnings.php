@@ -387,7 +387,7 @@ function submitWithdrawal(event) {
         return;
     }
     
-    fetch('seller-api.php', {
+    fetch('../api/seller.php', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -409,7 +409,7 @@ function submitWithdrawal(event) {
 }
 
 function downloadEarningsReport() {
-    window.open('seller-api.php?action=download_earnings_report', '_blank');
+    window.open('../api/seller.php?action=download_earnings_report', '_blank');
 }
 
 function viewTaxInfo() {

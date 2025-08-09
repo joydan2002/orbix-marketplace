@@ -282,7 +282,7 @@ document.addEventListener('DOMContentLoaded', function() {
 // Load featured templates for hero section
 async function loadHeroTemplates() {
     try {
-        const response = await fetch('api.php?action=featured&limit=4');
+        const response = await fetch('../api/general.php?action=featured&limit=4');
         const result = await response.json();
         
         if (result.success) {
@@ -296,7 +296,7 @@ async function loadHeroTemplates() {
 // Load main templates for Template Categories section
 async function loadMainTemplates() {
     try {
-        const url = `api.php?action=templates&limit=6${currentCategory ? '&category=' + currentCategory : ''}`;
+        const url = `../api/general.php?action=templates&limit=6${currentCategory ? '&category=' + currentCategory : ''}`;
         const response = await fetch(url);
         const result = await response.json();
         
@@ -316,7 +316,7 @@ async function loadMainTemplates() {
 // Load featured templates for slider
 async function loadFeaturedTemplates() {
     try {
-        const response = await fetch('api.php?action=featured&limit=8');
+        const response = await fetch('../api/general.php?action=featured&limit=8');
         const result = await response.json();
         
         if (result.success) {

@@ -522,7 +522,7 @@ if (isset($_GET['action']) && $_GET['action'] === 'verify') {
         // Google Sign In
         function handleCredentialResponse(response) {
             // Send the credential to your server
-            fetch('auth-handler.php', {
+            fetch('../api/auth.php', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

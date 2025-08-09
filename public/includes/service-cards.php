@@ -237,7 +237,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
     async function loadDomainExtensions() {
         try {
-            const response = await fetch('api.php?action=domain-extensions');
+            const response = await fetch('../api/general.php?action=domain-extensions');
             const data = await response.json();
             
             if (data.success) {
@@ -273,7 +273,7 @@ document.addEventListener('DOMContentLoaded', function() {
         domainResults.classList.add('hidden');
         
         try {
-            const response = await fetch(`api.php?action=domain-search&domain=${encodeURIComponent(domain)}&extension=${encodeURIComponent(extension)}`);
+            const response = await fetch(`../api/general.php?action=domain-search&domain=${encodeURIComponent(domain)}&extension=${encodeURIComponent(extension)}`);
             const data = await response.json();
             
             if (data.success) {
@@ -452,7 +452,7 @@ function handleOrderService(serviceId, title, price, image, seller) {
     });
     
     // Send to cart API directly
-    fetch(`cart-api.php?action=add`, {
+    fetch(`../api/cart.php?action=add`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/x-www-form-urlencoded',

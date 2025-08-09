@@ -203,7 +203,7 @@ if (isset($_SESSION['user_id']) && isset($_SESSION['user_type']) && $_SESSION['u
         
         function viewProductModal(id, type = 'template') {
             // Fetch product data first
-            fetch(`seller-api.php?action=get_product&id=${id}&type=${type}`)
+            fetch(`../api/seller.php?action=get_product&id=${id}&type=${type}`)
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
@@ -236,7 +236,7 @@ if (isset($_SESSION['user_id']) && isset($_SESSION['user_type']) && $_SESSION['u
             showConfirm(
                 'Are you sure you want to duplicate this product?',
                 () => {
-                    fetch('seller-api.php', {
+                    fetch('../api/seller.php', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({
@@ -269,7 +269,7 @@ if (isset($_SESSION['user_id']) && isset($_SESSION['user_type']) && $_SESSION['u
             showConfirm(
                 'Are you sure you want to delete this product? This action cannot be undone.',
                 () => {
-                    fetch('seller-api.php', {
+                    fetch('../api/seller.php', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({
@@ -367,14 +367,14 @@ if (isset($_SESSION['user_id']) && isset($_SESSION['user_type']) && $_SESSION['u
             if (!product || !product.type) {
                 console.log('⚠️ No product data found, trying API fallback');
                 // Try both types to see which one works
-                fetch(`seller-api.php?action=get_product&id=${id}&type=template`)
+                fetch(`../api/seller.php?action=get_product&id=${id}&type=template`)
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
                         window.editProduct(id, 'template');
                     } else {
                         // Try service type
-                        return fetch(`seller-api.php?action=get_product&id=${id}&type=service`);
+                        return fetch(`../api/seller.php?action=get_product&id=${id}&type=service`);
                     }
                 })
                 .then(response => {

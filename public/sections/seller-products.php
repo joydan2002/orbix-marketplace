@@ -365,7 +365,7 @@ function editProductFromList(id) {
         // Fallback: make direct API call to load product data
         console.log('🔧 Using fallback API call with type:', product.type);
         
-        fetch(`seller-api.php?action=get_product&id=${id}&type=${product.type}`)
+        fetch(`../api/seller.php?action=get_product&id=${id}&type=${product.type}`)
         .then(response => response.json())
         .then(data => {
             if (data.success) {
@@ -465,7 +465,7 @@ function toggleProductMenu(id) {
 
 function duplicateProduct(type, id) {
     showConfirm('Are you sure you want to duplicate this product?', () => {
-        fetch('seller-api.php', {
+        fetch('../api/seller.php', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -488,7 +488,7 @@ function duplicateProduct(type, id) {
 
 function deleteProduct(type, id) {
     showConfirm('Are you sure you want to delete this product? This action cannot be undone.', () => {
-        fetch('seller-api.php', {
+        fetch('../api/seller.php', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({

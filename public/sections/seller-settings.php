@@ -488,7 +488,7 @@ function updateProfile(event) {
     event.preventDefault();
     const formData = new FormData(event.target);
     
-    fetch('seller-api.php', {
+    fetch('../api/seller.php', {
         method: 'POST',
         body: formData
     })
@@ -511,7 +511,7 @@ function updateBusiness(event) {
     const formData = new FormData(event.target);
     formData.append('action', 'update_business_info');
     
-    fetch('seller-api.php', {
+    fetch('../api/seller.php', {
         method: 'POST',
         body: formData
     })
@@ -530,7 +530,7 @@ function updateNotifications(event) {
     const formData = new FormData(event.target);
     formData.append('action', 'update_notifications');
     
-    fetch('seller-api.php', {
+    fetch('../api/seller.php', {
         method: 'POST',
         body: formData
     })
@@ -554,7 +554,7 @@ function updatePassword(event) {
         return;
     }
     
-    fetch('seller-api.php', {
+    fetch('../api/seller.php', {
         method: 'POST',
         body: formData
     })
@@ -574,7 +574,7 @@ function updatePaymentSettings(event) {
     const formData = new FormData(event.target);
     formData.append('action', 'update_payment_settings');
     
-    fetch('seller-api.php', {
+    fetch('../api/seller.php', {
         method: 'POST',
         body: formData
     })
@@ -589,7 +589,7 @@ function updatePaymentSettings(event) {
 }
 
 function toggle2FA(enabled) {
-    fetch('seller-api.php', {
+    fetch('../api/seller.php', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -611,7 +611,7 @@ function toggle2FA(enabled) {
 
 function terminateSession(sessionId) {
     if (confirm('Are you sure you want to terminate this session?')) {
-        fetch('seller-api.php', {
+        fetch('../api/seller.php', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

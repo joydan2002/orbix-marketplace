@@ -1278,7 +1278,7 @@ $deliveryTimes = $serviceManager->getDeliveryTimeFilters();
             });
             
             // Send to cart API directly
-            fetch('cart-api.php?action=add', {
+            fetch('../api/cart.php?action=add', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded',

@@ -312,7 +312,7 @@ $total = $subtotal + $tax;
                             formData.append('template_id', itemId);
                         }
 
-                        const response = await fetch('cart-api.php?action=remove', {
+                        const response = await fetch('../api/cart.php?action=remove', {
                             method: 'POST',
                             body: formData
                         });
@@ -343,7 +343,7 @@ $total = $subtotal + $tax;
         // Auto-refresh cart if it's updated from another tab
         setInterval(async () => {
             try {
-                const response = await fetch('cart-api.php?action=get');
+                const response = await fetch('../api/cart.php?action=get');
                 const data = await response.json();
                 
                 if (data.success && data.items.length !== <?= count($cartItems) ?>) {

@@ -35,7 +35,7 @@ function viewOrderDetails(orderId) {
     showModal('orderModal');
     
     // Fetch order details
-    fetch(`seller-api.php?action=get_order_details&order_id=${orderId}`)
+    fetch(`../api/seller.php?action=get_order_details&order_id=${orderId}`)
         .then(response => response.json())
         .then(data => {
             if (data.success) {
@@ -232,7 +232,7 @@ function updateOrderStatus(orderId, newStatus) {
     showConfirm(
         `Are you sure you want to update this order status to "${newStatus}"?`,
         () => {
-            fetch('seller-api.php', {
+            fetch('../api/seller.php', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded',
@@ -270,7 +270,7 @@ function contactCustomer(email, name) {
 function downloadInvoice(orderId) {
     // Create a temporary link to download the invoice
     const link = document.createElement('a');
-    link.href = `seller-api.php?action=download_invoice&order_id=${orderId}`;
+    link.href = `../api/seller.php?action=download_invoice&order_id=${orderId}`;
     link.download = `invoice-${orderId}.pdf`;
     document.body.appendChild(link);
     link.click();

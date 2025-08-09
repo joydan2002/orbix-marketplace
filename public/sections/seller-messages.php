@@ -235,7 +235,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // Message management functions
 function openMessage(messageId) {
-    fetch(`seller-api.php?action=get_message&message_id=${messageId}`)
+    fetch(`../api/seller.php?action=get_message&message_id=${messageId}`)
         .then(response => response.json())
         .then(data => {
             if (data.success) {
@@ -297,7 +297,7 @@ function closeMessageModal() {
 }
 
 function replyToMessage(messageId) {
-    fetch(`seller-api.php?action=get_message&message_id=${messageId}`)
+    fetch(`../api/seller.php?action=get_message&message_id=${messageId}`)
         .then(response => response.json())
         .then(data => {
             if (data.success) {
@@ -334,7 +334,7 @@ function sendReply(event) {
         return;
     }
     
-    fetch('seller-api.php', {
+    fetch('../api/seller.php', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -357,7 +357,7 @@ function sendReply(event) {
 }
 
 function markAsRead(messageId) {
-    fetch('seller-api.php', {
+    fetch('../api/seller.php', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -382,7 +382,7 @@ function markAsRead(messageId) {
 
 function archiveMessage(messageId) {
     showConfirm('Are you sure you want to archive this message?', () => {
-        fetch('seller-api.php', {
+        fetch('../api/seller.php', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
