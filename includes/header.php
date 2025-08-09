@@ -458,19 +458,19 @@ try {
     <div class="mobile-menu-content">
         <!-- Navigation Links -->
         <nav class="mobile-nav">
-            <a href="/orbix/public/" class="mobile-menu-item">
+            <a href="index.php" class="mobile-menu-item">
                 <i class="ri-home-line"></i>
                 <span>Home</span>
             </a>
-            <a href="/orbix/public/services.php" class="mobile-menu-item">
+            <a href="services.php" class="mobile-menu-item">
                 <i class="ri-service-line"></i>
                 <span>Services</span>
             </a>
-            <a href="/orbix/public/templates.php" class="mobile-menu-item">
+            <a href="templates.php" class="mobile-menu-item">
                 <i class="ri-layout-line"></i>
                 <span>Templates</span>
             </a>
-            <a href="/orbix/public/support.php" class="mobile-menu-item">
+            <a href="support.php" class="mobile-menu-item">
                 <i class="ri-customer-service-line"></i>
                 <span>Support</span>
             </a>
@@ -480,36 +480,36 @@ try {
         <div class="mobile-user-section">
             <?php if ($isLoggedIn && $userData): ?>
                 <div class="mobile-user-info">
-                    <img src="<?php echo htmlspecialchars($userData['profile_image'] ?? '/orbix/assets/images/default-avatar.png'); ?>" 
-                         alt="Avatar" class="mobile-avatar" onerror="this.src='/orbix/assets/images/default-avatar.png'">
+                    <img src="<?php echo htmlspecialchars($userData['profile_image'] ?? '../assets/images/default-avatar.png'); ?>" 
+                         alt="Avatar" class="mobile-avatar" onerror="this.src='../assets/images/default-avatar.png'">
                     <div class="mobile-user-details">
                         <span class="mobile-username"><?php echo htmlspecialchars($userData['username'] ?? $userData['first_name'] ?? 'User'); ?></span>
                         <span class="mobile-user-role"><?php echo $userData['user_type'] === 'seller' ? 'Seller' : 'Customer'; ?></span>
                     </div>
                 </div>
                 <div class="mobile-user-actions">
-                    <a href="/orbix/public/profile.php" class="mobile-menu-item">
+                    <a href="profile.php" class="mobile-menu-item">
                         <i class="ri-user-line"></i>
                         <span>Profile</span>
                     </a>
                     <?php if ($userData['user_type'] === 'seller'): ?>
-                        <a href="/orbix/public/seller-channel.php" class="mobile-menu-item">
+                        <a href="seller-channel.php" class="mobile-menu-item">
                             <i class="ri-store-line"></i>
                             <span>Seller Dashboard</span>
                         </a>
                     <?php endif; ?>
-                    <a href="/orbix/public/logout.php" class="mobile-menu-item text-red-500">
+                    <a href="logout.php" class="mobile-menu-item text-red-500">
                         <i class="ri-logout-line"></i>
                         <span>Logout</span>
                     </a>
                 </div>
             <?php else: ?>
                 <div class="mobile-auth-actions">
-                    <a href="/orbix/public/auth.php" class="mobile-menu-item">
+                    <a href="auth.php" class="mobile-menu-item">
                         <i class="ri-login-line"></i>
                         <span>Login</span>
                     </a>
-                    <a href="/orbix/public/auth.php?mode=register" class="mobile-menu-item">
+                    <a href="auth.php?mode=register" class="mobile-menu-item">
                         <i class="ri-user-add-line"></i>
                         <span>Register</span>
                     </a>
@@ -519,7 +519,7 @@ try {
 
         <!-- Cart Section -->
         <div class="mobile-cart-section">
-            <a href="/orbix/public/cart.php" class="mobile-menu-item">
+            <a href="cart.php" class="mobile-menu-item">
                 <i class="ri-shopping-cart-line"></i>
                 <span>Cart</span>
                 <?php 
