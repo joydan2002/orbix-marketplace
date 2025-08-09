@@ -894,7 +894,7 @@ try {
         
         async loadCartFromServer() {
             try {
-                const response = await fetch('../api/cart.php?action=get');
+                const response = await fetch('/api/cart.php?action=get');
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
@@ -930,7 +930,7 @@ try {
                 const formData = new FormData();
                 formData.append('template_id', item.id);
                 
-                const response = await fetch('../api/cart.php?action=add', {
+                const response = await fetch('/api/cart.php?action=add', {
                     method: 'POST',
                     body: formData
                 });
@@ -973,7 +973,7 @@ try {
                     formData.append('template_id', itemId);
                 }
                 
-                const response = await fetch('../api/cart.php?action=remove', {
+                const response = await fetch('/api/cart.php?action=remove', {
                     method: 'POST',
                     body: formData
                 });
@@ -999,7 +999,7 @@ try {
         
         async clearCart() {
             try {
-                const response = await fetch('../api/cart.php?action=clear', {
+                const response = await fetch('/api/cart.php?action=clear', {
                     method: 'POST'
                 });
                 
