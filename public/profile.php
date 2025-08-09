@@ -5,7 +5,7 @@
  */
 
 session_start();
-require_once '../config/database.php';
+require_once 'config/database.php';
 
 // Check if user is logged in
 if (!isset($_SESSION['user_id'])) {
@@ -22,13 +22,13 @@ try {
     // Get user information with stats
     $stmt = $pdo->prepare("
         SELECT u.*, 
-               COUNT(DISTINCT CASE WHEN u.user_type = 'seller' THEN t.id END) as total_templates,
-               COUNT(DISTINCT CASE WHEN u.user_type = 'seller' THEN s.id END) as total_services,
-               COUNT(DISTINCT o.id) as total_orders,
+               COALESCE(COUNT(DISTINCT CASE WHEN u.user_type = 'seller' THEN t.id END), 0) as total_templates,
+               COALESCE(COUNT(DISTINCT CASE WHEN u.user_type = 'seller' THEN s.id END), 0) as total_services,
+               COALESCE(COUNT(DISTINCT o.id), 0) as total_orders,
                COALESCE(SUM(CASE WHEN t.status = 'approved' AND u.user_type = 'seller' THEN t.downloads_count ELSE 0 END), 0) as total_downloads,
                COALESCE(AVG(CASE WHEN r.rating > 0 AND u.user_type = 'seller' THEN r.rating END), 0) as avg_rating,
-               COUNT(DISTINCT r.id) as total_reviews,
-               COUNT(DISTINCT f.id) as total_favorites
+               COALESCE(COUNT(DISTINCT r.id), 0) as total_reviews,
+               COALESCE(COUNT(DISTINCT f.id), 0) as total_favorites
         FROM users u
         LEFT JOIN templates t ON u.id = t.seller_id
         LEFT JOIN services s ON u.id = s.seller_id  
@@ -44,6 +44,20 @@ try {
     if (!$userData) {
         header('Location: auth.php');
         exit();
+    }
+    
+    // Ensure all stats have default values (safety net)
+    $userData['total_templates'] = $userData['total_templates'] ?? 0;
+    $userData['total_services'] = $userData['total_services'] ?? 0;
+    $userData['total_orders'] = $userData['total_orders'] ?? 0;
+    $userData['total_downloads'] = $userData['total_downloads'] ?? 0;
+    $userData['avg_rating'] = $userData['avg_rating'] ?? 0;
+    $userData['total_reviews'] = $userData['total_reviews'] ?? 0;
+    $userData['total_favorites'] = $userData['total_favorites'] ?? 0;
+    
+    // Helper function to safely format numbers
+    function safeNumberFormat($value, $decimals = 0) {
+        return number_format(floatval($value ?? 0), $decimals);
     }
     
     // Get recent activity based on user type
@@ -198,7 +212,7 @@ include '../includes/header.php';
                             <?php if ($userData['user_type'] === 'seller' && $userData['avg_rating'] > 0): ?>
                             <span class="status-badge bg-yellow-500/20 text-yellow-100 px-4 py-2 rounded-full text-sm font-medium">
                                 <i class="ri-star-fill mr-2"></i>
-                                <?= number_format($userData['avg_rating'], 1) ?> Rating
+                                <?= safeNumberFormat($userData['avg_rating'], 1) ?> Rating
                             </span>
                             <?php endif; ?>
                         </div>
@@ -234,7 +248,7 @@ include '../includes/header.php';
                     <div class="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-4">
                         <i class="ri-layout-grid-line text-2xl text-white"></i>
                     </div>
-                    <div class="text-3xl font-bold text-white mb-2 text-shadow"><?= number_format($userData['total_templates']) ?></div>
+                    <div class="text-3xl font-bold text-white mb-2 text-shadow"><?= safeNumberFormat($userData['total_templates']) ?></div>
                     <div class="text-white/80 text-sm font-medium">Templates</div>
                 </div>
                 
@@ -242,7 +256,7 @@ include '../includes/header.php';
                     <div class="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-4">
                         <i class="ri-tools-line text-2xl text-white"></i>
                     </div>
-                    <div class="text-3xl font-bold text-white mb-2 text-shadow"><?= number_format($userData['total_services']) ?></div>
+                    <div class="text-3xl font-bold text-white mb-2 text-shadow"><?= safeNumberFormat($userData['total_services']) ?></div>
                     <div class="text-white/80 text-sm font-medium">Services</div>
                 </div>
                 
@@ -250,7 +264,7 @@ include '../includes/header.php';
                     <div class="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-4">
                         <i class="ri-download-line text-2xl text-white"></i>
                     </div>
-                    <div class="text-3xl font-bold text-white mb-2 text-shadow"><?= number_format($userData['total_downloads']) ?></div>
+                    <div class="text-3xl font-bold text-white mb-2 text-shadow"><?= safeNumberFormat($userData['total_downloads']) ?></div>
                     <div class="text-white/80 text-sm font-medium">Downloads</div>
                 </div>
                 
@@ -258,7 +272,7 @@ include '../includes/header.php';
                     <div class="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-4">
                         <i class="ri-star-line text-2xl text-white"></i>
                     </div>
-                    <div class="text-3xl font-bold text-white mb-2 text-shadow"><?= number_format($userData['total_reviews']) ?></div>
+                    <div class="text-3xl font-bold text-white mb-2 text-shadow"><?= safeNumberFormat($userData['total_reviews']) ?></div>
                     <div class="text-white/80 text-sm font-medium">Reviews</div>
                 </div>
                 <?php else: ?>
@@ -267,7 +281,7 @@ include '../includes/header.php';
                     <div class="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-4">
                         <i class="ri-shopping-bag-line text-2xl text-white"></i>
                     </div>
-                    <div class="text-3xl font-bold text-white mb-2 text-shadow"><?= number_format($userData['total_orders']) ?></div>
+                    <div class="text-3xl font-bold text-white mb-2 text-shadow"><?= safeNumberFormat($userData['total_orders']) ?></div>
                     <div class="text-white/80 text-sm font-medium">Orders</div>
                 </div>
                 
@@ -275,7 +289,7 @@ include '../includes/header.php';
                     <div class="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-4">
                         <i class="ri-heart-line text-2xl text-white"></i>
                     </div>
-                    <div class="text-3xl font-bold text-white mb-2 text-shadow"><?= number_format($userData['total_favorites']) ?></div>
+                    <div class="text-3xl font-bold text-white mb-2 text-shadow"><?= safeNumberFormat($userData['total_favorites']) ?></div>
                     <div class="text-white/80 text-sm font-medium">Favorites</div>
                 </div>
                 
@@ -283,7 +297,7 @@ include '../includes/header.php';
                     <div class="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-4">
                         <i class="ri-download-line text-2xl text-white"></i>
                     </div>
-                    <div class="text-3xl font-bold text-white mb-2 text-shadow"><?= number_format($userData['total_downloads']) ?></div>
+                    <div class="text-3xl font-bold text-white mb-2 text-shadow"><?= safeNumberFormat($userData['total_downloads']) ?></div>
                     <div class="text-white/80 text-sm font-medium">Downloads</div>
                 </div>
                 
@@ -291,7 +305,7 @@ include '../includes/header.php';
                     <div class="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-4">
                         <i class="ri-star-line text-2xl text-white"></i>
                     </div>
-                    <div class="text-3xl font-bold text-white mb-2 text-shadow"><?= number_format($userData['total_reviews']) ?></div>
+                    <div class="text-3xl font-bold text-white mb-2 text-shadow"><?= safeNumberFormat($userData['total_reviews']) ?></div>
                     <div class="text-white/80 text-sm font-medium">Reviews Given</div>
                 </div>
                 <?php endif; ?>
@@ -334,7 +348,7 @@ include '../includes/header.php';
                                         </div>
                                         <div class="text-right">
                                             <div class="text-white font-bold text-shadow">
-                                                $<?= number_format($activity['amount'] ?? 0, 2) ?>
+                                                $<?= safeNumberFormat($activity['amount'] ?? 0, 2) ?>
                                             </div>
                                             <span class="status-badge <?= $activity['status'] === 'completed' ? 'status-completed' : 'status-pending' ?> px-3 py-1 rounded-full text-xs font-medium">
                                                 <?= ucfirst($activity['status'] ?? 'pending') ?>
@@ -442,7 +456,7 @@ include '../includes/header.php';
                             <div class="flex justify-between items-center">
                                 <span class="text-white/80">Products</span>
                                 <span class="text-white font-semibold text-shadow">
-                                    <?= $userData['total_templates'] + $userData['total_services'] ?>
+                                    <?= intval($userData['total_templates'] ?? 0) + intval($userData['total_services'] ?? 0) ?>
                                 </span>
                             </div>
                             <?php else: ?>
