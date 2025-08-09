@@ -127,7 +127,7 @@ switch ($path) {
         includeFromPublic('logout.php');
         break;
         
-    // API endpoints - redirect to new API structure
+    // API endpoints - serve directly from api folder
     case 'api.php':
     case 'public/api.php':
         require_once 'api/general.php';
@@ -148,13 +148,59 @@ switch ($path) {
         require_once 'api/auth.php';
         break;
         
+    case 'api/test.php':
+        require_once 'api/test.php';
+        break;
+        
     case 'user-profile-api.php':
     case 'public/user-profile-api.php':
         includeFromPublic('user-profile-api.php');
         break;
         
     default:
-        // Check if file exists in public directory
+        // Handle static assets (CSS, JS, images) - serve directly
+        $static_assets = ['assets/', 'css/', 'js/', 'images/', 'vendor/'];
+        $is_static = false;
+        foreach ($static_assets as $asset_dir) {
+            if (strpos($path, $asset_dir) === 0) {
+                $is_static = true;
+                break;
+            }
+        }
+        
+        if ($is_static) {
+            // Look for static files in public directory first, then root
+            $file_paths = ['public/' . $path, $path];
+            
+            foreach ($file_paths as $file_path) {
+                if (file_exists($file_path) && is_file($file_path)) {
+                    // Get file extension to set correct MIME type
+                    $ext = pathinfo($file_path, PATHINFO_EXTENSION);
+                    $mime_types = [
+                        'css' => 'text/css',
+                        'js' => 'application/javascript',
+                        'png' => 'image/png',
+                        'jpg' => 'image/jpeg',
+                        'jpeg' => 'image/jpeg',
+                        'gif' => 'image/gif',
+                        'svg' => 'image/svg+xml',
+                        'ico' => 'image/x-icon',
+                        'json' => 'application/json',
+                        'txt' => 'text/plain'
+                    ];
+                    
+                    if (isset($mime_types[$ext])) {
+                        header('Content-Type: ' . $mime_types[$ext]);
+                    }
+                    
+                    // Output the file content
+                    readfile($file_path);
+                    exit;
+                }
+            }
+        }
+        
+        // Check if file exists in public directory  
         $public_file = 'public/' . $path;
         if (file_exists($public_file) && is_file($public_file)) {
             // Include using our safe function

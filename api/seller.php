@@ -4,9 +4,9 @@
  * Handle seller-related operations
  */
 
-require_once '../config/database.php';
-require_once '../config/seller-manager.php';
-require_once '../config/cloudinary-service.php'; // Add Cloudinary support
+require_once __DIR__ . '/../config/database.php';
+require_once __DIR__ . '/../config/seller-manager.php';
+require_once __DIR__ . '/../config/cloudinary-service.php'; // Add Cloudinary support
 
 // Start session if not already started
 if (session_status() === PHP_SESSION_NONE) {
