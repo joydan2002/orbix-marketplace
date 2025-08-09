@@ -6,6 +6,7 @@
 
 session_start();
 require_once 'config/database.php';
+require_once 'config/user-manager.php';
 
 // Check if user is logged in
 if (!isset($_SESSION['user_id'])) {
@@ -18,8 +19,9 @@ $user_id = $_SESSION['user_id'];
 // Get database connection and user data
 try {
     $pdo = DatabaseConfig::getConnection();
+    $userManager = new UserManager($pdo);
     
-    // First, get basic user information
+    // Get basic user information
     $stmt = $pdo->prepare("SELECT * FROM users WHERE id = ?");
     $stmt->execute([$user_id]);
     $userData = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -29,122 +31,14 @@ try {
         exit();
     }
     
-    // Initialize all stats with default values
-    $userData['total_templates'] = 0;
-    $userData['total_services'] = 0;
-    $userData['total_orders'] = 0;
-    $userData['total_downloads'] = 0;
-    $userData['avg_rating'] = 0;
-    $userData['total_reviews'] = 0;
-    $userData['total_favorites'] = 0;
+    // Get comprehensive user statistics using UserManager
+    $stats = $userManager->getUserStats($user_id, $userData['user_type']);
     
-    // Get stats separately for better reliability
-    if ($userData['user_type'] === 'seller') {
-        // Get templates count with error handling
-        try {
-            $stmt = $pdo->prepare("SELECT COUNT(*) as count FROM templates WHERE seller_id = ?");
-            $stmt->execute([$user_id]);
-            $result = $stmt->fetch(PDO::FETCH_ASSOC);
-            $userData['total_templates'] = intval($result['count'] ?? 0);
-        } catch (Exception $e) {
-            $userData['total_templates'] = 0;
-        }
-        
-        // Get services count with error handling
-        try {
-            $stmt = $pdo->prepare("SELECT COUNT(*) as count FROM services WHERE seller_id = ?");
-            $stmt->execute([$user_id]);
-            $result = $stmt->fetch(PDO::FETCH_ASSOC);
-            $userData['total_services'] = intval($result['count'] ?? 0);
-        } catch (Exception $e) {
-            $userData['total_services'] = 0;
-        }
-        
-        // Get total downloads with error handling
-        try {
-            $stmt = $pdo->prepare("SELECT SUM(downloads_count) as total FROM templates WHERE seller_id = ? AND status = 'approved'");
-            $stmt->execute([$user_id]);
-            $result = $stmt->fetch(PDO::FETCH_ASSOC);
-            $userData['total_downloads'] = intval($result['total'] ?? 0);
-        } catch (Exception $e) {
-            $userData['total_downloads'] = 0;
-        }
-        
-        // Get reviews count and average rating with error handling
-        try {
-            $stmt = $pdo->prepare("
-                SELECT COUNT(r.id) as count, AVG(r.rating) as avg_rating 
-                FROM reviews r 
-                JOIN templates t ON r.template_id = t.id 
-                WHERE t.seller_id = ? AND r.rating > 0
-            ");
-            $stmt->execute([$user_id]);
-            $result = $stmt->fetch(PDO::FETCH_ASSOC);
-            $userData['total_reviews'] = intval($result['count'] ?? 0);
-            $userData['avg_rating'] = floatval($result['avg_rating'] ?? 0);
-        } catch (Exception $e) {
-            $userData['total_reviews'] = 0;
-            $userData['avg_rating'] = 0;
-        }
-    }
+    // Merge stats with user data
+    $userData = array_merge($userData, $stats);
     
-    // Get orders count (for both buyers and sellers) with error handling
-    try {
-        $stmt = $pdo->prepare("SELECT COUNT(*) as count FROM orders WHERE user_id = ?");
-        $stmt->execute([$user_id]);
-        $result = $stmt->fetch(PDO::FETCH_ASSOC);
-        $userData['total_orders'] = intval($result['count'] ?? 0);
-    } catch (Exception $e) {
-        $userData['total_orders'] = 0;
-    }
-    
-    // Get favorites count with error handling
-    try {
-        $stmt = $pdo->prepare("SELECT COUNT(*) as count FROM favorites WHERE user_id = ?");
-        $stmt->execute([$user_id]);
-        $result = $stmt->fetch(PDO::FETCH_ASSOC);
-        $userData['total_favorites'] = intval($result['count'] ?? 0);
-    } catch (Exception $e) {
-        $userData['total_favorites'] = 0;
-    }
-    
-    // Helper function to safely format numbers
-    function safeNumberFormat($value, $decimals = 0) {
-        return number_format(floatval($value ?? 0), $decimals);
-    }
-    
-    // Get recent activity based on user type
-    $recentActivity = [];
-    if ($userData['user_type'] === 'seller') {
-        // Get recent orders for seller
-        $stmt = $pdo->prepare("
-            SELECT 'order' as type, o.order_number as title, o.total_amount as amount, 
-                   o.status, o.created_at, CONCAT(u.first_name, ' ', u.last_name) as customer_name
-            FROM orders o
-            JOIN order_items oi ON o.id = oi.order_id
-            JOIN templates t ON oi.template_id = t.id
-            JOIN users u ON o.user_id = u.id
-            WHERE t.seller_id = ?
-            ORDER BY o.created_at DESC
-            LIMIT 5
-        ");
-        $stmt->execute([$user_id]);
-        $recentActivity = $stmt->fetchAll(PDO::FETCH_ASSOC);
-    } else {
-        // Get recent orders for buyer
-        $stmt = $pdo->prepare("
-            SELECT 'purchase' as type, t.title, o.total_amount as amount,
-                   o.status, o.created_at, o.order_number
-            FROM orders o
-            JOIN order_items oi ON o.id = oi.order_id
-            JOIN templates t ON oi.template_id = t.id
-            WHERE o.user_id = ?
-            ORDER BY o.created_at DESC
-            LIMIT 5
-        ");
-        $stmt->execute([$user_id]);
-        $recentActivity = $stmt->fetchAll(PDO::FETCH_ASSOC);
-    }
+    // Get recent activity
+    $recentActivity = $userManager->getRecentActivity($user_id, $userData['user_type'], 5);
     
 } catch (Exception $e) {
     error_log("Profile page error: " . $e->getMessage());
@@ -177,13 +71,18 @@ foreach ($requiredKeys as $key) {
     }
 }
 
-// Ensure basic user info exists
+// Ensure basic user info exists  
 $userData['first_name'] = $userData['first_name'] ?? 'User';
 $userData['last_name'] = $userData['last_name'] ?? '';
 $userData['email'] = $userData['email'] ?? ($_SESSION['user_email'] ?? '');
 $userData['user_type'] = $userData['user_type'] ?? ($_SESSION['user_type'] ?? 'buyer');
 $userData['created_at'] = $userData['created_at'] ?? date('Y-m-d H:i:s');
 $userData['email_verified'] = $userData['email_verified'] ?? 1;
+
+// Helper function to safely format numbers
+function safeNumberFormat($value, $decimals = 0) {
+    return number_format(floatval($value ?? 0), $decimals);
+}
 
 // Include header
 include '../includes/header.php';
