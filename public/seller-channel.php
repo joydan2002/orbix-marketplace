@@ -486,11 +486,12 @@ if (isset($_SESSION['user_id']) && $_SESSION['user_type'] !== 'seller') {
 }
 */
 
-try {
-    require_once '../config/database.php';
-} catch (Exception $e) {
-    die("Database connection failed: " . $e->getMessage());
-}
+// Database connection is already included above, no need to require again
+// try {
+//     require_once '../config/database.php';
+// } catch (Exception $e) {
+//     die("Database connection failed: " . $e->getMessage());
+// }
 
 // Check if config files exist before requiring them
 if (file_exists('../config/service-manager.php')) {

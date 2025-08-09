@@ -4,7 +4,10 @@
  * Contains the HTML header section with navigation
  */
 
-require_once __DIR__ . '/../config/database.php';
+// Include database config only if DatabaseConfig class doesn't exist yet
+if (!class_exists('DatabaseConfig')) {
+    require_once __DIR__ . '/../config/database.php';
+}
 
 // Start session if not already started
 if (session_status() === PHP_SESSION_NONE) {

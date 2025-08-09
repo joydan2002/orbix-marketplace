@@ -16,13 +16,14 @@ if (file_exists(__DIR__ . '/production-config.php')) {
     require_once __DIR__ . '/production-config.php';
 }
 
-class DatabaseConfig {
-    /**
-     * Get database configuration based on environment
-     */
-    /**
-     * Get database configuration based on environment
-     */
+if (!class_exists('DatabaseConfig')) {
+    class DatabaseConfig {
+        /**
+         * Get database configuration based on environment
+         */
+        /**
+         * Get database configuration based on environment
+         */
     private static function getDbConfig() {
         // Check Railway provided variables first
         $railwayHost = $_ENV['MYSQLHOST'] ?? getenv('MYSQLHOST');
@@ -145,5 +146,6 @@ class DatabaseConfig {
             return false;
         }
     }
+}
 }
 ?>
