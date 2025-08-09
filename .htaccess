@@ -6,17 +6,26 @@ RewriteCond %{HTTP:X-Forwarded-Proto} !https
 RewriteCond %{HTTPS} off
 RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
 
-# API routes - serve from api folder
+# API routes - serve from api folder with fallback to index.php
 RewriteCond %{REQUEST_URI} ^/api/
 RewriteCond %{REQUEST_FILENAME} -f
 RewriteRule ^ - [L]
 
-# Direct all requests to public folder if file doesn't exist in root
+# API fallback - if API file doesn't exist, redirect to index.php
+RewriteCond %{REQUEST_URI} ^/api/
+RewriteRule ^(.*)$ index.php [L]
+
+# Direct all other requests to public folder or index.php
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteCond %{REQUEST_URI} !^/public/
 RewriteCond %{REQUEST_URI} !^/api/
 RewriteRule ^(.*)$ public/$1 [L]
+
+# Final fallback to index.php
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^(.*)$ index.php [L]
 
 # Security headers
 <IfModule mod_headers.c>

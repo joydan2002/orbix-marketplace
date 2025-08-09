@@ -50,6 +50,23 @@ switch ($path) {
         includeFromPublic('index.php');
         break;
         
+    // API routes - serve directly from api folder
+    case 'api/auth.php':
+        require_once 'api/auth.php';
+        break;
+        
+    case 'api/cart.php':
+        require_once 'api/cart.php';
+        break;
+        
+    case 'api/general.php':
+        require_once 'api/general.php';
+        break;
+        
+    case 'api/seller.php':
+        require_once 'api/seller.php';
+        break;
+        
     case 'debug-assets.php':
         // Serve debug assets from root
         require_once 'debug-assets.php';
@@ -113,23 +130,23 @@ switch ($path) {
     // API endpoints - redirect to new API structure
     case 'api.php':
     case 'public/api.php':
-        header('Location: /api/general.php?' . $_SERVER['QUERY_STRING']);
-        exit;
+        require_once 'api/general.php';
+        break;
         
     case 'cart-api.php':
     case 'public/cart-api.php':
-        header('Location: /api/cart.php?' . $_SERVER['QUERY_STRING']);
-        exit;
+        require_once 'api/cart.php';
+        break;
         
     case 'seller-api.php':
     case 'public/seller-api.php':
-        header('Location: /api/seller.php?' . $_SERVER['QUERY_STRING']);
-        exit;
+        require_once 'api/seller.php';
+        break;
         
     case 'auth-handler.php':
     case 'public/auth-handler.php':
-        header('Location: /api/auth.php?' . $_SERVER['QUERY_STRING']);
-        exit;
+        require_once 'api/auth.php';
+        break;
         
     case 'user-profile-api.php':
     case 'public/user-profile-api.php':
