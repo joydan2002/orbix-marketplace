@@ -21,10 +21,14 @@ if ($debug) {
     echo "<h2>🔍 Railway Debug Info</h2>";
     echo "<p><strong>Request URI:</strong> " . htmlspecialchars($request_uri) . "</p>";
     echo "<p><strong>Path:</strong> " . htmlspecialchars($path) . "</p>";
+    echo "<p><strong>Query String:</strong> " . htmlspecialchars($_SERVER['QUERY_STRING'] ?? '') . "</p>";
     echo "<p><strong>Document Root:</strong> " . $_SERVER['DOCUMENT_ROOT'] . "</p>";
     echo "<p><strong>Script Name:</strong> " . $_SERVER['SCRIPT_NAME'] . "</p>";
     echo "<p><strong>HTTP Host:</strong> " . $_SERVER['HTTP_HOST'] . "</p>";
     echo "<p><strong>Current Working Dir:</strong> " . $original_cwd . "</p>";
+    echo "<p><strong>Request Method:</strong> " . $_SERVER['REQUEST_METHOD'] . "</p>";
+    echo "<p><strong>GET params:</strong> " . json_encode($_GET) . "</p>";
+    echo "<p><strong>POST params:</strong> " . json_encode($_POST) . "</p>";
     echo "<hr>";
 }
 
@@ -52,18 +56,23 @@ switch ($path) {
         
     // API routes - serve directly from api folder
     case 'api/auth.php':
+        // Preserve query parameters and pass to API
+        $_SERVER['QUERY_STRING'] = $_SERVER['QUERY_STRING'] ?? '';
         require_once 'api/auth.php';
         break;
         
     case 'api/cart.php':
+        $_SERVER['QUERY_STRING'] = $_SERVER['QUERY_STRING'] ?? '';
         require_once 'api/cart.php';
         break;
         
     case 'api/general.php':
+        $_SERVER['QUERY_STRING'] = $_SERVER['QUERY_STRING'] ?? '';
         require_once 'api/general.php';
         break;
         
     case 'api/seller.php':
+        $_SERVER['QUERY_STRING'] = $_SERVER['QUERY_STRING'] ?? '';
         require_once 'api/seller.php';
         break;
         
