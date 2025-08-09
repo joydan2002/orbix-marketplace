@@ -4,8 +4,9 @@
  * Loads all data needed for seller dashboard sections
  */
 
-require_once '../../config/database.php';
-require_once '../../config/cloudinary-config.php'; // Add Cloudinary support
+require_once __DIR__ . '/../config-helper.php';
+requireConfig('database.php');
+requireConfig('cloudinary-config.php'); // Add Cloudinary support
 
 // Check if user is logged in as seller
 session_start();

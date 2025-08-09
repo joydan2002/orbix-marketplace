@@ -371,7 +371,7 @@ document.getElementById('addProductForm').addEventListener('submit', function(e)
     submitBtn.innerHTML = '<i class="ri-loader-4-line mr-2 animate-spin"></i>Publishing...';
     submitBtn.disabled = true;
     
-    fetch('../api/seller.php', {
+    fetch('api/seller.php', {
         method: 'POST',
         body: formData
     })

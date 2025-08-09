@@ -5,8 +5,8 @@
  * Now with caching to prevent continuous loading
  */
 
-require_once '../config/database.php';
-require_once '../config/cloudinary-config.php'; // Add Cloudinary support
+require_once __DIR__ . "/../../config/database.php';
+require_once __DIR__ . "/../../config/cloudinary-config.php'; // Add Cloudinary support
 
 // Cache configuration
 $cache_file = '../cache/template-cards.json';

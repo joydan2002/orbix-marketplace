@@ -4,9 +4,12 @@
  * Contains the HTML header section with navigation
  */
 
+// Include config helper for path resolution
+require_once __DIR__ . '/../config-helper.php';
+
 // Include database config only if DatabaseConfig class doesn't exist yet
 if (!class_exists('DatabaseConfig')) {
-    require_once __DIR__ . '/../config/database.php';
+    requireConfig('database.php');
 }
 
 // Start session if not already started

@@ -336,7 +336,7 @@ function viewServiceAnalytics(serviceId) {
 
 function duplicateService(serviceId) {
     if (confirm('Are you sure you want to duplicate this service?')) {
-        fetch('../api/seller.php', {
+        fetch('api/seller.php', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -362,7 +362,7 @@ function duplicateService(serviceId) {
 function toggleServiceStatus(serviceId, currentStatus) {
     const newStatus = currentStatus === 'active' ? 'paused' : 'active';
     
-    fetch('../api/seller.php', {
+    fetch('api/seller.php', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -386,7 +386,7 @@ function toggleServiceStatus(serviceId, currentStatus) {
 
 function deleteService(serviceId) {
     if (confirm('Are you sure you want to delete this service? This action cannot be undone.')) {
-        fetch('../api/seller.php', {
+        fetch('api/seller.php', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

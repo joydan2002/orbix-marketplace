@@ -310,7 +310,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // Order management functions
 function updateOrderStatus(orderId, type, newStatus) {
-    fetch('../api/seller.php', {
+    fetch('api/seller.php', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

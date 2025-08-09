@@ -15,8 +15,9 @@ session_start();
 // Check if user is logged in and is a seller - if so, show dashboard
 if (isset($_SESSION['user_id']) && isset($_SESSION['user_type']) && $_SESSION['user_type'] === 'seller') {
     // User is logged in as seller, show dashboard
-    require_once '../config/database.php';
-    require_once '../config/cloudinary-config.php'; // Add Cloudinary support
+    require_once __DIR__ . '/config-helper.php';
+    requireConfig('database.php');
+    requireConfig('cloudinary-config.php'); // Add Cloudinary support
     require_once 'includes/header.php';
     
     // Get seller data

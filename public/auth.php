@@ -4,9 +4,10 @@
  * Modern UI with glassmorphism effects and Google OAuth integration
  */
 
-require_once '../config/database.php';
-require_once '../config/email-service.php';
-require_once '../config/asset-config.php';
+require_once __DIR__ . '/config-helper.php';
+requireConfig('database.php');
+requireConfig('email-service.php');
+requireConfig('asset-config.php');
 
 // Handle form submissions
 $mode = $_GET['mode'] ?? 'signin';

@@ -288,7 +288,7 @@ document.addEventListener('DOMContentLoaded', function() {
 // Review management functions
 function respondToReview(reviewId) {
     // Get review data and show response modal
-    fetch(`../api/seller.php?action=get_review&review_id=${reviewId}`)
+    fetch(`api/seller.php?action=get_review&review_id=${reviewId}`)
         .then(response => response.json())
         .then(data => {
             if (data.success) {
@@ -344,7 +344,7 @@ function submitResponse(event) {
         return;
     }
     
-    fetch('../api/seller.php', {
+    fetch('api/seller.php', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -373,7 +373,7 @@ function submitResponse(event) {
 
 function reportReview(reviewId) {
     if (confirm('Are you sure you want to report this review for inappropriate content?')) {
-        fetch('../api/seller.php', {
+        fetch('api/seller.php', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

@@ -9,9 +9,10 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-require_once __DIR__ . '/../config/database.php';
-require_once __DIR__ . '/../config/template-manager.php';
-require_once __DIR__ . '/../config/cloudinary-config.php'; // Add Cloudinary support
+require_once __DIR__ . '/config-helper.php';
+requireConfig('database.php');
+requireConfig('template-manager.php');
+requireConfig('cloudinary-config.php'); // Add Cloudinary support
 
 // Get database connection
 try {

@@ -476,7 +476,7 @@ function viewTemplateAnalytics(templateId) {
 
 function duplicateTemplate(templateId) {
     if (confirm('Are you sure you want to duplicate this template?')) {
-        fetch('../api/seller.php', {
+        fetch('api/seller.php', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -499,7 +499,7 @@ function duplicateTemplate(templateId) {
 }
 
 function downloadTemplate(templateId) {
-    window.open(`../api/seller.php?action=download_template&template_id=${templateId}`, '_blank');
+    window.open(`api/seller.php?action=download_template&template_id=${templateId}`, '_blank');
 }
 
 function shareTemplate(templateId) {
@@ -519,7 +519,7 @@ function shareTemplate(templateId) {
 
 function deleteTemplate(templateId) {
     if (confirm('Are you sure you want to delete this template? This action cannot be undone.')) {
-        fetch('../api/seller.php', {
+        fetch('api/seller.php', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
