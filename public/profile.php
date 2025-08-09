@@ -19,25 +19,8 @@ $user_id = $_SESSION['user_id'];
 try {
     $pdo = DatabaseConfig::getConnection();
     
-    // Get user information with stats
-    $stmt = $pdo->prepare("
-        SELECT u.*, 
-               COALESCE(COUNT(DISTINCT CASE WHEN u.user_type = 'seller' THEN t.id END), 0) as total_templates,
-               COALESCE(COUNT(DISTINCT CASE WHEN u.user_type = 'seller' THEN s.id END), 0) as total_services,
-               COALESCE(COUNT(DISTINCT o.id), 0) as total_orders,
-               COALESCE(SUM(CASE WHEN t.status = 'approved' AND u.user_type = 'seller' THEN t.downloads_count ELSE 0 END), 0) as total_downloads,
-               COALESCE(AVG(CASE WHEN r.rating > 0 AND u.user_type = 'seller' THEN r.rating END), 0) as avg_rating,
-               COALESCE(COUNT(DISTINCT r.id), 0) as total_reviews,
-               COALESCE(COUNT(DISTINCT f.id), 0) as total_favorites
-        FROM users u
-        LEFT JOIN templates t ON u.id = t.seller_id
-        LEFT JOIN services s ON u.id = s.seller_id  
-        LEFT JOIN orders o ON u.id = o.user_id
-        LEFT JOIN reviews r ON t.id = r.template_id
-        LEFT JOIN favorites f ON u.id = f.user_id
-        WHERE u.id = ?
-        GROUP BY u.id
-    ");
+    // First, get basic user information
+    $stmt = $pdo->prepare("SELECT * FROM users WHERE id = ?");
     $stmt->execute([$user_id]);
     $userData = $stmt->fetch(PDO::FETCH_ASSOC);
     
@@ -46,14 +29,84 @@ try {
         exit();
     }
     
-    // Ensure all stats have default values (safety net)
-    $userData['total_templates'] = $userData['total_templates'] ?? 0;
-    $userData['total_services'] = $userData['total_services'] ?? 0;
-    $userData['total_orders'] = $userData['total_orders'] ?? 0;
-    $userData['total_downloads'] = $userData['total_downloads'] ?? 0;
-    $userData['avg_rating'] = $userData['avg_rating'] ?? 0;
-    $userData['total_reviews'] = $userData['total_reviews'] ?? 0;
-    $userData['total_favorites'] = $userData['total_favorites'] ?? 0;
+    // Initialize all stats with default values
+    $userData['total_templates'] = 0;
+    $userData['total_services'] = 0;
+    $userData['total_orders'] = 0;
+    $userData['total_downloads'] = 0;
+    $userData['avg_rating'] = 0;
+    $userData['total_reviews'] = 0;
+    $userData['total_favorites'] = 0;
+    
+    // Get stats separately for better reliability
+    if ($userData['user_type'] === 'seller') {
+        // Get templates count with error handling
+        try {
+            $stmt = $pdo->prepare("SELECT COUNT(*) as count FROM templates WHERE seller_id = ?");
+            $stmt->execute([$user_id]);
+            $result = $stmt->fetch(PDO::FETCH_ASSOC);
+            $userData['total_templates'] = intval($result['count'] ?? 0);
+        } catch (Exception $e) {
+            $userData['total_templates'] = 0;
+        }
+        
+        // Get services count with error handling
+        try {
+            $stmt = $pdo->prepare("SELECT COUNT(*) as count FROM services WHERE seller_id = ?");
+            $stmt->execute([$user_id]);
+            $result = $stmt->fetch(PDO::FETCH_ASSOC);
+            $userData['total_services'] = intval($result['count'] ?? 0);
+        } catch (Exception $e) {
+            $userData['total_services'] = 0;
+        }
+        
+        // Get total downloads with error handling
+        try {
+            $stmt = $pdo->prepare("SELECT SUM(downloads_count) as total FROM templates WHERE seller_id = ? AND status = 'approved'");
+            $stmt->execute([$user_id]);
+            $result = $stmt->fetch(PDO::FETCH_ASSOC);
+            $userData['total_downloads'] = intval($result['total'] ?? 0);
+        } catch (Exception $e) {
+            $userData['total_downloads'] = 0;
+        }
+        
+        // Get reviews count and average rating with error handling
+        try {
+            $stmt = $pdo->prepare("
+                SELECT COUNT(r.id) as count, AVG(r.rating) as avg_rating 
+                FROM reviews r 
+                JOIN templates t ON r.template_id = t.id 
+                WHERE t.seller_id = ? AND r.rating > 0
+            ");
+            $stmt->execute([$user_id]);
+            $result = $stmt->fetch(PDO::FETCH_ASSOC);
+            $userData['total_reviews'] = intval($result['count'] ?? 0);
+            $userData['avg_rating'] = floatval($result['avg_rating'] ?? 0);
+        } catch (Exception $e) {
+            $userData['total_reviews'] = 0;
+            $userData['avg_rating'] = 0;
+        }
+    }
+    
+    // Get orders count (for both buyers and sellers) with error handling
+    try {
+        $stmt = $pdo->prepare("SELECT COUNT(*) as count FROM orders WHERE user_id = ?");
+        $stmt->execute([$user_id]);
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+        $userData['total_orders'] = intval($result['count'] ?? 0);
+    } catch (Exception $e) {
+        $userData['total_orders'] = 0;
+    }
+    
+    // Get favorites count with error handling
+    try {
+        $stmt = $pdo->prepare("SELECT COUNT(*) as count FROM favorites WHERE user_id = ?");
+        $stmt->execute([$user_id]);
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+        $userData['total_favorites'] = intval($result['count'] ?? 0);
+    } catch (Exception $e) {
+        $userData['total_favorites'] = 0;
+    }
     
     // Helper function to safely format numbers
     function safeNumberFormat($value, $decimals = 0) {
@@ -95,12 +148,16 @@ try {
     
 } catch (Exception $e) {
     error_log("Profile page error: " . $e->getMessage());
-    // Fallback data
+    // Fallback data with all required keys
     $userData = [
+        'id' => $user_id,
         'first_name' => 'User',
         'last_name' => '',
         'email' => $_SESSION['user_email'] ?? '',
         'user_type' => $_SESSION['user_type'] ?? 'buyer',
+        'created_at' => date('Y-m-d H:i:s'),
+        'email_verified' => 1,
+        'profile_image' => '',
         'total_templates' => 0,
         'total_services' => 0,
         'total_orders' => 0,
@@ -111,6 +168,22 @@ try {
     ];
     $recentActivity = [];
 }
+
+// Final safety check - ensure all required keys exist
+$requiredKeys = ['total_templates', 'total_services', 'total_orders', 'total_downloads', 'avg_rating', 'total_reviews', 'total_favorites'];
+foreach ($requiredKeys as $key) {
+    if (!isset($userData[$key])) {
+        $userData[$key] = 0;
+    }
+}
+
+// Ensure basic user info exists
+$userData['first_name'] = $userData['first_name'] ?? 'User';
+$userData['last_name'] = $userData['last_name'] ?? '';
+$userData['email'] = $userData['email'] ?? ($_SESSION['user_email'] ?? '');
+$userData['user_type'] = $userData['user_type'] ?? ($_SESSION['user_type'] ?? 'buyer');
+$userData['created_at'] = $userData['created_at'] ?? date('Y-m-d H:i:s');
+$userData['email_verified'] = $userData['email_verified'] ?? 1;
 
 // Include header
 include '../includes/header.php';
