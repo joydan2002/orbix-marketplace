@@ -40,7 +40,7 @@ try {
 }
 
 // Include header
-include '../includes/header.php';
+include 'includes/header.php';
 
 // Check for logout success message
 $showLogoutSuccess = isset($_GET['logout']) && $_GET['logout'] === 'success';
@@ -198,9 +198,9 @@ $showLoginSuccess = isset($_GET['login']) && $_GET['login'] === 'success';
     </div>
 </section>
 
-<?php include '../includes/service-cards.php'; ?>
+<?php include 'includes/service-cards.php'; ?>
 
-<?php include '../includes/testimonials.php'; ?>
+<?php include 'includes/testimonials.php'; ?>
 
 <!-- CTA Section -->
 <section class="py-16 sm:py-20 bg-white">
@@ -870,4 +870,4 @@ document.addEventListener('DOMContentLoaded', initResponsiveUtilities);
 </style>
 </script>
 
-<?php include '../includes/footer.php'; ?>
+<?php include 'includes/footer.php'; ?>

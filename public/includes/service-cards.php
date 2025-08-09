@@ -1,15 +1,11 @@
 <?php
 /**
- * Service Cards Display - New Design with Database In                               alt="<?php echo htmlspecialchars($service['title']); ?>" 
-                             class="w-full h-full object-cover rounded-lg"
-                             onerror="this.onerror=null; this.src='../assets/images/default-service.jpg'; this.parentElement.innerHTML='<i class=\'ri-service-line text-2xl text-primary\'></i>';";                        alt="<?php echo htmlspecialchars($service['title']); ?>" 
-                             class="w-full h-full object-cover rounded-lg"
-                             onerror="this.onerror=null; this.src='../assets/images/default-service.jpg'; this.parentElement.innerHTML='<i class=\'ri-service-line text-2xl text-primary\'></i>';";ration
+ * Service Cards Display - New Design with Database Integration
  * Uses modern design from backup with orange theme and English translation
  */
 
 // Include Cloudinary service for image handling
-require_once '../config/cloudinary-service.php';
+require_once __DIR__ . '/../../config/cloudinary-service.php';
 
 // Get services from database
 try {
@@ -58,7 +54,7 @@ try {
                 
                 // Fallback to default image if no preview image or Cloudinary fails
                 if (empty($serviceImage)) {
-                    $serviceImage = '../assets/images/default-service.jpg';
+                    $serviceImage = 'assets/images/default-service.jpg';
                 }
                 ?>
                 
@@ -68,7 +64,7 @@ try {
                         <img src="<?php echo htmlspecialchars($serviceImage); ?>" 
                              alt="<?php echo htmlspecialchars($service['title']); ?>" 
                              class="w-full h-full object-cover rounded-lg"
-                             onerror="this.onerror=null; this.src='/assets/images/default-service.jpg'; this.parentElement.innerHTML='<i class=\'ri-service-line text-2xl text-primary\'></i>';">
+                             onerror="this.onerror=null; this.src='assets/images/default-service.jpg'; this.parentElement.innerHTML='<i class=\'ri-service-line text-2xl text-primary\'></i>';">
                     <?php else: ?>
                         <i class="<?php echo !empty($service['icon']) ? htmlspecialchars($service['icon']) : 'ri-service-line'; ?> text-2xl text-primary"></i>
                     <?php endif; ?>

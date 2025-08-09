@@ -17,7 +17,7 @@ if (isset($_SESSION['user_id']) && isset($_SESSION['user_type']) && $_SESSION['u
     // User is logged in as seller, show dashboard
     require_once '../config/database.php';
     require_once '../config/cloudinary-config.php'; // Add Cloudinary support
-    require_once '../includes/header.php';
+    require_once 'includes/header.php';
     
     // Get seller data
     $seller_id = $_SESSION['user_id'];
@@ -465,7 +465,7 @@ if (isset($_SESSION['user_id']) && isset($_SESSION['user_type']) && $_SESSION['u
     </script>
     
     <?php
-    require_once '../includes/footer.php';
+    require_once 'includes/footer.php';
     exit(); // Exit here to prevent showing the intro page
 }
 
@@ -584,7 +584,7 @@ if (empty($topSellers)) {
 }
 
 // Include the common header
-require_once '../includes/header.php';
+require_once 'includes/header.php';
 ?>
 
 <!-- Seller Channel Specific Styles -->
@@ -996,7 +996,7 @@ require_once '../includes/header.php';
     </section>
 </main>
 
-<?php require_once '../includes/footer.php'; ?>
+<?php require_once 'includes/footer.php'; ?>
 
 <!-- Enhanced JavaScript for interactions -->
 <script>

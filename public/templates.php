@@ -118,7 +118,7 @@ $technologies = $templateManager->getTechnologyFilters();
 </head>
 <body class="font-inter gradient-bg min-h-screen">
     <!-- Header -->
-    <?php include '../includes/header.php'; ?>
+    <?php include 'includes/header.php'; ?>
 
     <!-- Breadcrumb -->
     <section class="pt-24 pb-6">
@@ -523,7 +523,7 @@ $technologies = $templateManager->getTechnologyFilters();
     </section>
 
     <!-- Footer -->
-    <?php include '../includes/footer.php'; ?>
+    <?php include 'includes/footer.php'; ?>
 
     <script>
         // Toast Notification System - Inline version to ensure availability

@@ -69,7 +69,7 @@ if ($templates):
                          alt="<?php echo htmlspecialchars($template['title']); ?>" 
                          class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                          loading="lazy"
-                         onerror="this.src='../assets/images/fallbacks/<?php echo $template['category_slug'] ?? 'business'; ?>-fallback.svg'">
+                         onerror="this.src='assets/images/fallbacks/<?php echo $template['category_slug'] ?? 'business'; ?>-fallback.svg'">
                 <?php else: ?>
                     <div class="w-full h-full flex items-center justify-center bg-gradient-to-br from-orange-100 to-orange-200">
                         <i class="<?php echo htmlspecialchars($template['category_icon'] ?? 'ri-image-line'); ?> text-4xl text-orange-500"></i>

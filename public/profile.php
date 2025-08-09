@@ -81,7 +81,7 @@ $userData['created_at'] = $userData['created_at'] ?? date('Y-m-d H:i:s');
 $userData['email_verified'] = $userData['email_verified'] ?? 1;
 
 // Include header
-include __DIR__ . '/../includes/header.php';
+include 'includes/header.php';
 ?>
 
 <!DOCTYPE html>
@@ -449,6 +449,6 @@ include __DIR__ . '/../includes/header.php';
         </div>
     </div>
 
-    <?php include __DIR__ . '/../includes/footer.php'; ?>
+    <?php include 'includes/footer.php'; ?>
 </body>
 </html>

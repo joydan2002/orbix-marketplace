@@ -111,7 +111,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_contact'])) {
 </head>
 <body class="font-inter gradient-bg min-h-screen">
     <!-- Header -->
-    <?php include '../includes/header.php'; ?>
+    <?php include 'includes/header.php'; ?>
 
     <!-- Hero Section -->
     <section class="hero-section pt-24 pb-16 lg:pt-24 lg:pb-16 md:pt-20 md:pb-12 sm:pt-16 sm:pb-8 relative overflow-hidden">
@@ -414,7 +414,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_contact'])) {
     </section>
 
     <!-- Footer -->
-    <?php include '../includes/footer.php'; ?>
+    <?php include 'includes/footer.php'; ?>
 
     <script>
         // FAQ Toggle functionality

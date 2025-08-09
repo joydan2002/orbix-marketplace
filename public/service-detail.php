@@ -70,7 +70,7 @@ if (!empty($service['preview_image'])) {
 
 // Ensure we have at least one image
 if (empty($images)) {
-    $images[] = getOptimizedImageUrl('/orbix/public/assets/images/default-service.jpg', 'large');
+    $images[] = getOptimizedImageUrl('assets/images/default-service.jpg', 'large');
 }
 
 // Get service tags
@@ -127,7 +127,7 @@ function formatDeliveryTime($deliveryTime) {
 }
 
 // Optimize profile image
-$service['profile_image'] = getOptimizedImageUrl($service['profile_image'] ?? '/orbix/public/assets/images/default-avatar.png', 'avatar');
+$service['profile_image'] = getOptimizedImageUrl($service['profile_image'] ?? 'assets/images/default-avatar.png', 'avatar');
 $service['preview_image_optimized'] = getOptimizedImageUrl($service['preview_image'], 'large');
 $service['delivery_time_formatted'] = formatDeliveryTime($service['delivery_time']);
 ?>
@@ -165,7 +165,7 @@ $service['delivery_time_formatted'] = formatDeliveryTime($service['delivery_time
 </head>
 <body class="font-inter gradient-bg min-h-screen">
     <!-- Header -->
-    <?php include '../includes/header.php'; ?>
+    <?php include 'includes/header.php'; ?>
 
     <!-- Hero Section with Service Info -->
     <section class="pt-24 pb-12 lg:pt-24 lg:pb-12 md:pt-20 md:pb-8 sm:pt-16 sm:pb-6">
@@ -439,7 +439,7 @@ $service['delivery_time_formatted'] = formatDeliveryTime($service['delivery_time
                     </div>
                     <div class="p-6 lg:p-6 md:p-4 sm:p-3">
                         <div class="flex items-center space-x-2 lg:space-x-2 md:space-x-1 sm:space-x-1 mb-3 lg:mb-3 md:mb-2 sm:mb-2">
-                            <img src="<?= htmlspecialchars(getOptimizedImageUrl($related['profile_image'] ?? '/orbix/public/assets/images/default-avatar.png', 'avatar')) ?>" alt="<?= htmlspecialchars($related['seller_name']) ?>" class="w-6 h-6 lg:w-6 lg:h-6 md:w-5 md:h-5 sm:w-4 sm:h-4 rounded-full object-cover">
+                            <img src="<?= htmlspecialchars(getOptimizedImageUrl($related['profile_image'] ?? 'assets/images/default-avatar.png', 'avatar')) ?>" alt="<?= htmlspecialchars($related['seller_name']) ?>" class="w-6 h-6 lg:w-6 lg:h-6 md:w-5 md:h-5 sm:w-4 sm:h-4 rounded-full object-cover">
                             <span class="text-sm lg:text-sm md:text-xs sm:text-xs text-gray-600 font-medium"><?= htmlspecialchars($related['seller_name']) ?></span>
                         </div>
                         <h4 class="text-xl lg:text-xl md:text-lg sm:text-base font-bold text-secondary mb-2 lg:mb-2 md:mb-1 sm:mb-1"><?= htmlspecialchars($related['title']) ?></h4>
@@ -475,7 +475,7 @@ $service['delivery_time_formatted'] = formatDeliveryTime($service['delivery_time
     <?php endif; ?>
 
     <!-- Footer -->
-    <?php include '../includes/footer.php'; ?>
+    <?php include 'includes/footer.php'; ?>
 
     <script>
         // Change main image

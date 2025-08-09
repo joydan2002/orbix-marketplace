@@ -89,7 +89,7 @@ if (!empty($template['preview_image'])) {
 
 // Ensure we have at least one image
 if (empty($images)) {
-    $images[] = getOptimizedImageUrl('/orbix/public/assets/images/default-template.jpg', 'large');
+    $images[] = getOptimizedImageUrl('assets/images/default-template.jpg', 'large');
 }
 
 // Get template tags
@@ -116,7 +116,7 @@ if (!empty($template['features'])) {
 
 // Set default values for missing fields with optimized images
 $template['seller_name'] = $template['seller_name'] ?? 'Unknown';
-$template['profile_image'] = getOptimizedImageUrl($template['profile_image'] ?? '/orbix/public/assets/images/default-avatar.png', 'avatar');
+$template['profile_image'] = getOptimizedImageUrl($template['profile_image'] ?? 'assets/images/default-avatar.png', 'avatar');
 $template['preview_image_optimized'] = getOptimizedImageUrl($template['preview_image'], 'large');
 $template['avg_rating'] = $template['avg_rating'] ?? 4.5;
 $template['review_count'] = $template['review_count'] ?? 0;
@@ -161,7 +161,7 @@ $template['category_slug'] = $template['category_slug'] ?? 'general';
 </head>
 <body class="font-inter gradient-bg min-h-screen">
     <!-- Header -->
-    <?php include '../includes/header.php'; ?>
+    <?php include 'includes/header.php'; ?>
 
     <!-- Hero Section with Template Info -->
     <section class="pt-24 pb-12">
@@ -473,7 +473,7 @@ $template['category_slug'] = $template['category_slug'] ?? 'general';
     <?php endif; ?>
 
     <!-- Footer -->
-    <?php include '../includes/footer.php'; ?>
+    <?php include 'includes/footer.php'; ?>
 
     <script>
         // Change main image

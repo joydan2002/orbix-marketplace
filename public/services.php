@@ -151,7 +151,7 @@ $deliveryTimes = $serviceManager->getDeliveryTimeFilters();
 </head>
 <body class="font-inter gradient-bg min-h-screen">
     <!-- Header -->
-    <?php include '../includes/header.php'; ?>
+    <?php include 'includes/header.php'; ?>
 
     <!-- Breadcrumb -->
     <section class="pt-24 pb-6">
@@ -550,7 +550,7 @@ $deliveryTimes = $serviceManager->getDeliveryTimeFilters();
     </section>
 
     <!-- Footer -->
-    <?php include '../includes/footer.php'; ?>
+    <?php include 'includes/footer.php'; ?>
 
     <script>
         // Global variables

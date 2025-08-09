@@ -104,7 +104,7 @@ $total = $subtotal + $tax;
 </head>
 <body class="font-inter gradient-bg min-h-screen">
     <!-- Header -->
-    <?php include '../includes/header.php'; ?>
+    <?php include 'includes/header.php'; ?>
 
     <!-- Checkout Content -->
     <section class="pt-24 pb-16">
@@ -313,7 +313,7 @@ $total = $subtotal + $tax;
     </section>
 
     <!-- Footer -->
-    <?php include '../includes/footer.php'; ?>
+    <?php include 'includes/footer.php'; ?>
 
     <script>
         function selectPaymentMethod(element, method) {
